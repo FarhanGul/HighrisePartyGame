@@ -1,16 +1,14 @@
-
---!SerializeField
-local myNumber : number = 0
-
 --!SerializeField
 local diceTapHandler : TapHandler = nil
+--!SerializeField
+local boardGameObject : GameObject = nil
+local board
 
 -- Client
 function self:ClientAwake()
-
+    board = boardGameObject:GetComponent("Board")
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function() 
-        print("Object Tapped")
-        print(math.random(1,6))
+        board.Move(math.random(1,6))
     end)
 
     client.PlayerConnected:Connect(function(player)
