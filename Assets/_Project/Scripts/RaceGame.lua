@@ -8,6 +8,7 @@ local board
 function self:ClientAwake()
     board = boardGameObject:GetComponent("Board")
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function() 
+        
         board.Move(math.random(1,6))
     end)
 
