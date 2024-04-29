@@ -13,6 +13,16 @@
     font-size: 36px;
 }
 
+#username_1
+{
+    color: #07A5C7;
+}
+
+#username_2
+{
+    color: #D46175;
+}
+
 .turn-indicator{
     width: 32px;
     height: 32px;

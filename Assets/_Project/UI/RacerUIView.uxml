@@ -9,14 +9,14 @@
   <hr:UILuaView class="racer-u-i-view">
     <!-- TODO: Replace test names -->
     <VisualElement name="usernames" class="usernames">
-      <VisualElement name="player_1" class="username-block">
-        <VisualElement name="t_1" class="turn-indicator"/>
-        <hr:UILabel name="l_1" class="username"/>
+      <VisualElement name="userblock_1" class="username-block">
+        <VisualElement name="turn_indicator_1" class="turn-indicator"/>
+        <hr:UILabel name="username_1" class="username"/>
       </VisualElement>
 
-      <VisualElement name="player_2" class="username-block">
-        <VisualElement name="t_2" class="turn-indicator"/>
-        <hr:UILabel name="l_2" class="username"/>
+      <VisualElement name="userblock_2" class="username-block">
+        <VisualElement name="turn_indicator_2" class="turn-indicator"/>
+        <hr:UILabel name="username_2" class="username"/>
       </VisualElement>
     </VisualElement>
 
