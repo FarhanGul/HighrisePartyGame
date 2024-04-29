@@ -21,7 +21,7 @@ local view : GameObject = nil
 --Events
 local e_fetchGameStateFromServer = Event.new("fetchGameStateFromServer")
 local e_sendGameStateToClient = Event.new("sendGameStateToClient")
-local e_sendRollToClient = Event.new("sendRollToClient")
+local e_propogateRollToClients = Event.new("propogateRollToClients")
 local e_sendRollToServer = Event.new("sendRollToServer")
 --
 
@@ -32,23 +32,28 @@ local gameState = GameState.waitingForPlayers
 --
 
 function self:ClientAwake()
-    board = boardGameObject:GetComponent("Board")
-    diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        e_sendRollToServer:FireServer(math.random(1,6)) 
+    client.PlayerConnected:Connect(function(player)
+        -- print("Player Connected"..tostring(player.isLocal))
+        if (player.isLocal) then
+            board = boardGameObject:GetComponent("Board")
+            diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
+                e_sendRollToServer:FireServer(players[player].id ,math.random(1,6)) 
+            end)
+            e_sendGameStateToClient:Connect(function(newPlayers)
+                players = newPlayers
+                HandlePlayersUpdated()
+            end)
+            e_propogateRollToClients:Connect(function(id, roll)
+                board.Move(piecesGameObject.transform:GetChild(id-1).gameObject,roll)
+            end)
+        end
+        e_fetchGameStateFromServer:FireServer()
     end)
-    e_sendGameStateToClient:Connect(function(newPlayers)
-        players = newPlayers
-        HandlePlayersUpdated()
-    end)
-    e_sendRollToClient:Connect(function(roll)
-        board.Move(roll)
-    end)
-    e_fetchGameStateFromServer:FireServer()
 end
 
 function self:ServerAwake()
     server.PlayerConnected:Connect(function(player)
-        print(player.name .. " connected to the world on this client")
+        -- print(player.name .. " connected to the world on this client")
         local nextAvailableId = GetNextAvailableId()
         if(nextAvailableId ~= nil) -- Disable greater than two players for now, need to address this later with matchmaking
         then
@@ -63,7 +68,7 @@ function self:ServerAwake()
     end)
 
     server.PlayerDisconnected:Connect(function(player)
-        print(player.name .. " disconnected from the world on this client")
+        -- print(player.name .. " disconnected from the world on this client")
         players[player] = nil
         e_sendGameStateToClient:FireAllClients(players)
     end)
@@ -72,12 +77,13 @@ function self:ServerAwake()
         e_sendGameStateToClient:FireAllClients(players)
     end)
 
-    e_sendRollToServer:Connect(function(player, roll)
-        e_sendRollToClient:FireAllClients(roll)
+    e_sendRollToServer:Connect(function(player,id, roll)
+        e_propogateRollToClients:FireAllClients(id,roll)
     end)
 end
 
 function HandlePlayersUpdated()
+    -- print("Handle Players Updated")
     for i=1,2 do
         view:GetComponent("RacerUIView").SetPlayer(i,GetPlayerWithId(i))
     end
@@ -86,21 +92,19 @@ function HandlePlayersUpdated()
     for i=0,piecesGameObject.transform.childCount-1,1 do
         piecesGameObject.transform:GetChild(i).gameObject:SetActive(GetPlayerWithId(i+1) ~= nil )
     end
-    if(GetPlayersCount() == 2)
-    then
+    if(GetPlayersCount() == 2) then
         StartGame()
-    elseif(#players == 1)
-    then
+    elseif(GetPlayersCount() == 1) then
         ResetGame()
     end
 end
 
 function ResetGame()
-    -- Reset board pieces
+    print("Reset Game")
 end
 
 function StartGame()
-    
+    print("Start Game")
 end
 
 
@@ -125,7 +129,6 @@ function GetPlayerWithId(id)
     return nil
 end
 
--- TODO:  Replace this with #players
 function GetPlayersCount()
     local c = 0
     for k,v in pairs(players) do

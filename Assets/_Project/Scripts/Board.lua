@@ -1,7 +1,5 @@
---!SerializeField
-local piece : GameObject = nil
 local tiles = {}
-local location = 0
+local location = {}
 --!SerializeField
 local dice : GameObject = nil
 
@@ -12,21 +10,24 @@ function self:Start()
     end
 end
 
-function Move(roll)
-    print(roll)
+function Move(piece,roll)
+    -- print(roll)
     _DiceAnimation(roll)
-    _MovePiece(roll)
+    _MovePiece(piece,roll)
 end
 
-function _MovePiece(amount)
-    if( location >= #tiles or amount == 0 )
+function _MovePiece(piece, amount)
+    if( location[piece] == nil) then
+        location[piece] = 0
+    end
+    if( location[piece] >= #tiles or amount == 0 )
     then
         return
     end
-    location += 1
-    piece.transform.position = tiles[location].transform.position
+    location[piece] += 1
+    piece.transform.position = tiles[location[piece]].transform.position
     amount -= 1
-    local newTimer = Timer.new(0.25,function() _MovePiece(amount) end,false)
+    local newTimer = Timer.new(0.25,function() _MovePiece(piece, amount) end,false)
 end
 
 function _DiceAnimation(randomFace)
