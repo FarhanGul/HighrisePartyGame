@@ -1,0 +1,20 @@
+.usernames
+{
+    padding-left: 5%;
+    padding-top: 25%;
+}
+
+.username-block{
+    display: flex;
+    flex-direction: row;
+}
+
+.username{
+    font-size: 36px;
+}
+
+.turn-indicator{
+    width: 32px;
+    height: 32px;
+    background-image: resource("TurnIndicator");
+}

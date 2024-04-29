@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:hr="Highrise.UI"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+  <hr:UILuaView class="racer-u-i-view">
+
+    <VisualElement class="usernames">
+      <VisualElement class="username-block">
+        <VisualElement class="turn-indicator"/>
+        <hr:UILabel name="_player_1" class="username"/>
+      </VisualElement>
+
+      <VisualElement class="username-block">
+        <VisualElement class="turn-indicator"/>
+        <hr:UILabel name="_player_2" class="username"/>
+      </VisualElement>
+    </VisualElement>
+
+  </hr:UILuaView>
+
+</UXML>

@@ -4,8 +4,11 @@ local tiles = {}
 local location = 0
 --!SerializeField
 local dice : GameObject = nil
+--!SerializeField
+local view : GameObject = nil
 
 function self:Start()
+    view:GetComponent("RacerUIView").Test()
     for i = 0,self.transform.childCount-1,1
     do 
         tiles[i]= self.transform.GetChild(self.transform,i).gameObject;

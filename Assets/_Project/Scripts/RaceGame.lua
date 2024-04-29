@@ -1,23 +1,34 @@
+--Enums
+local GameState = {
+    waitingForPlayers = 1,
+    playing = 2,
+}
+--
+
+--Public Fields
 --!SerializeField
 local waitingForPlayerUI : GameObject = nil
 --!SerializeField
 local diceTapHandler : TapHandler = nil
 --!SerializeField
 local boardGameObject : GameObject = nil
-local board
---Game States
-local waitingForPlayers = 0
-local playing = 1
+--!SerializeField
+local piecesGameObject : GameObject = nil
 --
-local gameState = waitingForPlayers
+
 --Events
 local e_fetchGameStateFromServer = Event.new("fetchGameStateFromServer")
 local e_sendGameStateToClient = Event.new("sendGameStateToClient")
 local e_sendRollToClient = Event.new("sendRollToClient")
 local e_sendRollToServer = Event.new("sendRollToServer")
 --
-local players = {}
 
+--Private Variables
+local players = {}
+local playerWhoseTurnItIs
+local board
+local gameState = GameState.waitingForPlayers
+--
 
 function self:ClientAwake()
     board = boardGameObject:GetComponent("Board")
@@ -37,13 +48,19 @@ end
 function self:ServerAwake()
     server.PlayerConnected:Connect(function(player)
         print(player.name .. " connected to the world on this client")
-        table.insert(players,player)
-        e_sendGameStateToClient:FireAllClients(players)
+        local nextAvailableId = GetNextAvailableId()
+        if(nextAvailableId ~= nil) -- Disable greater than two players for now, need to address this later with matchmaking
+        then
+            players[player] = nextAvailableId
+            for k,v in pairs(players) do
+            end
+            e_sendGameStateToClient:FireAllClients(players)
+        end
     end)
 
     server.PlayerDisconnected:Connect(function(player)
         print(player.name .. " disconnected from the world on this client")
-        table.remove(players,table.find(players, player))
+        players[player] = nil
         e_sendGameStateToClient:FireAllClients(players)
     end)
 
@@ -57,5 +74,54 @@ function self:ServerAwake()
 end
 
 function HandlePlayersUpdated()
-    waitingForPlayerUI.SetActive(waitingForPlayerUI,#players == 1)
+    print(GetPlayersCount())
+    waitingForPlayerUI.SetActive(waitingForPlayerUI,GetPlayersCount() == 1)
+    for i=0,piecesGameObject.transform.childCount-1,1 do
+        piecesGameObject.transform:GetChild(i).gameObject:SetActive(PlayersHasId(i+1))
+    end
+    if(GetPlayersCount() == 2)
+    then
+        StartGame()
+    elseif(#players == 1)
+    then
+        ResetGame()
+    end
+end
+
+function ResetGame()
+    -- Reset board pieces
+end
+
+function StartGame()
+    
+end
+
+
+function GetNextAvailableId()
+    local availableIds = {1,2}
+    for k,v in pairs(players) do
+        table.remove(availableIds,v)
+    end
+    if (#availableIds == 0) then
+        return nil
+    else 
+        return availableIds[1]
+    end
+end
+
+function PlayersHasId(id)
+    for k,v in pairs(players) do
+        if(v == id) then
+            return true
+        end
+    end
+    return false
+end
+
+function GetPlayersCount()
+    local c = 0
+    for k,v in pairs(players) do
+            c+=1
+    end
+    return c
 end
