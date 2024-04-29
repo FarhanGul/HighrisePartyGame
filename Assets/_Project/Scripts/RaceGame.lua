@@ -37,7 +37,9 @@ function self:ClientAwake()
         if (player.isLocal) then
             board = boardGameObject:GetComponent("Board")
             diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-                e_sendRollToServer:FireServer(players[player].id ,math.random(1,6)) 
+                if(players[player].isTurn) then
+                    e_sendRollToServer:FireServer(players[player].id ,math.random(1,6)) 
+                end
             end)
             e_sendGameStateToClient:Connect(function(newPlayers)
                 players = newPlayers
@@ -45,6 +47,9 @@ function self:ClientAwake()
             end)
             e_propogateRollToClients:Connect(function(id, roll)
                 board.Move(piecesGameObject.transform:GetChild(id-1).gameObject,roll)
+                GetPlayerWithId(id).isTurn = false
+                GetPlayerWithId(GetNextId((id))).isTurn = true
+                UpdateHUD()
             end)
         end
         e_fetchGameStateFromServer:FireServer()
@@ -61,7 +66,8 @@ function self:ServerAwake()
             players[player].id = nextAvailableId
             players[player].isTurn = false
             players[player].player = player
-            for k,v in pairs(players) do
+            if(GetPlayersCount()==2) then
+                players[GetPlayerWithId(math.random(1,2)).player].isTurn = true
             end
             e_sendGameStateToClient:FireAllClients(players)
         end
@@ -84,10 +90,7 @@ end
 
 function HandlePlayersUpdated()
     -- print("Handle Players Updated")
-    for i=1,2 do
-        view:GetComponent("RacerUIView").SetPlayer(i,GetPlayerWithId(i))
-    end
-
+    UpdateHUD()
     waitingForPlayerUI.SetActive(waitingForPlayerUI,GetPlayersCount() == 1)
     for i=0,piecesGameObject.transform.childCount-1,1 do
         piecesGameObject.transform:GetChild(i).gameObject:SetActive(GetPlayerWithId(i+1) ~= nil )
@@ -100,13 +103,19 @@ function HandlePlayersUpdated()
 end
 
 function ResetGame()
-    print("Reset Game")
+    -- print("Reset Game")
 end
 
 function StartGame()
     print("Start Game")
+    
 end
 
+function UpdateHUD()
+    for i=1,2 do
+        view:GetComponent("RacerUIView").SetPlayer(i,GetPlayerWithId(i))
+    end
+end
 
 function GetNextAvailableId()
     local availableIds = {1,2}
@@ -118,6 +127,10 @@ function GetNextAvailableId()
     else 
         return availableIds[1]
     end
+end
+
+function GetNextId(id)
+    if id == 1 then return 2 else return 1 end
 end
 
 function GetPlayerWithId(id)
