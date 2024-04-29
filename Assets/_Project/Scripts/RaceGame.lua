@@ -14,6 +14,8 @@ local diceTapHandler : TapHandler = nil
 local boardGameObject : GameObject = nil
 --!SerializeField
 local piecesGameObject : GameObject = nil
+--!SerializeField
+local view : GameObject = nil
 --
 
 --Events
@@ -25,7 +27,6 @@ local e_sendRollToServer = Event.new("sendRollToServer")
 
 --Private Variables
 local players = {}
-local playerWhoseTurnItIs
 local board
 local gameState = GameState.waitingForPlayers
 --
@@ -51,7 +52,10 @@ function self:ServerAwake()
         local nextAvailableId = GetNextAvailableId()
         if(nextAvailableId ~= nil) -- Disable greater than two players for now, need to address this later with matchmaking
         then
-            players[player] = nextAvailableId
+            players[player] = {}
+            players[player].id = nextAvailableId
+            players[player].isTurn = false
+            players[player].player = player
             for k,v in pairs(players) do
             end
             e_sendGameStateToClient:FireAllClients(players)
@@ -74,10 +78,13 @@ function self:ServerAwake()
 end
 
 function HandlePlayersUpdated()
-    print(GetPlayersCount())
+    for i=1,2 do
+        view:GetComponent("RacerUIView").SetPlayer(i,GetPlayerWithId(i))
+    end
+
     waitingForPlayerUI.SetActive(waitingForPlayerUI,GetPlayersCount() == 1)
     for i=0,piecesGameObject.transform.childCount-1,1 do
-        piecesGameObject.transform:GetChild(i).gameObject:SetActive(PlayersHasId(i+1))
+        piecesGameObject.transform:GetChild(i).gameObject:SetActive(GetPlayerWithId(i+1) ~= nil )
     end
     if(GetPlayersCount() == 2)
     then
@@ -100,7 +107,7 @@ end
 function GetNextAvailableId()
     local availableIds = {1,2}
     for k,v in pairs(players) do
-        table.remove(availableIds,v)
+        table.remove(availableIds,v.id)
     end
     if (#availableIds == 0) then
         return nil
@@ -109,15 +116,16 @@ function GetNextAvailableId()
     end
 end
 
-function PlayersHasId(id)
+function GetPlayerWithId(id)
     for k,v in pairs(players) do
-        if(v == id) then
-            return true
+        if(v.id == id) then
+            return v
         end
     end
-    return false
+    return nil
 end
 
+-- TODO:  Replace this with #players
 function GetPlayersCount()
     local c = 0
     for k,v in pairs(players) do

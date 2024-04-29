@@ -1,11 +1,15 @@
 --!Type(UI)
 
 --!Bind
-local _player_1 : UILabel = nil
---!Bind
-local _player_2 : UILabel = nil
+local usernames: VisualElement = nil
 
-function Test(userName, userScore)
-    _player_1:SetPrelocalizedText("test Name", false)
-    _player_2:SetPrelocalizedText("Test score", false)
+function SetPlayer(id,player)
+    local usernameBlock = usernames:Q("player_"..id)
+    if (player == nil) then
+        usernameBlock.visible = false
+        return
+    end
+    usernameBlock.visible = true
+    usernameBlock:Q("l_"..id):SetPrelocalizedText(player.player.name, false)
+    usernameBlock:Q("t_"..id).visible = player.isTurn
 end
