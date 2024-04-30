@@ -3,13 +3,13 @@
 --!Bind
 local usernames: VisualElement = nil
 
-function SetPlayer(id,player)
+function SetPlayer(id,racer)
     local usernameBlock = usernames:Q("userblock_"..id)
-    if (player == nil) then
+    if (racer == nil) then
         usernameBlock.visible = false
         return
     end
     usernameBlock.visible = true
-    usernameBlock:Q("username_"..id):SetPrelocalizedText(player.player.name, false)
-    usernameBlock:Q("turn_indicator_"..id).visible = player.isTurn
+    usernameBlock:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
+    usernameBlock:Q("turn_indicator_"..id).visible = racer.isTurn
 end
