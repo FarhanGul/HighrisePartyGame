@@ -1,6 +1,13 @@
+local gamesInfo = {
+    count = 2,
+    positions = {
+        Vector3.new(100,0,0),
+        Vector3.new(100,0,100),
+    },
+    waitingAreaPosition = Vector3.new(0,0,0)
+}
+
 --Public Variables
---!SerializeField
-local waitingArea : GameObject = nil
 --!SerializeField
 local raceGames : GameObject = nil
 --!SerializeField
@@ -24,9 +31,9 @@ local e_sendMoveToWaitingAreaToClient = Event.new("sendMoveToWaitingAreaToClient
 --
 
 --Classes
-function GameInstance(_raceGame,_p1,_p2,_firstTurn)
+function GameInstance(_gameIndex,_p1,_p2,_firstTurn)
     return{
-        raceGame = _raceGame,
+        gameIndex = _gameIndex,
         firstTurn = _firstTurn,
         p1 = _p1,
         p2 = _p2
@@ -38,25 +45,15 @@ function GameInstances()
         _table = {},
         playersInWaitingQueue = {},
         Initialize = function(self)
-            for i=0, raceGames.transform.childCount - 1 do
-                table.insert(self._table,GameInstance(raceGames.transform:GetChild(i).gameObject:GetComponent("RaceGame"),nil,nil,nil))
+            for i=1, gamesInfo.count do
+                table.insert(self._table,GameInstance(i,nil,nil,nil))
             end
-        end,
-        GetOtherPlayer = function(self,player)
-            for k,v in pairs(self._table) do
-                if(v.p1 ~= nil and v.p2 ~= nil) then
-                    if (v.p1 == player ) then return v.p2
-                    elseif(v.p2 == player) then return v.p1
-                    end
-                end
-            end
-            return nil
         end,
         HandlePlayerSlotsFreed = function(self,count)
             -- Handle players in waiting queue as new players based on free slots
             for i=1,count do
                 if(#self.playersInWaitingQueue > 0) then
-                    self.HandleNewPlayer(self.playersInWaitingQueue[1])
+                    self:HandleNewPlayer(self.playersInWaitingQueue[1])
                     table.remove(self.playersInWaitingQueue,1)
                 end
             end
@@ -72,7 +69,7 @@ function GameInstances()
             for k,v in pairs(self._table) do
                 if (v.p1 == player and v.p2 == nil ) then
                     v.p1 = nil
-                    self.HandlePlayerSlotsFreed(1)
+                    self:HandlePlayerSlotsFreed(1)
                     return
                 end
             end
@@ -80,12 +77,13 @@ function GameInstances()
             for k,v in pairs(self._table) do
                 if(v.p1 ~= nil and v.p2 ~= nil) then
                     if ( v.p1 == player or v.p2 == player ) then
-                        local otherPlayer = self.GetOtherPlayer()
-                        e_sendMatchCancelledToClient:FireAllClients(otherPlayer)
-                        self.HandleNewPlayer(otherPlayer)
+                        local otherPlayer
+                        if (v.p1 == player) then otherPlayer = v.p2 else otherPlayer = v.p1 end
                         v.p1 = nil
                         v.p2 = nil
-                        self.HandlePlayerSlotsFreed(2)
+                        e_sendMatchCancelledToClient:FireAllClients(otherPlayer)
+                        self:HandleNewPlayer(otherPlayer)
+                        self:HandlePlayerSlotsFreed(1)
                         return
                     end
                 end
@@ -96,13 +94,13 @@ function GameInstances()
             -- if another player is waiting then create match
             -- then send both players to game area
             for k,v in pairs(self._table) do
-                if (v.p1 ~= nil ) then
+                if (v.p1 ~= nil and v.p2 == nil  ) then
                     v.p2 = player
                     v.firstTurn = math.random(1,2)
-                    v.p1.character.transform.position = v.raceGame.transform.position
-                    v.p2.character.transform.position = v.raceGame.transform.position
-                    e_sendStartMatchToClient:FireAllClients(v.p1,v.raceGame,v.p1,v.p2,v.firstTurn)
-                    e_sendStartMatchToClient:FireAllClients(v.p2,v.raceGame,v.p1,v.p2,v.firstTurn)
+                    v.p1.character.transform.position = gamesInfo.positions[v.gameIndex]
+                    v.p2.character.transform.position = gamesInfo.positions[v.gameIndex]
+                    e_sendStartMatchToClient:FireAllClients(v.p1,v.gameIndex,v.p1,v.p2,v.firstTurn)
+                    e_sendStartMatchToClient:FireAllClients(v.p2,v.gameIndex,v.p1,v.p2,v.firstTurn)
                     return
                 end
             end
@@ -111,14 +109,14 @@ function GameInstances()
             for k,v in pairs(self._table) do
                 if (v.p1 == nil and v.p2 == nil ) then 
                     v.p1 = player
-                    v.p1.character.transform.position = waitingArea.transform.position
+                    v.p1.character.transform.position = gamesInfo.waitingAreaPosition
                     e_sendMoveToWaitingAreaToClient:FireAllClients(v.p1)
                     return
                 end
             end
             -- We are out of game instances
             -- add player to waiting queue and send player to waiting area
-            player.character.transform.position = waitingArea.transform.position
+            player.character.transform.position = gamesInfo.waitingAreaPosition
             e_sendMoveToWaitingAreaToClient:FireAllClients(player)
             table.insert(self.playersInWaitingQueue,player)
         end
@@ -126,7 +124,6 @@ function GameInstances()
 end
 
 function self:ServerAwake()
-    print("Server"..tostring(raceGames==nil))
     gameInstances = GameInstances()
     gameInstances:Initialize()
     server.PlayerConnected:Connect(function(player)
@@ -140,26 +137,25 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    print("Client"..tostring(raceGames==nil))
     playerHud = playerHudGameObject:GetComponent("PlayerHud")
 
-    e_sendStartMatchToClient:Connect(function(player,raceGame,p1,p2,firstTurn)
+    e_sendStartMatchToClient:Connect(function(player,gameIndex,p1,p2,firstTurn)
         if(client.localPlayer == player)then
-            local instance = GameInstance(raceGame,p1,p2,firstTurn)
-            instance.p1.character:Teleport(instance.raceGame.transform.position,function() end)
-            instance.p2.character:Teleport(instance.raceGame.transform.position,function() end)
-            cameraRoot:GetComponent("RTSCamera").CenterOn(instance.raceGame.transform.position)
-            instance.raceGame:GetComponent("RaceGame").StartMatch(instance)
-            playerHud.location = playerHud.Location.Game
+            local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
+            p1.character:Teleport(raceGame.transform.position,function() end)
+            p2.character:Teleport(raceGame.transform.position,function() end)
+            cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
+            raceGame:GetComponent("RaceGame").StartMatch(p1,p2,firstTurn)
+            playerHud.SetLocation( playerHud.Location().Game )
             playerHud.UpdateView()
         end
     end)
     e_sendMoveToWaitingAreaToClient:Connect(function(player)
         if(client.localPlayer == player) then 
-            playerHud.location = playerHud.Location.Lobby
+            playerHud.SetLocation( playerHud.Location().Lobby )
             playerHud.UpdateView()
-            player.character:Teleport(waitingArea.transform.position,function() end)
-            cameraRoot:GetComponent("RTSCamera").CenterOn(waitingArea.transform.position) 
+            player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
+            cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
     end)
     e_sendMatchCancelledToClient:Connect(function(player)

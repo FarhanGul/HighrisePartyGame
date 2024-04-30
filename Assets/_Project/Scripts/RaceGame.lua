@@ -68,13 +68,13 @@ function self:ServerAwake()
     end)
 end
 
-function StartMatch(match)
-    print("Start Match : "..match.p1.name.." vs "..match.p2.name)
+function StartMatch(p1,p2,firstTurn)
+    print("Start Match : "..p1.name.." vs "..p2.name)
     boardGameObject:GetComponent("Board").Reset()
     racers = Racers()
-    racers:Add(Racer(1,match.p1,match.firstTurn == 1))
-    racers:Add(Racer(2,match.p2,match.firstTurn == 2))
-    playerHud.racers = racers
+    racers:Add(Racer(1,p1,firstTurn == 1))
+    racers:Add(Racer(2,p2,firstTurn == 2))
+    playerHud.SetRacers( racers )
     localRacer = racers:GetFromPlayer(client.localPlayer)
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
         if(localRacer.isTurn) then

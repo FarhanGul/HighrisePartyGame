@@ -1,5 +1,7 @@
 --Enums
-local Location={Lobby = 0 , Game = 1}
+function Location ()
+    return {Lobby = 0 , Game = 1}
+end
 
 --Variables
 --!SerializeField
@@ -12,10 +14,18 @@ function self:ClientAwake()
     view = self:GetComponent("RacerUIView")
 end
 
+function SetLocation(_location)
+    location = _location
+end
+
+function SetRacers(_racers)
+    racers = _racers
+end
+
 function UpdateView()
-    waitingForPlayerUI.SetActive(waitingForPlayerUI,location == Location.Lobby)
+    waitingForPlayerUI.SetActive(waitingForPlayerUI,location == Location().Lobby)
     for i=1,2 do
-        if(location == Location.Lobby) then 
+        if(location == Location().Lobby) then 
             view:GetComponent("RacerUIView").SetPlayer(i,nil)
         else
             view:GetComponent("RacerUIView").SetPlayer(i,racers:GetFromId(i))
