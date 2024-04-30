@@ -31,14 +31,11 @@ local state = State.Lobby
 --
 
 --Classes
-local function Racer(_id,_player)
+local function Racer(_id,_player,_isTurn)
     return {
         id = _id,
         player = _player,
-        isTurn = false,
-        testFunction = function(self)
-            print(tostring(self.id).." - is Turn "..tostring(self.isTurn))
-        end
+        isTurn = _isTurn
     }
 end
 
@@ -79,24 +76,31 @@ function self:ClientAwake()
     end)
 end
 
-function StartMatch(p1,p2)
-    print("Start Match : "..p1.name.." vs "..p2.name)
+function self:ServerAwake()
+    e_sendRollToServer:Connect(function(player,id, roll)
+        e_sendRollToClients:FireAllClients(id,roll)
+    end)
+end
+
+function StartMatch(match)
+    print("Start Match : "..match.p1.name.." vs "..match.p2.name)
     racers = Racers()
-    racers:Add(Racer(1,p1))
-    racers:Add(Racer(2,p2))
-    if(math.random(1,2)) then racers:GetFromId(1).isTurn = true else racers:GetFromId(2).isTurn = true end
+    racers:Add(Racer(1,match.p1,match.firstTurn == 1))
+    racers:Add(Racer(2,match.p2,match.firstTurn == 2))
     localRacer = racers:GetFromPlayer(client.localPlayer)
-    client.localPlayer.character:Teleport(Vector3.new(100,0,0),function() print("Teleported") end)
-    client.localPlayer.character.transform.position = Vector3.new(100,0,0)
+    -- client.localPlayer.character:Teleport(Vector3.new(100,0,0),function() print("Teleported") end)
+    -- client.localPlayer.character.transform.position = Vector3.new(100,0,0)
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
+        -- print("Dice tapped")
         if(localRacer.isTurn) then
             e_sendRollToServer:FireServer(localRacer.id ,math.random(1,6)) 
         end
     end)
     e_sendRollToClients:Connect(function(id, roll)
         boardGameObject:GetComponent("Board").Move(piecesGameObject.transform:GetChild(id-1).gameObject,roll)
-        racers.GetFromId(id).isTurn = false
-        racers.GetFromId(id)(racers.GetOtherId((id))).isTurn = true
+        racers:GetFromId(id).isTurn = false
+        racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+        print("Roll Recieved by client")
         UpdateHUD()
     end)
     state = State.Game
@@ -104,8 +108,8 @@ function StartMatch(p1,p2)
 end
 
 function GoToLobby()
-    client.localPlayer.character:Teleport(Vector3.new(0,0,0),function() end)
-    client.localPlayer.character.transform.position = Vector3.new(0,0,0)
+    -- client.localPlayer.character:Teleport(Vector3.new(0,0,0),function() end)
+    -- client.localPlayer.character.transform.position = Vector3.new(0,0,0)
     state = State.Lobby
     UpdateHUD()
 end
@@ -143,12 +147,6 @@ end
 --             end)
 --         end
 --         e_fetchGameStateFromServer:FireServer()
---     end)
--- end
-
--- function self:ServerAwake()
---     e_sendRollToServer:Connect(function(player,id, roll)
---         e_sendRollToClients:FireAllClients(id,roll)
 --     end)
 -- end
 

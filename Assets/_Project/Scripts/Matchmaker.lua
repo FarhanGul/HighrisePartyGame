@@ -1,6 +1,8 @@
 --Public Variables
 --!SerializeField
 local raceGame : GameObject = nil
+--!SerializeField
+local cameraRoot : GameObject = nil
 --
 
 --Private Variables
@@ -12,15 +14,17 @@ local matchTable
 -- Events
 local e_sendStartMatchToClients = Event.new("sendStartMatchToClients")
 local e_sendMatchCancelledToClients = Event.new("sendMatchCancelledToClients")
+local e_sendTeleportEventToClients = Event.new("sendTeleportEventToClients")
 --
 
 --Classes
-function Match(_player_01,_player_02)
+function Match(_p1,_p2,_firstTurn)
     return{
-        player_01 = _player_01,
-        player_02 = _player_02,
+        p1 = _p1,
+        p2 = _p2,
+        firstTurn = _firstTurn,
         GetId = function (self)
-            return self.player_01.id..self.player_02.id
+            return self.p1.id..self.p2.id
         end
     }
 end
@@ -33,14 +37,14 @@ function MatchTable()
         end,
         GetOtherPlayer = function(self,player)
             for k,v in pairs(self._table) do
-                if(v.player_01 == player) then return v.player_02 end
-                if(v.player_02 == player) then return v.player_01 end
+                if(v.p1 == player) then return v.p2 end
+                if(v.p2 == player) then return v.p1 end
             end
             return nil
         end,
         Remove = function(self,player)
             for k,v in pairs(self._table) do
-                if(v.player_01 == player or v.player_02 == player) then self._table[k] = nil return end
+                if(v.p1 == player or v.p2 == player) then self._table[k] = nil return end
             end
         end,
         GetCount = function(self)
@@ -57,8 +61,11 @@ end
 function self:ServerAwake()
     matchTable = MatchTable()
     server.PlayerConnected:Connect(function(player)
-        table.insert(waitingQueue,player)
-        while CheckMatch() do end
+        -- Todo remove magic number
+        Timer.new(2,function()
+            table.insert(waitingQueue,player)
+            while CreateMatch() do end
+        end,false)
     end)
 
     server.PlayerDisconnected:Connect(function(player)
@@ -72,16 +79,18 @@ function self:ServerAwake()
     end)
 end
 
-function CheckMatch()
+function CreateMatch()
     if(matchTable:GetCount() < maxMatches and #waitingQueue > 1)then
         local p1 = waitingQueue[1]
         local p2 = waitingQueue[2]
         table.remove(waitingQueue,1)
         table.remove(waitingQueue,1)
-        local newMatch = Match(p1,p2)
-        matchTable:Add(newMatch)
-        print("new match id : "..tostring(newMatch:GetId()))
-        e_sendStartMatchToClients:FireAllClients(p1,p2)
+        local match = Match(p1,p2,math.random(1,2))
+        matchTable:Add(match)
+        -- print("new match id : "..tostring(match:GetId()))
+        p1.character.transform.position = Vector3.new(100,0,0)
+        p2.character.transform.position = Vector3.new(100,0,0)
+        e_sendStartMatchToClients:FireAllClients(p1,p2,match.firstTurn)
         return true
     else
         return false
@@ -89,9 +98,20 @@ function CheckMatch()
 end
 
 function self:ClientAwake()
-    e_sendStartMatchToClients:Connect(function(p1,p2)
-        print("client recieve match players: "..tostring(p1.name)..tostring(p2.name))
-        raceGame:GetComponent("RaceGame").StartMatch(p1,p2)
+    e_sendStartMatchToClients:Connect(function(p1,p2,firstTurn)
+        local match = Match(p1,p2,firstTurn)
+        -- print("client recieve match players: "..tostring(match.p1.name)..tostring(match.p2.name))
+        match.p1.character:Teleport(Vector3.new(100,0,0),function() print("p1 Teleported") end)
+        match.p2.character:Teleport(Vector3.new(100,0,0),function() print("p2 Teleported") end)
+        -- cameraRoot.transform.position = Vector3.new(100,0,0);
+        cameraRoot:GetComponent("RTSCamera").CenterOn(Vector3.new(100,0,0))
+        -- client.mainCamera.gameObject:SetActive(false)
+        -- client.localPlayer.character.gameObject:SetActive(false)
+        -- client.mainCamera.transform.position += Vector3.new(100,0,0)
+        -- client.localPlayer.character.transform.position = Vector3.new(100,0,0)
+        -- client.localPlayer.character.gameObject:SetActive(true)
+        -- client.mainCamera.gameObject:SetActive(true)
+        raceGame:GetComponent("RaceGame").StartMatch(match)
     end)
     e_sendMatchCancelledToClients:Connect(function(otherPlayer)
         if(client.localPlayer == otherPlayer) then raceGame:GetComponent("RaceGame"):GoToLobby() end
