@@ -2,6 +2,8 @@ local tiles = {}
 local location = {}
 --!SerializeField
 local dice : GameObject = nil
+--!SerializeField
+local piecesGameObject : GameObject = nil
 
 function self:Start()
     for i = 0,self.transform.childCount-1,1
@@ -10,10 +12,24 @@ function self:Start()
     end
 end
 
-function Move(piece,roll)
-    -- print(roll)
+function GetPiece(id)
+    return piecesGameObject.transform:GetChild(id-1).gameObject
+end
+
+function Reset()
+    for k,v in pairs(location) do
+        v = 0
+        SetPiecePosition(k)
+    end
+end
+
+function SetPiecePosition(piece)
+    piece.transform.position = tiles[location[piece]].transform.position
+end
+
+function Move(id,roll)
     _DiceAnimation(roll)
-    _MovePiece(piece,roll)
+    _MovePiece(GetPiece(id),roll)
 end
 
 function _MovePiece(piece, amount)
@@ -25,7 +41,7 @@ function _MovePiece(piece, amount)
         return
     end
     location[piece] += 1
-    piece.transform.position = tiles[location[piece]].transform.position
+    SetPiecePosition(piece)
     amount -= 1
     local newTimer = Timer.new(0.25,function() _MovePiece(piece, amount) end,false)
 end

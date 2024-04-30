@@ -1,119 +1,170 @@
 --Public Variables
 --!SerializeField
-local raceGame : GameObject = nil
+local waitingArea : GameObject = nil
+--!SerializeField
+local raceGames : GameObject = nil
 --!SerializeField
 local cameraRoot : GameObject = nil
+--!SerializeField
+local playerHudGameObject : GameObject = nil
 --
 
 --Private Variables
-local maxMatches = 1
-local waitingQueue={}
+-- local maxMatches = 1
+-- local waitingQueue={}
 local matchTable
+local gameInstances
+local playerHud
 --
 
 -- Events
-local e_sendStartMatchToClients = Event.new("sendStartMatchToClients")
-local e_sendMatchCancelledToClients = Event.new("sendMatchCancelledToClients")
-local e_sendTeleportEventToClients = Event.new("sendTeleportEventToClients")
+local e_sendStartMatchToClient = Event.new("sendStartMatchToClient")
+local e_sendMatchCancelledToClient = Event.new("sendMatchCancelledToClient")
+local e_sendMoveToWaitingAreaToClient = Event.new("sendMoveToWaitingAreaToClient")
 --
 
 --Classes
-function Match(_p1,_p2,_firstTurn)
+function GameInstance(_raceGame,_p1,_p2,_firstTurn)
     return{
-        p1 = _p1,
-        p2 = _p2,
+        raceGame = _raceGame,
         firstTurn = _firstTurn,
-        GetId = function (self)
-            return self.p1.id..self.p2.id
-        end
+        p1 = _p1,
+        p2 = _p2
     }
 end
 
-function MatchTable()
+function GameInstances()
     return{
         _table = {},
-        Add = function(self,match)
-            table[match:GetId()] = match
+        playersInWaitingQueue = {},
+        Initialize = function(self)
+            for i=0, raceGames.transform.childCount - 1 do
+                table.insert(self._table,GameInstance(raceGames.transform:GetChild(i).gameObject:GetComponent("RaceGame"),nil,nil,nil))
+            end
         end,
         GetOtherPlayer = function(self,player)
             for k,v in pairs(self._table) do
-                if(v.p1 == player) then return v.p2 end
-                if(v.p2 == player) then return v.p1 end
+                if(v.p1 ~= nil and v.p2 ~= nil) then
+                    if (v.p1 == player ) then return v.p2
+                    elseif(v.p2 == player) then return v.p1
+                    end
+                end
             end
             return nil
         end,
-        Remove = function(self,player)
-            for k,v in pairs(self._table) do
-                if(v.p1 == player or v.p2 == player) then self._table[k] = nil return end
+        HandlePlayerSlotsFreed = function(self,count)
+            -- Handle players in waiting queue as new players based on free slots
+            for i=1,count do
+                if(#self.playersInWaitingQueue > 0) then
+                    self.HandleNewPlayer(self.playersInWaitingQueue[1])
+                    table.remove(self.playersInWaitingQueue,1)
+                end
             end
         end,
-        GetCount = function(self)
-            local c = 0
-            for k,v in pairs(self._table) do
-                    c+=1
+        HandlePlayerLeft = function(self,player)
+            -- Is player in waiting area then remove from waiting area
+            local indexOfPlayerInWaitingQueue = table.find(self.playersInWaitingQueue, player)
+            if(indexOfPlayerInWaitingQueue ~= nil) then
+                table.remove(self.playersInWaitingQueue,indexOfPlayerInWaitingQueue)
+                return
             end
-            return c
+            -- Is player in game instance table waiting for another player then remove from there
+            for k,v in pairs(self._table) do
+                if (v.p1 == player and v.p2 == nil ) then
+                    v.p1 = nil
+                    self.HandlePlayerSlotsFreed(1)
+                    return
+                end
+            end
+            -- if player was inside game when they left, notify other player and handle them like new player
+            for k,v in pairs(self._table) do
+                if(v.p1 ~= nil and v.p2 ~= nil) then
+                    if ( v.p1 == player or v.p2 == player ) then
+                        local otherPlayer = self.GetOtherPlayer()
+                        e_sendMatchCancelledToClient:FireAllClients(otherPlayer)
+                        self.HandleNewPlayer(otherPlayer)
+                        v.p1 = nil
+                        v.p2 = nil
+                        self.HandlePlayerSlotsFreed(2)
+                        return
+                    end
+                end
+            end
+
+        end,
+        HandleNewPlayer = function(self,player)
+            -- if another player is waiting then create match
+            -- then send both players to game area
+            for k,v in pairs(self._table) do
+                if (v.p1 ~= nil ) then
+                    v.p2 = player
+                    v.firstTurn = math.random(1,2)
+                    v.p1.character.transform.position = v.raceGame.transform.position
+                    v.p2.character.transform.position = v.raceGame.transform.position
+                    e_sendStartMatchToClient:FireAllClients(v.p1,v.raceGame,v.p1,v.p2,v.firstTurn)
+                    e_sendStartMatchToClient:FireAllClients(v.p2,v.raceGame,v.p1,v.p2,v.firstTurn)
+                    return
+                end
+            end
+            -- If no players are waiting then see if there is a free instance this player can be assigned to
+            -- then send player to waiting area
+            for k,v in pairs(self._table) do
+                if (v.p1 == nil and v.p2 == nil ) then 
+                    v.p1 = player
+                    v.p1.character.transform.position = waitingArea.transform.position
+                    e_sendMoveToWaitingAreaToClient:FireAllClients(v.p1)
+                    return
+                end
+            end
+            -- We are out of game instances
+            -- add player to waiting queue and send player to waiting area
+            player.character.transform.position = waitingArea.transform.position
+            e_sendMoveToWaitingAreaToClient:FireAllClients(player)
+            table.insert(self.playersInWaitingQueue,player)
         end
     }
 end
---
 
 function self:ServerAwake()
-    matchTable = MatchTable()
+    print("Server"..tostring(raceGames==nil))
+    gameInstances = GameInstances()
+    gameInstances:Initialize()
     server.PlayerConnected:Connect(function(player)
-        -- Todo remove magic number
-        Timer.new(2,function()
-            table.insert(waitingQueue,player)
-            while CreateMatch() do end
-        end,false)
+        -- Todo remove magic number delay
+        Timer.new(2,function() gameInstances:HandleNewPlayer(player) end,false)
     end)
 
     server.PlayerDisconnected:Connect(function(player)
-        local waitingQueueRef = table.find(waitingQueue, player)
-        local otherPlayer = matchTable:GetOtherPlayer(player)
-        if (waitingQueueRef ~= nil) then table.remove(waitingQueue,waitingQueueRef) 
-        elseif (otherPlayer ~= nil ) then 
-            e_sendMatchCancelledToClients:FireAllClients(otherPlayer) 
-            matchTable:Remove(otherPlayer)
-        end
+        gameInstances:HandlePlayerLeft(player)
     end)
-end
-
-function CreateMatch()
-    if(matchTable:GetCount() < maxMatches and #waitingQueue > 1)then
-        local p1 = waitingQueue[1]
-        local p2 = waitingQueue[2]
-        table.remove(waitingQueue,1)
-        table.remove(waitingQueue,1)
-        local match = Match(p1,p2,math.random(1,2))
-        matchTable:Add(match)
-        -- print("new match id : "..tostring(match:GetId()))
-        p1.character.transform.position = Vector3.new(100,0,0)
-        p2.character.transform.position = Vector3.new(100,0,0)
-        e_sendStartMatchToClients:FireAllClients(p1,p2,match.firstTurn)
-        return true
-    else
-        return false
-    end
 end
 
 function self:ClientAwake()
-    e_sendStartMatchToClients:Connect(function(p1,p2,firstTurn)
-        local match = Match(p1,p2,firstTurn)
-        -- print("client recieve match players: "..tostring(match.p1.name)..tostring(match.p2.name))
-        match.p1.character:Teleport(Vector3.new(100,0,0),function() print("p1 Teleported") end)
-        match.p2.character:Teleport(Vector3.new(100,0,0),function() print("p2 Teleported") end)
-        -- cameraRoot.transform.position = Vector3.new(100,0,0);
-        cameraRoot:GetComponent("RTSCamera").CenterOn(Vector3.new(100,0,0))
-        -- client.mainCamera.gameObject:SetActive(false)
-        -- client.localPlayer.character.gameObject:SetActive(false)
-        -- client.mainCamera.transform.position += Vector3.new(100,0,0)
-        -- client.localPlayer.character.transform.position = Vector3.new(100,0,0)
-        -- client.localPlayer.character.gameObject:SetActive(true)
-        -- client.mainCamera.gameObject:SetActive(true)
-        raceGame:GetComponent("RaceGame").StartMatch(match)
+    print("Client"..tostring(raceGames==nil))
+    playerHud = playerHudGameObject:GetComponent("PlayerHud")
+
+    e_sendStartMatchToClient:Connect(function(player,raceGame,p1,p2,firstTurn)
+        if(client.localPlayer == player)then
+            local instance = GameInstance(raceGame,p1,p2,firstTurn)
+            instance.p1.character:Teleport(instance.raceGame.transform.position,function() end)
+            instance.p2.character:Teleport(instance.raceGame.transform.position,function() end)
+            cameraRoot:GetComponent("RTSCamera").CenterOn(instance.raceGame.transform.position)
+            instance.raceGame:GetComponent("RaceGame").StartMatch(instance)
+            playerHud.location = playerHud.Location.Game
+            playerHud.UpdateView()
+        end
     end)
-    e_sendMatchCancelledToClients:Connect(function(otherPlayer)
-        if(client.localPlayer == otherPlayer) then raceGame:GetComponent("RaceGame"):GoToLobby() end
+    e_sendMoveToWaitingAreaToClient:Connect(function(player)
+        if(client.localPlayer == player) then 
+            playerHud.location = playerHud.Location.Lobby
+            playerHud.UpdateView()
+            player.character:Teleport(waitingArea.transform.position,function() end)
+            cameraRoot:GetComponent("RTSCamera").CenterOn(waitingArea.transform.position) 
+        end
+    end)
+    e_sendMatchCancelledToClient:Connect(function(player)
+        if(client.localPlayer == player) then 
+            print("Other Player Left the match : Show message on HUD")
+        end
     end)
 end
