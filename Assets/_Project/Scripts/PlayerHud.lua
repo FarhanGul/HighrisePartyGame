@@ -1,3 +1,8 @@
+--Constants
+local strings={
+    title = "TABLETOP RACER"
+}
+
 --Enums
 function Location ()
     return {Lobby = 0 , Game = 1}
@@ -10,6 +15,7 @@ local racers
 
 function self:ClientAwake()
     view = self:GetComponent("RacerUIView")
+    view.Initialize(strings)
 end
 
 function SetLocation(_location)
@@ -21,7 +27,7 @@ function SetRacers(_racers)
 end
 
 function UpdateView()
-    if (location == Location().Lobby) then view.SetSceneHeading("TABLETOP RACER","WAITING AREA") else view.SetSceneHeading("TABLETOP RACER","GAME") end
+    if (location == Location().Lobby) then view.SetSceneHeading(strings.title,"WAITING AREA") else view.SetSceneHeading(strings.title,"GAME") end
     if (location == Location().Lobby) then view.SetSceneHelp("PLEASE WAIT FOR MATCH") else 
         if(racers.IsLocalRacerTurn()) then view.SetSceneHelp("IT IS YOUR TURN") else view.SetSceneHelp("PLEASE WAIT WHILE YOUR OPPONENET MAKES THEIR TURN") end
     end

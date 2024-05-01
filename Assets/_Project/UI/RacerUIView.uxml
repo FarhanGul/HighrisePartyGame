@@ -31,6 +31,17 @@
       <hr:UILabel name="scene_help" class="subtitle_text" picking-mode="Ignore"/>
     </VisualElement>
 
+    <VisualElement name="welcome_group">
+      <hr:UILabel name="welcome_title" class="title_text" picking-mode="Ignore"/>
+      <hr:UILabel name="welcome_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
+      <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
+      <VisualElement name="welcome_image"  picking-mode="Ignore"/>
+      <hr:UILabel name="welcome_guide" class="normal_text" picking-mode="Ignore"/>
+      <hr:UIButton name="welcome_play_button" class="button">
+        <hr:UILabel name="welcome_play_button_text" class="button_text"/>
+      </hr:UIButton>
+    </VisualElement>
+
   </hr:UILuaView>
 
 </UXML>

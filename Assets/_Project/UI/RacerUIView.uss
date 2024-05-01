@@ -1,3 +1,11 @@
+.racer-u-i-view{
+    position: absolute;
+    top:0px;
+    bottom: 0px;
+    right: 0px;
+    left:0px;
+}
+
 .usernames
 {
     padding-left: 5%;
@@ -20,6 +28,9 @@
 
 .normal_text{
     font-size: 28px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    margin: 25px;
 }
 
 
@@ -37,4 +48,37 @@
     width: 32px;
     height: 32px;
     background-image: resource("TurnIndicator");
+}
+
+#welcome_group{
+    background-color: #C3EFFF;
+    border-color: #53A2BF;
+    padding: 20px;
+    position: absolute;
+    top:0px;
+    bottom: 0px;
+    right: 0px;
+    left:0px;
+    align-items : center;
+    justify-content: center;
+}
+
+#welcome_image{
+    width: 512px;
+    height: 512px;
+    background-image: resource("WelcomeImage");
+}
+
+.button{
+    background-color: #68C1E1;
+    border-radius: 10px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+.button_text{
+    color: white;
+    font-size: 48px;
 }
