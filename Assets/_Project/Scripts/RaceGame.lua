@@ -72,7 +72,7 @@ function self:ServerAwake()
 end
 
 function StartMatch(p1,p2,firstTurn)
-    print("Start Match : "..p1.name.." vs "..p2.name)
+    -- print("Start Match : "..p1.name.." vs "..p2.name)
     boardGameObject:GetComponent("Board").Reset()
     racers = Racers()
     racers:Add(Racer(1,p1,firstTurn == 1))

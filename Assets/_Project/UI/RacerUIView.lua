@@ -8,14 +8,14 @@ local scene_heading_group: VisualElement = nil
 local scene_help_group: VisualElement = nil
 
 function SetPlayer(id,racer)
-    local usernameBlock = usernames:Q("userblock_"..id)
     if (racer == nil) then
-        usernameBlock.visible = false
+        usernames:Q("username_"..id).visible = false
+        usernames:Q("turn_indicator_"..id).visible = false
         return
     end
-    usernameBlock.visible = true
-    usernameBlock:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
-    usernameBlock:Q("turn_indicator_"..id).visible = racer.isTurn
+    usernames:Q("username_"..id).visible = true
+    usernames:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
+    usernames:Q("turn_indicator_"..id).visible = racer.isTurn
 end
 
 function SetSceneHeading(title,subtitle)

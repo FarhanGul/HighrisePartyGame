@@ -14,6 +14,7 @@
     </VisualElement>
 
     <VisualElement name="usernames" class="usernames" picking-mode="Ignore" >
+
       <VisualElement name="userblock_1" class="username-block" picking-mode="Ignore">
         <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
         <hr:UILabel name="username_1" class="subtitle_text" picking-mode="Ignore"/>
@@ -23,6 +24,7 @@
         <VisualElement name="turn_indicator_2" class="turn-indicator" picking-mode="Ignore"/>
         <hr:UILabel name="username_2" class="subtitle_text" picking-mode="Ignore"/>
       </VisualElement>
+
     </VisualElement>
 
     <VisualElement name="scene_help_group">

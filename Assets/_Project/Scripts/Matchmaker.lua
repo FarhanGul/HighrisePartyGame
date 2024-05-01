@@ -160,7 +160,7 @@ function self:ClientAwake()
     end)
     e_sendMatchCancelledToClient:Connect(function(player)
         if(client.localPlayer == player) then 
-            print("Other Player Left the match : Show message on HUD")
+            -- print("Other Player Left the match : Show message on HUD")
         end
     end)
 end
