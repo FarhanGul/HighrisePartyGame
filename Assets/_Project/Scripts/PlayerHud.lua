@@ -4,8 +4,6 @@ function Location ()
 end
 
 --Variables
---!SerializeField
-local waitingForPlayerUI : GameObject = nil
 local view
 local location
 local racers
@@ -23,12 +21,15 @@ function SetRacers(_racers)
 end
 
 function UpdateView()
-    waitingForPlayerUI.SetActive(waitingForPlayerUI,location == Location().Lobby)
+    if (location == Location().Lobby) then view.SetSceneHeading("TABLETOP RACER","WAITING AREA") else view.SetSceneHeading("TABLETOP RACER","GAME") end
+    if (location == Location().Lobby) then view.SetSceneHelp("PLEASE WAIT FOR MATCH") else 
+        if(racers.IsLocalRacerTurn()) then view.SetSceneHelp("IT IS YOUR TURN") else view.SetSceneHelp("PLEASE WAIT WHILE YOUR OPPONENET MAKES THEIR TURN") end
+    end
     for i=1,2 do
         if(location == Location().Lobby) then 
-            view:GetComponent("RacerUIView").SetPlayer(i,nil)
+            view.SetPlayer(i,nil)
         else
-            view:GetComponent("RacerUIView").SetPlayer(i,racers:GetFromId(i))
+            view.SetPlayer(i,racers:GetFromId(i))
         end
     end
 end

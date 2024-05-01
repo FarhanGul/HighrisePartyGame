@@ -9,9 +9,19 @@
     flex-direction: row;
 }
 
-.username{
-    font-size: 36px;
+.title_text{
+    color : #07A5C7;
+    font-size: 60px;
 }
+
+.subtitle_text{
+    font-size: 48px;
+}
+
+.normal_text{
+    font-size: 28px;
+}
+
 
 #username_1
 {

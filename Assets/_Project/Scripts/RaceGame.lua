@@ -53,6 +53,9 @@ local function Racers()
         end,
         GetOtherId = function(id)
             if id == 1 then return 2 else return 1 end
+        end,
+        IsLocalRacerTurn = function()
+            return localRacer.isTurn
         end
     }
 end
