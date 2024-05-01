@@ -62,7 +62,7 @@ end
 
 
 function self:ClientAwake()
-    playerHud = playerHudGameObject:GetComponent("PlayerHud")
+    playerHud = playerHudGameObject:GetComponent("RacerUIView")
 end
 
 function self:ServerAwake()

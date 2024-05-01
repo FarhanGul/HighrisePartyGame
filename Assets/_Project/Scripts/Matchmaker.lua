@@ -28,6 +28,7 @@ local playerHud
 local e_sendStartMatchToClient = Event.new("sendStartMatchToClient")
 local e_sendMatchCancelledToClient = Event.new("sendMatchCancelledToClient")
 local e_sendMoveToWaitingAreaToClient = Event.new("sendMoveToWaitingAreaToClient")
+local e_sendReadyForMatchmakingToServer= Event.new("sendReadyForMatchmakingToServer")
 --
 
 --Classes
@@ -126,19 +127,20 @@ end
 function self:ServerAwake()
     gameInstances = GameInstances()
     gameInstances:Initialize()
-    server.PlayerConnected:Connect(function(player)
-        -- Todo remove magic number delay
-        Timer.new(2,function() gameInstances:HandleNewPlayer(player) end,false)
-    end)
-
     server.PlayerDisconnected:Connect(function(player)
         gameInstances:HandlePlayerLeft(player)
+    end)
+    e_sendReadyForMatchmakingToServer:Connect(function(player)
+        gameInstances:HandleNewPlayer(player)
     end)
 end
 
 function self:ClientAwake()
-    playerHud = playerHudGameObject:GetComponent("PlayerHud")
+    playerHud = playerHudGameObject:GetComponent("RacerUIView")
 
+    playerHud.ShowWelcomeScreen(function()
+        e_sendReadyForMatchmakingToServer:FireServer()
+    end)
     e_sendStartMatchToClient:Connect(function(player,gameIndex,p1,p2,firstTurn)
         if(client.localPlayer == player)then
             local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")

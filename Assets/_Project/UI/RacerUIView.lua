@@ -1,5 +1,13 @@
 --!Type(UI)
 
+--Constants
+local strings={
+    title = "TABLETOP RACER"
+}
+
+--!SerializeField
+local allowDebugInput : boolean = false
+
 --!Bind
 local usernames: VisualElement = nil
 --!Bind
@@ -23,10 +31,47 @@ local welcome_play_button_text : UILabel = nil
 --!Bind
 local welcome_play_button : UIButton = nil
 
-local strings
+--Variables
+local location
+local racers
+local OnWelcomeScreenClosed
 
-function Initialize(_strings)
-    strings = _strings
+--Enums
+function Location ()
+    return {Lobby = 0 , Game = 1}
+end
+
+function self:ClientAwake()
+    Initialize()
+end
+
+function self:ClientUpdate()
+    if(allowDebugInput) then HandleDebugInput() end
+end
+
+function SetLocation(_location)
+    location = _location
+end
+
+function SetRacers(_racers)
+    racers = _racers
+end
+
+function UpdateView()
+    if (location == Location().Lobby) then SetSceneHeading(strings.title,"WAITING AREA") else SetSceneHeading(strings.title,"GAME") end
+    if (location == Location().Lobby) then SetSceneHelp("PLEASE WAIT FOR MATCH") else 
+        if(racers.IsLocalRacerTurn()) then SetSceneHelp("IT IS YOUR TURN") else SetSceneHelp("PLEASE WAIT WHILE YOUR OPPONENET MAKES THEIR TURN") end
+    end
+    for i=1,2 do
+        if(location == Location().Lobby) then 
+            SetPlayer(i,nil)
+        else
+            SetPlayer(i,racers:GetFromId(i))
+        end
+    end
+end
+
+function Initialize()
     -- Set Text
     welcome_title:SetPrelocalizedText(strings.title, false)
     welcome_subtitle:SetPrelocalizedText("WELCOME", false)
@@ -35,16 +80,18 @@ function Initialize(_strings)
     welcome_play_button_text:SetPrelocalizedText("PLAY", false)
 
     -- Register callback
-    welcome_play_button:RegisterPressCallback(function() SetWelcomeScreen(false) end)
-    SetWelcomeScreen(true)
+    welcome_play_button:RegisterPressCallback(CloseWelcomeScreen)
 end
 
-function SetWelcomeScreen(isActive)
-    if(isActive)then
-        welcome_group.visible = true
-    else
-        welcome_group.visible = false
-    end
+function ShowWelcomeScreen(onClose)
+    OnWelcomeScreenClosed = onClose
+    welcome_group.visible = true
+end
+
+function CloseWelcomeScreen()
+    print("Welcome Screen Closed")
+    welcome_group.visible = false
+    OnWelcomeScreenClosed()
 end
 
 function SetPlayer(id,racer)
@@ -75,4 +122,8 @@ function SetSceneHelp(help)
     end
     scene_help_group.visible = true
     scene_help_group:Q("scene_help"):SetPrelocalizedText(help, false)
+end
+
+function HandleDebugInput()
+    if(welcome_group.visible and Input.isAltPressed) then CloseWelcomeScreen() end
 end
