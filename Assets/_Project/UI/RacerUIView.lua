@@ -94,15 +94,20 @@ end
 function ShowResult(didWin,onClose)
     OnResultScreenClosed = onClose
     root:Q("result_group").visible = true
-    root:Q("result_win_image").visible = didWin
-    root:Q("result_lose_image").visible = not didWin
+    if(didWin) then
+        root:Q("result_win_image"):RemoveFromClassList("hide")
+        root:Q("result_lose_image"):AddToClassList("hide")
+    else
+        root:Q("result_win_image"):AddToClassList("hide")
+        root:Q("result_lose_image"):RemoveFromClassList("hide")
+    end
 end
 
 function CloseResult(invokeCallback)
     if(invokeCallback) then OnResultScreenClosed() end
     root:Q("result_group").visible = false
-    root:Q("result_win_image").visible = false
-    root:Q("result_lose_image").visible = false
+    root:Q("result_win_image"):AddToClassList("hide")
+    root:Q("result_lose_image"):AddToClassList("hide")
 end
 
 function ShowOpponentLeft(onClose)

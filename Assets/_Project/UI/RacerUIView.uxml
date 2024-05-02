@@ -14,19 +14,15 @@
     </VisualElement>
 
     <VisualElement name="username_group" class="center" picking-mode="Ignore" >
-
       <VisualElement name="userblock_1" class="username-block center" picking-mode="Ignore">
         <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
         <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
       </VisualElement>
-
       <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/>
-
       <VisualElement name="userblock_2" class="username-block center" picking-mode="Ignore">
         <VisualElement name="turn_indicator_2" class="turn-indicator" picking-mode="Ignore"/>
         <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
       </VisualElement>
-
     </VisualElement>
 
     <VisualElement name="scene_help_group" class="center">
