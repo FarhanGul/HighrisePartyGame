@@ -85,7 +85,7 @@ function GameInstances()
                     return
                 end
             end
-            -- if player was inside game when they left, notify other player and handle them like new player
+            -- if player was inside game when they left, notify other player
             for k,v in pairs(self._table) do
                 if(v.p1 ~= nil and v.p2 ~= nil) then
                     if ( v.p1 == player or v.p2 == player ) then
@@ -93,9 +93,10 @@ function GameInstances()
                         if (v.p1 == player) then otherPlayer = v.p2 else otherPlayer = v.p1 end
                         v.p1 = nil
                         v.p2 = nil
+                        otherPlayer.character.transform.position = gamesInfo.waitingAreaPosition
+                        e_sendMoveToWaitingAreaToClient:FireAllClients(otherPlayer)
                         e_sendMatchCancelledToClient:FireAllClients(otherPlayer)
-                        self:HandleNewPlayer(otherPlayer)
-                        self:HandlePlayerSlotsFreed(1)
+                        self:HandlePlayerSlotsFreed(2)
                         return
                     end
                 end
@@ -175,7 +176,9 @@ function self:ClientAwake()
     end)
     e_sendMatchCancelledToClient:Connect(function(player)
         if(client.localPlayer == player) then 
-            -- print("Other Player Left the match : Show message on HUD")
+            playerHud.ShowOpponentLeft(function()
+                e_sendReadyForMatchmakingToServer:FireServer()
+            end)
         end
     end)
 end

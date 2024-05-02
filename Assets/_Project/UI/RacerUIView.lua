@@ -9,26 +9,14 @@ local strings={
 local allowDebugInput : boolean = false
 
 --!Bind
-local usernames: VisualElement = nil
---!Bind
-local scene_heading_group: VisualElement = nil
---!Bind
-local scene_help_group: VisualElement = nil
---!Bind
-local welcome_group: VisualElement = nil
---!Bind
-local result_group: VisualElement = nil
-
---!Bind
-local welcome_play_button : UIButton = nil
---!Bind
-local result_play_button : UIButton = nil
+local root: VisualElement = nil
 
 --Variables
 local location
 local racers
 local OnWelcomeScreenClosed
 local OnResultScreenClosed
+local OnOpponentLeftScreenClosed
 
 --Enums
 function Location ()
@@ -67,79 +55,95 @@ end
 
 function Initialize()
     -- Set Text
-    welcome_group:Q("welcome_title"):SetPrelocalizedText(strings.title, false)
-    welcome_group:Q("welcome_subtitle"):SetPrelocalizedText("WELCOME", false)
-    welcome_group:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
-    welcome_group:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
-    welcome_group:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
+    root:Q("welcome_title"):SetPrelocalizedText(strings.title, false)
+    root:Q("welcome_subtitle"):SetPrelocalizedText("WELCOME", false)
+    root:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
+    root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
+    root:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
 
-    result_group:Q("result_title"):SetPrelocalizedText(strings.title, false)
-    result_group:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
-    result_group:Q("result_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
-
+    root:Q("result_title"):SetPrelocalizedText(strings.title, false)
+    root:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
+    root:Q("result_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
+    
+    root:Q("opponent_left_title"):SetPrelocalizedText(strings.title, false)
+    root:Q("opponent_left_subtitle"):SetPrelocalizedText("OPPONENT LEFT THE MATCH", false)
+    root:Q("opponent_left_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
+    
     -- Register callbacks
-    welcome_play_button:RegisterPressCallback(CloseWelcomeScreen)
-    result_play_button:RegisterPressCallback(function()CloseResult(true)end)
+    root:Q("welcome_play_button"):RegisterPressCallback(CloseWelcomeScreen)
+    root:Q("result_play_button"):RegisterPressCallback(function()CloseResult(true)end)
+    root:Q("opponent_left_play_button"):RegisterPressCallback(function()CloseOpponentLeft(true)end)
 
     -- Set Intial State
     CloseResult(false)
+    CloseOpponentLeft(false)
 end
 
 function ShowWelcomeScreen(onClose)
     OnWelcomeScreenClosed = onClose
-    welcome_group.visible = true
+    root:Q("welcome_group").visible = true
 end
 
 function CloseWelcomeScreen()
-    welcome_group.visible = false
+    root:Q("welcome_group").visible = false
     OnWelcomeScreenClosed()
 end
 
 function ShowResult(didWin,onClose)
     OnResultScreenClosed = onClose
-    result_group.visible = true
-    result_group:Q("result_win_image").visible = didWin
-    result_group:Q("result_lose_image").visible = not didWin
+    root:Q("result_group").visible = true
+    root:Q("result_win_image").visible = didWin
+    root:Q("result_lose_image").visible = not didWin
 end
 
 function CloseResult(invokeCallback)
     if(invokeCallback) then OnResultScreenClosed() end
-    result_group.visible = false
-    result_group:Q("result_win_image").visible = false
-    result_group:Q("result_lose_image").visible = false
+    root:Q("result_group").visible = false
+    root:Q("result_win_image").visible = false
+    root:Q("result_lose_image").visible = false
+end
+
+function ShowOpponentLeft(onClose)
+    OnOpponentLeftScreenClosed = onClose
+    root:Q("opponent_left_group").visible = true
+end
+
+function CloseOpponentLeft(invokeCallback)
+    if(invokeCallback) then OnOpponentLeftScreenClosed() end
+    root:Q("opponent_left_group").visible = false
 end
 
 function SetPlayer(id,racer)
     if (racer == nil) then
-        usernames:Q("username_"..id).visible = false
-        usernames:Q("turn_indicator_"..id).visible = false
+        root:Q("username_"..id).visible = false
+        root:Q("turn_indicator_"..id).visible = false
         return
     end
-    usernames:Q("username_"..id).visible = true
-    usernames:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
-    usernames:Q("turn_indicator_"..id).visible = racer.isTurn
+    root:Q("username_"..id).visible = true
+    root:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
+    root:Q("turn_indicator_"..id).visible = racer.isTurn
 end
 
 function SetSceneHeading(title,subtitle)
     if (title == nil or subtitle == nil) then
-        scene_heading_group.visible = false
+        root:Q("scene_heading_group").visible = false
         return
     end
-    scene_heading_group.visible = true
-    scene_heading_group:Q("scene_title"):SetPrelocalizedText(title, false)
-    scene_heading_group:Q("scene_subtitle"):SetPrelocalizedText(subtitle, false)
+    root:Q("scene_heading_group").visible = true
+    root:Q("scene_title"):SetPrelocalizedText(title, false)
+    root:Q("scene_subtitle"):SetPrelocalizedText(subtitle, false)
 end
 
 function SetSceneHelp(help)
     if (help == nil) then
-        scene_help_group.visible = false
+        root:Q("scene_help_group").visible = false
         return
     end
-    scene_help_group.visible = true
-    scene_help_group:Q("scene_help"):SetPrelocalizedText(help, false)
+    root:Q("scene_help_group").visible = true
+    root:Q("scene_help"):SetPrelocalizedText(help, false)
 end
 
 function HandleDebugInput()
-    if(welcome_group.visible and Input.isAltPressed) then CloseWelcomeScreen() end
-    if(result_group.visible and Input.isAltPressed) then CloseResult(true) end
+    if(root:Q("welcome_group").visible and Input.isAltPressed) then CloseWelcomeScreen() end
+    if(root:Q("result_group").visible and Input.isAltPressed) then CloseResult(true) end
 end

@@ -81,6 +81,12 @@
     background-image: resource("LoseGraphic");
 }
 
+#opponent_left_image{
+    width: 512px;
+    height: 512px;
+    background-image: resource("OpponentLeftGraphic");
+}
+
 .button{
     background-color: #68C1E1;
     border-radius: 10px;

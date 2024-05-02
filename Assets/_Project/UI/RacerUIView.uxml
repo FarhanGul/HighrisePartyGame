@@ -6,7 +6,7 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-  <hr:UILuaView class="racer-u-i-view" picking-mode="Ignore" >
+  <hr:UILuaView name="root" class="racer-u-i-view" picking-mode="Ignore" >
 
     <VisualElement name="scene_heading_group">
       <hr:UILabel name="scene_title" class="title_text" picking-mode="Ignore"/>
@@ -49,6 +49,15 @@
       <VisualElement name="result_lose_image"  picking-mode="Ignore"/>
       <hr:UIButton name="result_play_button" class="button">
         <hr:UILabel name="result_play_button_text" class="button_text"/>
+      </hr:UIButton>
+    </VisualElement>
+
+    <VisualElement name="opponent_left_group" class="popup">
+      <hr:UILabel name="opponent_left_title" class="title_text" picking-mode="Ignore"/>
+      <hr:UILabel name="opponent_left_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
+      <VisualElement name="opponent_left_image"  picking-mode="Ignore"/>
+      <hr:UIButton name="opponent_left_play_button" class="button">
+        <hr:UILabel name="opponent_left_play_button_text" class="button_text"/>
       </hr:UIButton>
     </VisualElement>
 
