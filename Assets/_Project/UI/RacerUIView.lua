@@ -69,6 +69,8 @@ function Initialize()
     root:Q("opponent_left_subtitle"):SetPrelocalizedText("OPPONENT LEFT THE MATCH", false)
     root:Q("opponent_left_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
     
+    root:Q("vs_label"):SetPrelocalizedText("vs", false)
+
     -- Register callbacks
     root:Q("welcome_play_button"):RegisterPressCallback(CloseWelcomeScreen)
     root:Q("result_play_button"):RegisterPressCallback(function()CloseResult(true)end)
@@ -116,12 +118,14 @@ end
 function SetPlayer(id,racer)
     if (racer == nil) then
         root:Q("username_"..id).visible = false
-        root:Q("turn_indicator_"..id).visible = false
+        root:Q("turn_indicator_"..id):AddToClassList("hide")
+        root:Q("vs_label").visible = false
         return
     end
     root:Q("username_"..id).visible = true
+    root:Q("vs_label").visible = true
     root:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
-    root:Q("turn_indicator_"..id).visible = racer.isTurn
+    if(racer.isTurn) then root:Q("turn_indicator_"..id):RemoveFromClassList("hide") else root:Q("turn_indicator_"..id):AddToClassList("hide") end
 end
 
 function SetSceneHeading(title,subtitle)

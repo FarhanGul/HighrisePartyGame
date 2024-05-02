@@ -9,7 +9,6 @@
     bottom: 0px;
     right: 0px;
     left:0px;
-    /* background-color: #D46175; */
 }
 
 .center{
@@ -38,14 +37,16 @@
 
 #username_group{
     position: absolute;
-    top:250px; 
+    bottom:200px; 
     left:0px;
     right:0px;
+    display: flex;
+    flex-direction: row;
 }
 
-.usernames{
-    /* padding-left: 5%;
-    padding-top: 25%; */
+#vs_label{
+    margin-left: 30px;
+    margin-right: 30px;
 }
 
 .username-block{
@@ -73,7 +74,7 @@
 }
 
 .username_text{
-    font-size: 40px;
+    font-size: 50px;
     -unity-font-definition: var(--heading-font);
 }
 
@@ -106,12 +107,15 @@
     justify-content: center;
 }
 
+.hide{
+    display: none;
+}
+
 .turn-indicator{
     width: 32px;
     height: 32px;
     background-image: resource("TurnIndicator");
-    position: absolute;
-    left : -45px
+    margin-right: 5px;
 }
 
 
