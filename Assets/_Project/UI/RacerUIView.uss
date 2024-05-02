@@ -4,6 +4,7 @@
     bottom: 0px;
     right: 0px;
     left:0px;
+    padding: 200px;
 }
 
 .usernames
@@ -33,7 +34,6 @@
     margin: 25px;
 }
 
-
 #username_1
 {
     color: #07A5C7;
@@ -50,7 +50,7 @@
     background-image: resource("TurnIndicator");
 }
 
-#welcome_group{
+.popup{
     background-color: #C3EFFF;
     border-color: #53A2BF;
     padding: 20px;
@@ -67,6 +67,18 @@
     width: 512px;
     height: 512px;
     background-image: resource("WelcomeImage");
+}
+
+#result_win_image{
+    width: 512px;
+    height: 512px;
+    background-image: resource("WinGraphic");
+}
+
+#result_lose_image{
+    width: 512px;
+    height: 512px;
+    background-image: resource("LoseGraphic");
 }
 
 .button{

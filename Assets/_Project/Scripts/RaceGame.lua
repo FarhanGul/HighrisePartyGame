@@ -56,6 +56,14 @@ local function Racers()
         end,
         IsLocalRacerTurn = function()
             return localRacer.isTurn
+        end,
+        GetPlayerWhoseTurnItIs = function(self)
+            for k,v in pairs(self.list) do
+                if(v.isTurn) then
+                    return v.player
+                end
+            end
+            return nil
         end
     }
 end
@@ -71,9 +79,9 @@ function self:ServerAwake()
     end)
 end
 
-function StartMatch(p1,p2,firstTurn)
+function StartMatch(gameIndex, p1,p2,firstTurn)
     -- print("Start Match : "..p1.name.." vs "..p2.name)
-    boardGameObject:GetComponent("Board").Reset()
+    boardGameObject:GetComponent("Board").Initialize(gameIndex)
     racers = Racers()
     racers:Add(Racer(1,p1,firstTurn == 1))
     racers:Add(Racer(2,p2,firstTurn == 2))
@@ -92,3 +100,6 @@ function StartMatch(p1,p2,firstTurn)
     end)
 end
 
+function GetRacers()
+    return racers
+end

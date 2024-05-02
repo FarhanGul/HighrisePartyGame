@@ -29,6 +29,7 @@ local e_sendStartMatchToClient = Event.new("sendStartMatchToClient")
 local e_sendMatchCancelledToClient = Event.new("sendMatchCancelledToClient")
 local e_sendMoveToWaitingAreaToClient = Event.new("sendMoveToWaitingAreaToClient")
 local e_sendReadyForMatchmakingToServer= Event.new("sendReadyForMatchmakingToServer")
+local e_sendMatchFinishedToServer= Event.new("sendMatchFinishedToServer")
 --
 
 --Classes
@@ -49,6 +50,16 @@ function GameInstances()
             for i=1, gamesInfo.count do
                 table.insert(self._table,GameInstance(i,nil,nil,nil))
             end
+        end,
+        HandleGameFinished = function(self,gameIndex)
+            if(self._table[gameIndex].p1 == nil or self._table[gameIndex].p2 == nil) then return end
+            self._table[gameIndex].p1.character.transform.position = gamesInfo.waitingAreaPosition
+            e_sendMoveToWaitingAreaToClient:FireAllClients(self._table[gameIndex].p1)
+            self._table[gameIndex].p2.character.transform.position = gamesInfo.waitingAreaPosition
+            e_sendMoveToWaitingAreaToClient:FireAllClients(self._table[gameIndex].p2)
+            self._table[gameIndex].p1 = nil
+            self._table[gameIndex].p2 = nil
+            self:HandlePlayerSlotsFreed(2)
         end,
         HandlePlayerSlotsFreed = function(self,count)
             -- Handle players in waiting queue as new players based on free slots
@@ -89,7 +100,6 @@ function GameInstances()
                     end
                 end
             end
-
         end,
         HandleNewPlayer = function(self,player)
             -- if another player is waiting then create match
@@ -133,6 +143,9 @@ function self:ServerAwake()
     e_sendReadyForMatchmakingToServer:Connect(function(player)
         gameInstances:HandleNewPlayer(player)
     end)
+    e_sendMatchFinishedToServer:Connect(function(player,_gameIndex)
+        gameInstances:HandleGameFinished(_gameIndex)
+    end)
 end
 
 function self:ClientAwake()
@@ -147,7 +160,7 @@ function self:ClientAwake()
             p1.character:Teleport(raceGame.transform.position,function() end)
             p2.character:Teleport(raceGame.transform.position,function() end)
             cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
-            raceGame:GetComponent("RaceGame").StartMatch(p1,p2,firstTurn)
+            raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
             playerHud.SetLocation( playerHud.Location().Game )
             playerHud.UpdateView()
         end
@@ -165,4 +178,15 @@ function self:ClientAwake()
             -- print("Other Player Left the match : Show message on HUD")
         end
     end)
+end
+
+function GameFinished(_gameIndex)
+    local raceGame = raceGames.transform:GetChild(_gameIndex-1).gameObject:GetComponent("RaceGame")
+    local playerWhoWon = raceGame.GetRacers():GetPlayerWhoseTurnItIs()
+    playerHud.ShowResult(client.localPlayer ~= playerWhoWon,function()
+        e_sendReadyForMatchmakingToServer:FireServer()
+    end)
+    if(client.localPlayer ~= playerWhoWon) then 
+        e_sendMatchFinishedToServer:FireServer(_gameIndex)
+    end
 end

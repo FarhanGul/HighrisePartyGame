@@ -16,25 +16,19 @@ local scene_heading_group: VisualElement = nil
 local scene_help_group: VisualElement = nil
 --!Bind
 local welcome_group: VisualElement = nil
-
 --!Bind
-local welcome_title : UILabel = nil
---!Bind
-local welcome_subtitle : UILabel = nil
---!Bind
-local welcome_description : UILabel = nil
---!Bind
-local welcome_guide : UILabel = nil
---!Bind
-local welcome_play_button_text : UILabel = nil
+local result_group: VisualElement = nil
 
 --!Bind
 local welcome_play_button : UIButton = nil
+--!Bind
+local result_play_button : UIButton = nil
 
 --Variables
 local location
 local racers
 local OnWelcomeScreenClosed
+local OnResultScreenClosed
 
 --Enums
 function Location ()
@@ -73,14 +67,22 @@ end
 
 function Initialize()
     -- Set Text
-    welcome_title:SetPrelocalizedText(strings.title, false)
-    welcome_subtitle:SetPrelocalizedText("WELCOME", false)
-    welcome_description:SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
-    welcome_guide:SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
-    welcome_play_button_text:SetPrelocalizedText("PLAY", false)
+    welcome_group:Q("welcome_title"):SetPrelocalizedText(strings.title, false)
+    welcome_group:Q("welcome_subtitle"):SetPrelocalizedText("WELCOME", false)
+    welcome_group:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
+    welcome_group:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
+    welcome_group:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
 
-    -- Register callback
+    result_group:Q("result_title"):SetPrelocalizedText(strings.title, false)
+    result_group:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
+    result_group:Q("result_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
+
+    -- Register callbacks
     welcome_play_button:RegisterPressCallback(CloseWelcomeScreen)
+    result_play_button:RegisterPressCallback(function()CloseResult(true)end)
+
+    -- Set Intial State
+    CloseResult(false)
 end
 
 function ShowWelcomeScreen(onClose)
@@ -89,9 +91,22 @@ function ShowWelcomeScreen(onClose)
 end
 
 function CloseWelcomeScreen()
-    print("Welcome Screen Closed")
     welcome_group.visible = false
     OnWelcomeScreenClosed()
+end
+
+function ShowResult(didWin,onClose)
+    OnResultScreenClosed = onClose
+    result_group.visible = true
+    result_group:Q("result_win_image").visible = didWin
+    result_group:Q("result_lose_image").visible = not didWin
+end
+
+function CloseResult(invokeCallback)
+    if(invokeCallback) then OnResultScreenClosed() end
+    result_group.visible = false
+    result_group:Q("result_win_image").visible = false
+    result_group:Q("result_lose_image").visible = false
 end
 
 function SetPlayer(id,racer)
@@ -126,4 +141,5 @@ end
 
 function HandleDebugInput()
     if(welcome_group.visible and Input.isAltPressed) then CloseWelcomeScreen() end
+    if(result_group.visible and Input.isAltPressed) then CloseResult(true) end
 end

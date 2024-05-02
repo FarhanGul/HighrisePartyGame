@@ -1,11 +1,17 @@
-local tiles = {}
-local location = {}
 --!SerializeField
 local dice : GameObject = nil
 --!SerializeField
 local piecesGameObject : GameObject = nil
+--!SerializeField
+local matchmakerGameObject : GameObject = nil
+
+local tiles = {}
+local location = {}
+local matchmaker
+local gameIndex
 
 function self:Start()
+    matchmaker = matchmakerGameObject:GetComponent("Matchmaker")
     for i = 0,self.transform.childCount-1,1
     do 
         tiles[i]= self.transform.GetChild(self.transform,i).gameObject;
@@ -16,23 +22,31 @@ function GetPiece(id)
     return piecesGameObject.transform:GetChild(id-1).gameObject
 end
 
-function Reset()
+function Initialize(_gameIndex)
+    gameIndex = _gameIndex
+    local i = 1
     for k,v in pairs(location) do
         v = 0
-        SetPiecePosition(k)
+        if(i == 1) then offset = 0.15 else offset = -0.15 end
+        k.transform.position = tiles[0].transform.position + Vector3.new(offset, 0, 0)
+        i += 1
     end
 end
 
-function SetPiecePosition(piece)
-    piece.transform.position = tiles[location[piece]].transform.position
+function SetPiecePosition(id)
+    local piece = GetPiece(id)
+    local offset
+    if(id == 1) then offset = 0.15 else offset = -0.15 end
+    piece.transform.position = tiles[location[piece]].transform.position + Vector3.new(offset, 0, 0)
 end
 
 function Move(id,roll)
     _DiceAnimation(roll)
-    _MovePiece(GetPiece(id),roll)
+    _MovePiece(id,roll)
 end
 
-function _MovePiece(piece, amount)
+function _MovePiece(id, amount)
+    local piece = GetPiece(id)
     if( location[piece] == nil) then
         location[piece] = 0
     end
@@ -41,9 +55,13 @@ function _MovePiece(piece, amount)
         return
     end
     location[piece] += 1
-    SetPiecePosition(piece)
+    SetPiecePosition(id)
     amount -= 1
-    local newTimer = Timer.new(0.25,function() _MovePiece(piece, amount) end,false)
+    if( location[piece] == #tiles) then
+        matchmaker.GameFinished(gameIndex)
+        return
+    end
+    local newTimer = Timer.new(0.25,function() _MovePiece(id, amount) end,false)
 end
 
 function _DiceAnimation(randomFace)
