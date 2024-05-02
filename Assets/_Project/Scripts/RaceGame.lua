@@ -71,6 +71,17 @@ end
 
 function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
+    e_sendRollToClients:Connect(function(id, roll)
+        boardGameObject:GetComponent("Board").Move(id,roll)
+        racers:GetFromId(id).isTurn = false
+        racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+        playerHud.UpdateView()
+    end)
+    diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
+        if(localRacer.isTurn) then
+            e_sendRollToServer:FireServer(localRacer.id ,math.random(1,6)) 
+        end
+    end)
 end
 
 function self:ServerAwake()
@@ -80,24 +91,12 @@ function self:ServerAwake()
 end
 
 function StartMatch(gameIndex, p1,p2,firstTurn)
-    -- print("Start Match : "..p1.name.." vs "..p2.name)
     boardGameObject:GetComponent("Board").Initialize(gameIndex)
     racers = Racers()
     racers:Add(Racer(1,p1,firstTurn == 1))
     racers:Add(Racer(2,p2,firstTurn == 2))
     playerHud.SetRacers( racers )
     localRacer = racers:GetFromPlayer(client.localPlayer)
-    diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        if(localRacer.isTurn) then
-            e_sendRollToServer:FireServer(localRacer.id ,math.random(1,6)) 
-        end
-    end)
-    e_sendRollToClients:Connect(function(id, roll)
-        boardGameObject:GetComponent("Board").Move(id,roll)
-        racers:GetFromId(id).isTurn = false
-        racers:GetFromId(racers.GetOtherId(id)).isTurn = true
-        playerHud.UpdateView()
-    end)
 end
 
 function GetRacers()

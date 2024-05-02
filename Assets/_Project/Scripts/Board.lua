@@ -6,7 +6,7 @@ local piecesGameObject : GameObject = nil
 local matchmakerGameObject : GameObject = nil
 
 local tiles = {}
-local location = {}
+local location = {0,0}
 local matchmaker
 local gameIndex
 
@@ -14,7 +14,7 @@ function self:Start()
     matchmaker = matchmakerGameObject:GetComponent("Matchmaker")
     for i = 0,self.transform.childCount-1,1
     do 
-        tiles[i]= self.transform.GetChild(self.transform,i).gameObject;
+        tiles[i] = self.transform.GetChild(self.transform,i).gameObject;
     end
 end
 
@@ -23,21 +23,16 @@ function GetPiece(id)
 end
 
 function Initialize(_gameIndex)
+    location = {0,0}
     gameIndex = _gameIndex
-    local i = 1
-    for k,v in pairs(location) do
-        v = 0
-        if(i == 1) then offset = 0.15 else offset = -0.15 end
-        k.transform.position = tiles[0].transform.position + Vector3.new(offset, 0, 0)
-        i += 1
-    end
+    SetPiecePosition(1)
+    SetPiecePosition(2)
 end
 
 function SetPiecePosition(id)
-    local piece = GetPiece(id)
     local offset
     if(id == 1) then offset = 0.15 else offset = -0.15 end
-    piece.transform.position = tiles[location[piece]].transform.position + Vector3.new(offset, 0, 0)
+    GetPiece(id).transform.position = tiles[location[id]].transform.position + Vector3.new(offset, 0, 0)
 end
 
 function Move(id,roll)
@@ -46,18 +41,11 @@ function Move(id,roll)
 end
 
 function _MovePiece(id, amount)
-    local piece = GetPiece(id)
-    if( location[piece] == nil) then
-        location[piece] = 0
-    end
-    if( location[piece] >= #tiles or amount == 0 )
-    then
-        return
-    end
-    location[piece] += 1
+    if( amount == 0 ) then return end
+    location[id] += 1
     SetPiecePosition(id)
     amount -= 1
-    if( location[piece] == #tiles) then
+    if( location[id] == #tiles) then
         matchmaker.GameFinished(gameIndex)
         return
     end
