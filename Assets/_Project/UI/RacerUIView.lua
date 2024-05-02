@@ -42,7 +42,7 @@ end
 function UpdateView()
     if (location == Location().Lobby) then SetSceneHeading(strings.title,"WAITING AREA") else SetSceneHeading(strings.title,"GAME") end
     if (location == Location().Lobby) then SetSceneHelp("PLEASE WAIT FOR MATCH") else 
-        if(racers.IsLocalRacerTurn()) then SetSceneHelp("IT IS YOUR TURN") else SetSceneHelp("PLEASE WAIT WHILE YOUR OPPONENET MAKES THEIR TURN") end
+        if(racers.IsLocalRacerTurn()) then SetSceneHelp("IT IS YOUR TURN") else SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN") end
     end
     for i=1,2 do
         if(location == Location().Lobby) then 

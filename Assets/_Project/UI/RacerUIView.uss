@@ -1,16 +1,51 @@
+:root {
+    --heading-font: url("project://database/Assets/_Project/Fonts/impactSDF.asset");
+    --normal-font: url("project://database/Assets/_Project/Fonts/bahnschriftSDF.asset");
+}
+
 .racer-u-i-view{
     position: absolute;
     top:0px;
     bottom: 0px;
     right: 0px;
     left:0px;
-    padding: 200px;
+    /* background-color: #D46175; */
 }
 
-.usernames
-{
-    padding-left: 5%;
-    padding-top: 25%;
+.center{
+    align-items : center;
+    justify-content: center;
+}
+
+#scene_help_background{
+    background-color: #C3EFFF;
+    padding: 15px;
+}
+
+#scene_heading_group{
+    position: absolute;
+    top:100px;
+    left:0px;
+    right:0px;
+}
+
+#scene_help_group{
+    position: absolute;
+    bottom:100px;
+    left:0px;
+    right:0px;
+}
+
+#username_group{
+    position: absolute;
+    top:250px; 
+    left:0px;
+    right:0px;
+}
+
+.usernames{
+    /* padding-left: 5%;
+    padding-top: 25%; */
 }
 
 .username-block{
@@ -21,10 +56,12 @@
 .title_text{
     color : #07A5C7;
     font-size: 60px;
+    -unity-font-definition: var(--heading-font);
 }
 
 .subtitle_text{
     font-size: 48px;
+    -unity-font-definition: var(--heading-font);
 }
 
 .normal_text{
@@ -32,6 +69,18 @@
     white-space: normal;
     -unity-text-align: middle-center;
     margin: 25px;
+    -unity-font-definition: var(--normal-font);
+}
+
+.username_text{
+    font-size: 40px;
+    -unity-font-definition: var(--heading-font);
+}
+
+.button_text{
+    color: white;
+    font-size: 48px;
+    -unity-font-definition: var(--heading-font);
 }
 
 #username_1
@@ -42,12 +91,6 @@
 #username_2
 {
     color: #D46175;
-}
-
-.turn-indicator{
-    width: 32px;
-    height: 32px;
-    background-image: resource("TurnIndicator");
 }
 
 .popup{
@@ -62,6 +105,15 @@
     align-items : center;
     justify-content: center;
 }
+
+.turn-indicator{
+    width: 32px;
+    height: 32px;
+    background-image: resource("TurnIndicator");
+    position: absolute;
+    left : -45px
+}
+
 
 #welcome_image{
     width: 512px;
@@ -94,9 +146,4 @@
     padding-bottom: 50px;
     padding-left: 100px;
     padding-right: 100px;
-}
-
-.button_text{
-    color: white;
-    font-size: 48px;
 }
