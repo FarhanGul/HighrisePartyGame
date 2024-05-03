@@ -31,7 +31,7 @@ end
 
 function SetPiecePosition(id)
     local offset
-    if(id == 1) then offset = 0.15 else offset = -0.15 end
+    if(id == 1) then offset = 0.4 else offset = -0.4 end
     GetPiece(id).transform.position = tiles[location[id]].transform.position + Vector3.new(offset, 0.19, 0)
 end
 

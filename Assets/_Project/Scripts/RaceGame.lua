@@ -16,6 +16,7 @@ local e_sendRollToClients = Event.new("sendRollToClients")
 local racers
 local localRacer
 local playerHud
+local isRollSentToServer
 --
 
 --Classes
@@ -76,9 +77,11 @@ function self:ClientAwake()
         racers:GetFromId(id).isTurn = false
         racers:GetFromId(racers.GetOtherId(id)).isTurn = true
         playerHud.UpdateView()
+        isRollSentToServer = false
     end)
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        if(localRacer.isTurn) then
+        if(localRacer.isTurn and not isRollSentToServer) then
+            isRollSentToServer = true
             e_sendRollToServer:FireServer(localRacer.id ,math.random(1,6)) 
         end
     end)
