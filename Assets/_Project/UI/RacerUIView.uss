@@ -1,6 +1,19 @@
 :root {
     --heading-font: url("project://database/Assets/_Project/Fonts/impactSDF.asset");
     --normal-font: url("project://database/Assets/_Project/Fonts/bahnschriftSDF.asset");
+    --color-01: #07A5C7;
+    --color-02: #314360;
+    --color-03: #C3E3E3;
+    --color-04: #D9E8EB;
+    --color-05: #000000;
+    --color-06: #7F8082;
+    --color-06: #C72507;
+    --alien-graphic: url("project://database/Assets/_Project/Textures/AlienGraphic.png");
+    --win-graphic: url("project://database/Assets/_Project/Textures/WinGraphic.png");
+    --lose-graphic: url("project://database/Assets/_Project/Textures/LoseGraphic.png");
+    --opponent-left-graphic: url("project://database/Assets/_Project/Textures/OpponentLeftGraphic.png");
+    --turn-indicator: url("project://database/Assets/_Project/Textures/TurnIndicator.png");
+
 }
 
 .racer-u-i-view{
@@ -17,8 +30,10 @@
 }
 
 #scene_help_background{
-    background-color: #C3EFFF;
+    background-color: var(--color-04);
     padding: 15px;
+    padding-left:50px;
+    padding-right:50px;
 }
 
 #scene_heading_group{
@@ -30,14 +45,14 @@
 
 #scene_help_group{
     position: absolute;
-    bottom:100px;
+    top:200px;
     left:0px;
     right:0px;
 }
 
 #username_group{
     position: absolute;
-    bottom:200px; 
+    top:300px; 
     left:0px;
     right:0px;
     display: flex;
@@ -97,8 +112,7 @@
 }
 
 .popup{
-    background-color: #C3EFFF;
-    border-color: #53A2BF;
+    background-color: var(--color-03);
     padding: 20px;
     position: absolute;
     top:0px;
@@ -116,38 +130,42 @@
 .turn-indicator{
     width: 32px;
     height: 32px;
-    background-image: resource("TurnIndicator");
+    background-image: var(--turn-indicator);
     margin-right: 5px;
 }
 
 
 #welcome_image{
-    width: 800px;
+    width: 700px;
     height: 700px;
-    background-image: resource("WelcomeImage");
+    background-image: var(--alien-graphic)
 }
 
 #result_win_image{
-    width: 512px;
-    height: 512px;
-    background-image: resource("WinGraphic");
+    width: 400px;
+    height: 400px;
+    margin: 50px;
+    background-image: var(--win-graphic)
 }
 
 #result_lose_image{
-    width: 512px;
-    height: 512px;
-    background-image: resource("LoseGraphic");
+    width: 400px;
+    height: 400px;
+    margin: 50px;
+    background-image: var(--lose-graphic)
 }
 
 #opponent_left_image{
     width: 400px;
     height: 400px;
-    margin: 40px;
-    background-image: resource("OpponentLeftGraphic");
+    margin: 50px;
+    background-image: var(--opponent-left-graphic)
 }
 
 .button{
-    background-color: #68C1E1;
+    background-color: var(--color-02);
+    border-color: var(--color-01);
+    border-width: 4px;
     border-radius: 10px;
     padding-top: 50px;
     padding-bottom: 50px;

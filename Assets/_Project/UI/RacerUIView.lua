@@ -2,7 +2,7 @@
 
 --Constants
 local strings={
-    title = "TABLETOP RACER"
+    title = "COSMIC RUSH"
 }
 
 --!SerializeField
@@ -140,7 +140,6 @@ function SetSceneHeading(title,subtitle)
     end
     root:Q("scene_heading_group").visible = true
     root:Q("scene_title"):SetPrelocalizedText(title, false)
-    root:Q("scene_subtitle"):SetPrelocalizedText(subtitle, false)
 end
 
 function SetSceneHelp(help)

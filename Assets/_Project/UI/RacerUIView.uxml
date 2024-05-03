@@ -10,7 +10,6 @@
 
     <VisualElement name="scene_heading_group" class="center">
       <hr:UILabel name="scene_title" class="title_text" picking-mode="Ignore"/>
-      <hr:UILabel name="scene_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
     </VisualElement>
 
     <VisualElement name="username_group" class="center" picking-mode="Ignore" >
