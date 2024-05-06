@@ -13,15 +13,17 @@
     --lose-graphic: url("project://database/Assets/_Project/Textures/LoseGraphic.png");
     --opponent-left-graphic: url("project://database/Assets/_Project/Textures/OpponentLeftGraphic.png");
     --turn-indicator: url("project://database/Assets/_Project/Textures/TurnIndicator.png");
+}
 
+*{
+    margin:0px;
+    padding:0px;
 }
 
 .racer-u-i-view{
     position: absolute;
-    top:0px;
-    bottom: 0px;
-    right: 0px;
-    left:0px;
+    height: 100%;
+    width: 100%;
 }
 
 .center{
@@ -36,32 +38,16 @@
     padding-right:50px;
 }
 
-#scene_heading_group{
-    position: absolute;
-    top:100px;
-    left:0px;
-    right:0px;
-}
-
-#scene_help_group{
-    position: absolute;
-    top:200px;
-    left:0px;
-    right:0px;
-}
-
 #username_group{
-    position: absolute;
-    top:320px; 
-    left:0px;
-    right:0px;
+    margin-top: 30px;
     display: flex;
     flex-direction: row;
 }
 
 #vs_label{
-    margin-left: 30px;
-    margin-right: 30px;
+    width: 10%;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .username-block{
@@ -71,19 +57,21 @@
 
 .title_text{
     color : #07A5C7;
-    font-size: 60px;
+    font-size: 600%;
     margin-bottom: 15px;
     margin-top: 15px;
     -unity-font-definition: var(--heading-font);
 }
 
 .subtitle_text{
-    font-size: 48px;
+    font-size: 480%;
+    white-space: normal;
+    -unity-text-align: middle-center;
     -unity-font-definition: var(--heading-font);
 }
 
 .normal_text{
-    font-size: 32px;
+    font-size: 320%;
     white-space: normal;
     -unity-text-align: middle-center;
     margin: 25px;
@@ -91,13 +79,18 @@
 }
 
 .username_text{
-    font-size: 50px;
+    -unity-text-align: middle-center;
+    font-size: 400%;
     -unity-font-definition: var(--normal-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 35%;
 }
 
 .button_text{
     color: white;
-    font-size: 48px;
+    font-size: 480%;
     -unity-font-definition: var(--heading-font);
 }
 
@@ -111,16 +104,22 @@
     color: #D46175;
 }
 
+#game_view_group{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items : center;
+    padding: 10%;
+}
+
 .popup{
     background-color: var(--color-03);
-    padding: 20px;
     position: absolute;
-    top:0px;
-    bottom: 0px;
-    right: 0px;
-    left:0px;
+    width: 100%;
+    height: 100%;
     align-items : center;
     justify-content: center;
+    padding: 15%;
 }
 
 .hide{
@@ -128,37 +127,42 @@
 }
 
 .turn-indicator{
-    width: 32px;
-    height: 32px;
+    width: 10%;
+    height: 60%;   
+    background-size: contain;
     background-image: var(--turn-indicator);
     margin-right: 7px;
     margin-bottom: 5px;
 }
 
 
-#welcome_image{
-    width: 700px;
-    height: 700px;
-    background-image: var(--alien-graphic)
+#welcome_image{ 
+    width: 100%;
+    height: 40%;
+    background-size: contain;
+    --unity-image: var(--alien-graphic)
 }
 
 #result_win_image{
-    width: 400px;
-    height: 400px;
+    width: 50%;
+    height: 20%;     
+    background-size: contain;
     margin: 50px;
     background-image: var(--win-graphic)
 }
 
 #result_lose_image{
-    width: 400px;
-    height: 400px;
+    width: 50%;
+    height: 20%;    
+    background-size: contain;
     margin: 50px;
     background-image: var(--lose-graphic)
 }
 
 #opponent_left_image{
-    width: 400px;
-    height: 400px;
+    width: 50%;
+    height: 20%;   
+    background-size: contain;
     margin: 50px;
     background-image: var(--opponent-left-graphic)
 }
@@ -172,8 +176,4 @@
     padding-bottom: 50px;
     padding-left: 100px;
     padding-right: 100px;
-}
-
-#welcome_group .normal_text{
-    width: 800px;
 }

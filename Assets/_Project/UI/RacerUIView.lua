@@ -6,6 +6,8 @@ local strings={
 }
 
 --!SerializeField
+local uiDebugMode : boolean = false
+--!SerializeField
 local allowDebugInput : boolean = false
 
 --!Bind
@@ -17,6 +19,8 @@ local racers
 local OnWelcomeScreenClosed
 local OnResultScreenClosed
 local OnOpponentLeftScreenClosed
+local uiDebugCycleIndex = 0
+local isAltReleased
 
 --Enums
 function Location ()
@@ -29,6 +33,7 @@ end
 
 function self:ClientUpdate()
     if(allowDebugInput) then HandleDebugInput() end
+    if(uiDebugMode) then HandleUiDebug() end
 end
 
 function SetLocation(_location)
@@ -59,6 +64,7 @@ function Initialize()
     root:Q("welcome_subtitle"):SetPrelocalizedText("WELCOME", false)
     root:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
     root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
+
     root:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
 
     root:Q("result_title"):SetPrelocalizedText(strings.title, false)
@@ -123,14 +129,16 @@ end
 function SetPlayer(id,racer)
     if (racer == nil) then
         root:Q("username_"..id).visible = false
-        root:Q("turn_indicator_"..id):AddToClassList("hide")
+        -- root:Q("turn_indicator_"..id):AddToClassList("hide")
+        root:Q("turn_indicator_"..id).visible = false
         root:Q("vs_label").visible = false
         return
     end
     root:Q("username_"..id).visible = true
     root:Q("vs_label").visible = true
     root:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
-    if(racer.isTurn) then root:Q("turn_indicator_"..id):RemoveFromClassList("hide") else root:Q("turn_indicator_"..id):AddToClassList("hide") end
+    -- if(racer.isTurn) then root:Q("turn_indicator_"..id):RemoveFromClassList("hide") else root:Q("turn_indicator_"..id):AddToClassList("hide") end
+    root:Q("turn_indicator_"..id).visible = racer.isTurn
 end
 
 function SetSceneHeading(title,subtitle)
@@ -154,4 +162,39 @@ end
 function HandleDebugInput()
     if(root:Q("welcome_group").visible and Input.isAltPressed) then CloseWelcomeScreen() end
     if(root:Q("result_group").visible and Input.isAltPressed) then CloseResult(true) end
+end
+
+function HandleUiDebug()
+    if(not isAltReleased and not Input.isAltPressed) then
+        isAltReleased = true
+    end
+    if(isAltReleased and Input.isAltPressed) then
+        isAltReleased = false
+        if(uiDebugCycleIndex == 0) then
+            CloseResult(false)
+            ShowWelcomeScreen(function()end)
+        elseif(uiDebugCycleIndex == 1) then
+            CloseWelcomeScreen()
+            SetLocation(Location().Lobby)
+            UpdateView()
+        elseif(uiDebugCycleIndex == 2) then
+            SetSceneHeading(strings.title,"GAME")
+            SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN")
+            local debugRacer = {}
+            debugRacer.isTurn = true
+            debugRacer.player = {}
+            debugRacer.player.name = "Debug Racer big name 01"
+            SetPlayer(1,debugRacer)
+            debugRacer.isTurn = false
+            debugRacer.player.name = "sn"
+            SetPlayer(2,debugRacer)
+        elseif(uiDebugCycleIndex == 3) then
+            ShowOpponentLeft(function()end)
+        elseif(uiDebugCycleIndex == 4) then
+            CloseOpponentLeft(false)
+            ShowResult(function()end, nil)
+        end
+        uiDebugCycleIndex += 1
+        if(uiDebugCycleIndex == 5) then uiDebugCycleIndex = 0 end
+    end
 end

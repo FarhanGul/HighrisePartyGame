@@ -8,33 +8,30 @@
 >
   <hr:UILuaView name="root" class="racer-u-i-view" picking-mode="Ignore" >
 
-    <VisualElement name="scene_heading_group" class="center">
-      <hr:UILabel name="scene_title" class="title_text" picking-mode="Ignore"/>
-    </VisualElement>
-
-    <VisualElement name="username_group" class="center" picking-mode="Ignore" >
-      <VisualElement name="userblock_1" class="username-block center" picking-mode="Ignore">
+    <VisualElement name="game_view_group" picking-mode="Ignore">
+      <VisualElement name="scene_heading_group" class="center" picking-mode="Ignore">
+        <hr:UILabel name="scene_title" class="title_text" picking-mode="Ignore"/>
+      </VisualElement>
+      <VisualElement name="scene_help_group" class="center" picking-mode="Ignore">
+        <VisualElement name="scene_help_background"  picking-mode="Ignore">
+          <hr:UILabel name="scene_help" class="subtitle_text" picking-mode="Ignore"/>
+        </VisualElement>
+      </VisualElement>
+      <VisualElement name="username_group" class="center" picking-mode="Ignore" >
         <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
         <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
-      </VisualElement>
-      <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/>
-      <VisualElement name="userblock_2" class="username-block center" picking-mode="Ignore">
+        <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/>
         <VisualElement name="turn_indicator_2" class="turn-indicator" picking-mode="Ignore"/>
         <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
       </VisualElement>
     </VisualElement>
 
-    <VisualElement name="scene_help_group" class="center">
-      <VisualElement name="scene_help_background"  picking-mode="Ignore">
-        <hr:UILabel name="scene_help" class="subtitle_text" picking-mode="Ignore"/>
-      </VisualElement>
-    </VisualElement>
 
     <VisualElement name="welcome_group" class="popup">
       <hr:UILabel name="welcome_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
-      <VisualElement name="welcome_image"  picking-mode="Ignore"/>
+      <Image name="welcome_image" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_guide" class="normal_text" picking-mode="Ignore"/>
       <hr:UIButton name="welcome_play_button" class="button">
         <hr:UILabel name="welcome_play_button_text" class="button_text"/>
