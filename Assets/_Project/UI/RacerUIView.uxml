@@ -33,9 +33,9 @@
       <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
       <Image name="welcome_image" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_guide" class="normal_text" picking-mode="Ignore"/>
-      <hr:UIButton name="welcome_play_button" class="button">
+      <!-- <hr:UIButton name="welcome_play_button" class="button">
         <hr:UILabel name="welcome_play_button_text" class="button_text"/>
-      </hr:UIButton>
+      </hr:UIButton> -->
     </VisualElement>
 
     <VisualElement name="result_group" class="popup">

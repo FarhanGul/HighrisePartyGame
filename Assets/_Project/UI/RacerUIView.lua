@@ -9,6 +9,8 @@ local strings={
 local uiDebugMode : boolean = false
 --!SerializeField
 local allowDebugInput : boolean = false
+--!SerializeField
+local welcomePlayTapHandler : TapHandler = nil
 
 --!Bind
 local root: VisualElement = nil
@@ -29,6 +31,9 @@ end
 
 function self:ClientAwake()
     Initialize()
+    welcomePlayTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
+        CloseWelcomeScreen()
+    end)
 end
 
 function self:ClientUpdate()
@@ -65,7 +70,7 @@ function Initialize()
     root:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
     root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
 
-    root:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
+    -- root:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
 
     root:Q("result_title"):SetPrelocalizedText(strings.title, false)
     root:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
@@ -78,7 +83,7 @@ function Initialize()
     root:Q("vs_label"):SetPrelocalizedText("vs", false)
 
     -- Register callbacks
-    root:Q("welcome_play_button"):RegisterPressCallback(CloseWelcomeScreen)
+    -- root:Q("welcome_play_button"):RegisterPressCallback(CloseWelcomeScreen)
     root:Q("result_play_button"):RegisterPressCallback(function()CloseResult(true)end)
     root:Q("opponent_left_play_button"):RegisterPressCallback(function()CloseOpponentLeft(true)end)
 
