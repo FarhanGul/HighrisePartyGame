@@ -1,10 +1,13 @@
 local gamesInfo = {
     count = 2,
     positions = {
-        Vector3.new(100,0,0),
-        Vector3.new(100,0,100),
+        Vector3.new(500,0,0)
     },
-    waitingAreaPosition = Vector3.new(0,0,0)
+    worldSpaceUiRelativeGamePositions = {
+        Vector3.new(500,3.12,9.76)
+    },
+    waitingAreaPosition = Vector3.new(0,0,0),
+    worldSpaceUiRelativeWaitingAreaPosition = Vector3.new(0,3.12,8.36)
 }
 
 --Public Variables
@@ -160,6 +163,7 @@ function self:ClientAwake()
             local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
             p1.character:Teleport(raceGame.transform.position,function() end)
             p2.character:Teleport(raceGame.transform.position,function() end)
+            playerHudGameObject.transform.position = gamesInfo.worldSpaceUiRelativeGamePositions[gameIndex]
             cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
             playerHud.SetLocation( playerHud.Location().Game )
@@ -171,6 +175,7 @@ function self:ClientAwake()
             playerHud.SetLocation( playerHud.Location().Lobby )
             playerHud.UpdateView()
             player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
+            playerHudGameObject.transform.position = gamesInfo.worldSpaceUiRelativeWaitingAreaPosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
     end)

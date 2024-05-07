@@ -43,18 +43,18 @@
       <hr:UILabel name="result_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <VisualElement name="result_win_image"  picking-mode="Ignore"/>
       <VisualElement name="result_lose_image"  picking-mode="Ignore"/>
-      <hr:UIButton name="result_play_button" class="button">
+      <!-- <hr:UIButton name="result_play_button" class="button">
         <hr:UILabel name="result_play_button_text" class="button_text"/>
-      </hr:UIButton>
+      </hr:UIButton> -->
     </VisualElement>
 
     <VisualElement name="opponent_left_group" class="popup">
       <hr:UILabel name="opponent_left_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="opponent_left_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <VisualElement name="opponent_left_image"  picking-mode="Ignore"/>
-      <hr:UIButton name="opponent_left_play_button" class="button">
+      <!-- <hr:UIButton name="opponent_left_play_button" class="button">
         <hr:UILabel name="opponent_left_play_button_text" class="button_text"/>
-      </hr:UIButton>
+      </hr:UIButton> -->
     </VisualElement>
 
   </hr:UILuaView>

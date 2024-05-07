@@ -10,7 +10,7 @@ local uiDebugMode : boolean = false
 --!SerializeField
 local allowDebugInput : boolean = false
 --!SerializeField
-local welcomePlayTapHandler : TapHandler = nil
+local playTapHandler : TapHandler = nil
 
 --!Bind
 local root: VisualElement = nil
@@ -31,8 +31,15 @@ end
 
 function self:ClientAwake()
     Initialize()
-    welcomePlayTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        CloseWelcomeScreen()
+    playTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
+        if(root:Q("welcome_group").visible) then
+            CloseWelcomeScreen()
+        elseif(root:Q("result_group").visible) then
+            CloseResult(true)
+        elseif(root:Q("opponent_left_group").visible) then
+            CloseOpponentLeft(true)
+        end
+        playTapHandler.gameObject:SetActive(false)
     end)
 end
 
@@ -74,18 +81,18 @@ function Initialize()
 
     root:Q("result_title"):SetPrelocalizedText(strings.title, false)
     root:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
-    root:Q("result_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
+    -- root:Q("result_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
     
     root:Q("opponent_left_title"):SetPrelocalizedText(strings.title, false)
     root:Q("opponent_left_subtitle"):SetPrelocalizedText("OPPONENT LEFT THE MATCH", false)
-    root:Q("opponent_left_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
+    -- root:Q("opponent_left_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
     
     root:Q("vs_label"):SetPrelocalizedText("vs", false)
 
     -- Register callbacks
     -- root:Q("welcome_play_button"):RegisterPressCallback(CloseWelcomeScreen)
-    root:Q("result_play_button"):RegisterPressCallback(function()CloseResult(true)end)
-    root:Q("opponent_left_play_button"):RegisterPressCallback(function()CloseOpponentLeft(true)end)
+    -- root:Q("result_play_button"):RegisterPressCallback(function()CloseResult(true)end)
+    -- root:Q("opponent_left_play_button"):RegisterPressCallback(function()CloseOpponentLeft(true)end)
 
     -- Set Intial State
     CloseResult(false)
@@ -93,6 +100,7 @@ function Initialize()
 end
 
 function ShowWelcomeScreen(onClose)
+    playTapHandler.gameObject:SetActive(true)
     OnWelcomeScreenClosed = onClose
     root:Q("welcome_group").visible = true
 end
@@ -103,6 +111,7 @@ function CloseWelcomeScreen()
 end
 
 function ShowResult(didWin,onClose)
+    playTapHandler.gameObject:SetActive(true)
     OnResultScreenClosed = onClose
     root:Q("result_group").visible = true
     if(didWin) then
@@ -122,6 +131,7 @@ function CloseResult(invokeCallback)
 end
 
 function ShowOpponentLeft(onClose)
+    playTapHandler.gameObject:SetActive(true)
     OnOpponentLeftScreenClosed = onClose
     root:Q("opponent_left_group").visible = true
 end
