@@ -4,10 +4,10 @@ local gamesInfo = {
         Vector3.new(500,0,0)
     },
     worldSpaceUiRelativeGamePositions = {
-        Vector3.new(500,3.12,9.76)
+        Vector3.new(500,3.58,9.76)
     },
     waitingAreaPosition = Vector3.new(0,0,0),
-    worldSpaceUiRelativeWaitingAreaPosition = Vector3.new(0,3.12,8.36)
+    worldSpaceUiRelativeWaitingAreaPosition = Vector3.new(0,3.58,8.36)
 }
 
 --Public Variables
