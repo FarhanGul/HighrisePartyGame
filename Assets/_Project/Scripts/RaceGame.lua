@@ -5,19 +5,18 @@ local diceTapHandler : TapHandler = nil
 local boardGameObject : GameObject = nil
 --!SerializeField
 local playerHudGameObject : GameObject = nil
---
+--!SerializeField
+local cardManagerGameObject : GameObject = nil
 
 --Events
 local e_sendRollToServer = Event.new("sendRollToServer")
 local e_sendRollToClients = Event.new("sendRollToClients")
---
 
 --Private Variables
 local racers
 local localRacer
 local playerHud
 local isRollSentToServer
---
 
 --Classes
 local function Racer(_id,_player,_isTurn)
@@ -72,14 +71,19 @@ local function Racers()
     }
 end
 
+--Functions
 function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     e_sendRollToClients:Connect(function(id, roll)
         boardGameObject:GetComponent("Board").Move(id,roll,function() 
-            racers:GetFromId(id).isTurn = false
-            racers:GetFromId(racers.GetOtherId(id)).isTurn = true
-            diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
-            playerHud.UpdateView()
+            local skipOpponentTurn = false
+            if(cardManagerGameObject:GetComponent("CardManager").GetPlayedCard() == "Zap") then skipOpponentTurn = true end
+            if(not skipOpponentTurn) then
+                racers:GetFromId(id).isTurn = false
+                racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+                diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
+                playerHud.UpdateView()
+            end
             isRollSentToServer = false
             boardGameObject:GetComponent("Board").TurnChanged()
         end)

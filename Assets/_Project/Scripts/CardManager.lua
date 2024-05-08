@@ -12,43 +12,60 @@ local cardSlot_03 : TapHandler = nil
 local cards = {}
 local selectedCard
 local racers
+local playedCard = nil
 
 -- Events
 local e_sendInitializeToServer = Event.new("sendInitializeToServer")
 local e_sendDrawCardToServer = Event.new("sendDrawCardToServer")
 local e_sendCardsToClient = Event.new("sendCardsToClient")
+local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
+local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
 
 function self:ClientAwake()
     playCardTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(PlaySelectedCard)
     cardSlot_01.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(1) end)
     cardSlot_02.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(2) end)
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
-    e_sendCardsToClient:Connect(function(player,_cards)
+    e_sendCardsToClient:Connect(function(_cards)
         cards = _cards
-        print("Client received cards - player.id: "..player.id.." client.localPlayer.id: "..client.localPlayer.id)
-        if(client.localPlayer == player)then
-            print(client.localPlayer.name.." recieved cards from server and updated view")
+        -- print("Client received cards - player.id: "..player.id.." client.localPlayer.id: "..client.localPlayer.id)
+        if(cards[client.localPlayer] ~= nil)then
+            -- print(client.localPlayer.name.." recieved cards from server and updated view")
             if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
             UpdateView()
         end
     end)
+    e_sendPlayCardToClient:Connect(function(_playedCard)
+        print("Card Played : ".._playedCard)
+        playedCard = _playedCard
+    end)
+end
+
+function GetPlayedCard()
+    return playedCard
 end
 
 function self:ServerAwake()
     e_sendInitializeToServer:Connect(function(player)
         -- print("Server recieved Initialize request from "..player.name)
-        print("Server recieved Initialize request - player.id: "..player.id)
+        -- print("Server recieved Initialize request - player.id: "..player.id)
         cards[player] = {}
-        e_sendCardsToClient:FireAllClients(player,cards)
+        e_sendCardsToClient:FireAllClients(cards)
     end)
     e_sendDrawCardToServer:Connect(function(player)
         if(#cards[player] < 3) then
             local deck = {"Nos","Zap"}
             local newCard = deck[math.random(1,2)]
             table.insert(cards[player],newCard)
-            e_sendCardsToClient:FireAllClients(player,cards)
+            e_sendCardsToClient:FireAllClients(cards)
         end
     end)
+    e_sendPlayCardToServer:Connect(function(player,_playedCard)
+        table.remove(cards[player],table.find(cards[player], _playedCard))
+        e_sendCardsToClient:FireAllClients(cards)
+        e_sendPlayCardToClient:FireAllClients(_playedCard)
+    end
+    )
 end
 
 function LandedOnDrawCardTile()
@@ -58,13 +75,22 @@ end
 
 function Initialize(_racers)
     e_sendInitializeToServer:FireServer() 
-    print("Initialize Request sent to server- client.localPlayer.id: "..client.localPlayer.id)
+    -- print("Initialize Request sent to server- client.localPlayer.id: "..client.localPlayer.id)
     -- print(client.localPlayer.name.." Sent Initialize request to server")
     racers = _racers
 end
 
+function TurnChanged()
+    playedCard = nil
+    UpdateView()
+end
+
+
 function PlaySelectedCard()
-    print("Card Played : "..cards[client.localPlayer][selectedCard])
+    -- print("Card Played : "..cards[client.localPlayer][selectedCard])
+    -- send it to server
+    local playedCard = cards[client.localPlayer][selectedCard]
+    e_sendPlayCardToServer:FireServer(playedCard) 
 end
 
 function CardSlotClick(cardSlotIndex)
@@ -74,7 +100,8 @@ end
 
 function UpdateView()
     local c = cards[client.localPlayer]
-    playCardTapHandler.gameObject:SetActive(#c > 0 and racers.IsLocalRacerTurn())
+    local canPlayCard = #c > 0 and racers.IsLocalRacerTurn() and playedCard == nil
+    playCardTapHandler.gameObject:SetActive(canPlayCard)
     cardSlot_01.gameObject:SetActive(#c > 0)
     cardSlot_02.gameObject:SetActive(#c > 1)
     cardSlot_03.gameObject:SetActive(#c > 2)
@@ -90,7 +117,7 @@ function UpdateView()
     end
     local slots = {cardSlot_01,cardSlot_02, cardSlot_03}
     for i = 1 , #c do
-        ActivateCardInSlot(slots[i], c[i], i == selectedCard)
+        ActivateCardInSlot(slots[i], c[i], i == selectedCard and canPlayCard)
     end
 end
 

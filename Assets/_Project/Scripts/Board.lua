@@ -15,7 +15,7 @@ local gameIndex
 local racers
 local onMoveFinished
 
-function self:Start()
+function self:ClientAwake()
     matchmaker = matchmakerGameObject:GetComponent("Matchmaker")
     cardManager = cardManagerGameObject:GetComponent("CardManager")
     for i = 0,self.transform.childCount-1,1
@@ -44,23 +44,26 @@ function SetPiecePosition(id)
 end
 
 function Move(id,roll,_onMoveFinished)
+    print("Move - CardManager.playedCard : "..tostring(cardManager.GetPlayedCard()))
+    local modifiedRoll = roll
+    if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     onMoveFinished = _onMoveFinished
     _DiceAnimation(roll)
-    _MovePiece(id,roll)
+    _MovePiece(id,modifiedRoll)
 end
 
 function TurnChanged()
-    cardManager.UpdateView()
+    cardManager.TurnChanged()
 end
 
 function _MovePiece(id, amount)
     if( amount == 0 ) then
         -- This is the final tile
         if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
-            print("Temporarily treating every tile as Draw Tile")
-            -- if(tiles[location[id]]:GetComponent("BoardTile")).type == "Draw" then
+            -- print("Temporarily treating every tile as Draw Tile")
+            if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
                 cardManager.LandedOnDrawCardTile()
-            -- end
+            end
         end
         onMoveFinished()
         return
