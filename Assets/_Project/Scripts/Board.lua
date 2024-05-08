@@ -4,14 +4,20 @@ local dice : GameObject = nil
 local piecesGameObject : GameObject = nil
 --!SerializeField
 local matchmakerGameObject : GameObject = nil
+--!SerializeField
+local cardManagerGameObject : GameObject = nil
 
 local tiles = {}
 local location = {0,0}
 local matchmaker
+local cardManager
 local gameIndex
+local racers
+local onMoveFinished
 
 function self:Start()
     matchmaker = matchmakerGameObject:GetComponent("Matchmaker")
+    cardManager = cardManagerGameObject:GetComponent("CardManager")
     for i = 0,self.transform.childCount-1,1
     do 
         tiles[i] = self.transform.GetChild(self.transform,i).gameObject;
@@ -22,11 +28,13 @@ function GetPiece(id)
     return piecesGameObject.transform:GetChild(id-1).gameObject
 end
 
-function Initialize(_gameIndex)
+function Initialize(_gameIndex,_racers,p1,p2)
     location = {0,0}
+    racers = _racers
     gameIndex = _gameIndex
     SetPiecePosition(1)
     SetPiecePosition(2)
+    cardManager.Initialize(racers)
 end
 
 function SetPiecePosition(id)
@@ -35,13 +43,28 @@ function SetPiecePosition(id)
     GetPiece(id).transform.position = tiles[location[id]].transform.position + Vector3.new(offset, 0.19, 0)
 end
 
-function Move(id,roll)
+function Move(id,roll,_onMoveFinished)
+    onMoveFinished = _onMoveFinished
     _DiceAnimation(roll)
     _MovePiece(id,roll)
 end
 
+function TurnChanged()
+    cardManager.UpdateView()
+end
+
 function _MovePiece(id, amount)
-    if( amount == 0 ) then return end
+    if( amount == 0 ) then
+        -- This is the final tile
+        if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
+            print("Temporarily treating every tile as Draw Tile")
+            -- if(tiles[location[id]]:GetComponent("BoardTile")).type == "Draw" then
+                cardManager.LandedOnDrawCardTile()
+            -- end
+        end
+        onMoveFinished()
+        return
+    end
     location[id] += 1
     SetPiecePosition(id)
     amount -= 1

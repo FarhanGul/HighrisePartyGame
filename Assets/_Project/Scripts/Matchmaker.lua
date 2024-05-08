@@ -4,7 +4,7 @@ local gamesInfo = {
         Vector3.new(500,0,0)
     },
     worldSpaceUiRelativeGamePositions = {
-        Vector3.new(500,3.58,9.76)
+        Vector3.new(500.37,4.2,1.65)
     },
     waitingAreaPosition = Vector3.new(0,0,0),
     worldSpaceUiRelativeWaitingAreaPosition = Vector3.new(0,3.58,8.36)
@@ -17,7 +17,6 @@ local raceGames : GameObject = nil
 local cameraRoot : GameObject = nil
 --!SerializeField
 local playerHudGameObject : GameObject = nil
---
 
 --Private Variables
 -- local maxMatches = 1
@@ -141,6 +140,9 @@ end
 function self:ServerAwake()
     gameInstances = GameInstances()
     gameInstances:Initialize()
+    server.PlayerConnected:Connect(function(player)
+        print(player.name.." connected with id "..player.id)
+    end)
     server.PlayerDisconnected:Connect(function(player)
         gameInstances:HandlePlayerLeft(player)
     end)
@@ -154,6 +156,7 @@ end
 
 function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
+    playerHudGameObject.transform.position = gamesInfo.worldSpaceUiRelativeWaitingAreaPosition
 
     playerHud.ShowWelcomeScreen(function()
         e_sendReadyForMatchmakingToServer:FireServer()
@@ -191,7 +194,7 @@ end
 function GameFinished(_gameIndex)
     local raceGame = raceGames.transform:GetChild(_gameIndex-1).gameObject:GetComponent("RaceGame")
     local playerWhoWon = raceGame.GetRacers():GetPlayerWhoseTurnItIs()
-    playerHud.ShowResult(client.localPlayer ~= playerWhoWon,function()
+    playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
     if(client.localPlayer ~= playerWhoWon) then 
