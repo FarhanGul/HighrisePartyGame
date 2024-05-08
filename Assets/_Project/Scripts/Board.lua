@@ -1,3 +1,6 @@
+-- Constants
+local TotalLaps = 3
+
 --!SerializeField
 local dice : GameObject = nil
 --!SerializeField
@@ -6,9 +9,12 @@ local piecesGameObject : GameObject = nil
 local matchmakerGameObject : GameObject = nil
 --!SerializeField
 local cardManagerGameObject : GameObject = nil
+--!SerializeField
+local playerHudGameObject : GameObject = nil
 
 local tiles = {}
 local location = {0,0}
+local laps = {1,1}
 local matchmaker
 local cardManager
 local gameIndex
@@ -29,6 +35,7 @@ function GetPiece(id)
 end
 
 function Initialize(_gameIndex,_racers,p1,p2)
+    laps = {1,1}
     location = {0,0}
     racers = _racers
     gameIndex = _gameIndex
@@ -44,10 +51,10 @@ function SetPiecePosition(id)
 end
 
 function Move(id,roll,_onMoveFinished)
-    print("Move - CardManager.playedCard : "..tostring(cardManager.GetPlayedCard()))
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     onMoveFinished = _onMoveFinished
+    -- if(Input.isAltPressed) then modifiedRoll = 25 end
     _DiceAnimation(roll)
     _MovePiece(id,modifiedRoll)
 end
@@ -69,12 +76,18 @@ function _MovePiece(id, amount)
         return
     end
     location[id] += 1
+    if( location[id] == #tiles + 1) then
+        if(laps[id] == TotalLaps ) then
+            matchmaker.GameFinished(gameIndex)
+            return
+        end
+        laps[id] += 1
+        location[id] = 0
+        racers:GetFromId(id).lap = laps[id]
+        playerHudGameObject:GetComponent("RacerUIView").UpdateView()
+    end
     SetPiecePosition(id)
     amount -= 1
-    if( location[id] == #tiles) then
-        matchmaker.GameFinished(gameIndex)
-        return
-    end
     local newTimer = Timer.new(0.25,function() _MovePiece(id, amount) end,false)
 end
 

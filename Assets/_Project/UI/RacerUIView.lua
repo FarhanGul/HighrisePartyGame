@@ -2,13 +2,14 @@
 
 --Constants
 local strings={
-    title = "COSMIC RUSH"
+    title = "COSMIC RUSH",
+    totalLaps = "3"
 }
 
 --!SerializeField
 local uiDebugMode : boolean = false
---!SerializeField
-local allowDebugInput : boolean = false
+-- --!SerializeField
+-- local allowDebugInput : boolean = false
 --!SerializeField
 local playTapHandler : TapHandler = nil
 
@@ -44,7 +45,7 @@ function self:ClientAwake()
 end
 
 function self:ClientUpdate()
-    if(allowDebugInput) then HandleDebugInput() end
+    -- if(allowDebugInput) then HandleDebugInput() end
     if(uiDebugMode) then HandleUiDebug() end
 end
 
@@ -58,11 +59,11 @@ end
 
 function UpdateView()
     if (location == Location().Lobby) then SetSceneHeading(strings.title,"WAITING AREA") else SetSceneHeading(strings.title,"GAME") end
-    if (location == Location().Lobby) then SetSceneHelp("PLEASE WAIT FOR MATCH") else 
+    if (location == Location().Lobby) then SetSceneHelp("PLEASE WAIT FOR MATCH") else
         if(racers.IsLocalRacerTurn()) then SetSceneHelp("IT IS YOUR TURN") else SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN") end
     end
     for i=1,2 do
-        if(location == Location().Lobby) then 
+        if(location == Location().Lobby) then
             SetPlayer(i,nil)
         else
             SetPlayer(i,racers:GetFromId(i))
@@ -77,22 +78,13 @@ function Initialize()
     root:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
     root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
 
-    -- root:Q("welcome_play_button_text"):SetPrelocalizedText("PLAY", false)
-
     root:Q("result_title"):SetPrelocalizedText(strings.title, false)
     root:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
-    -- root:Q("result_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
-    
+
     root:Q("opponent_left_title"):SetPrelocalizedText(strings.title, false)
     root:Q("opponent_left_subtitle"):SetPrelocalizedText("OPPONENT LEFT THE MATCH", false)
-    -- root:Q("opponent_left_play_button_text"):SetPrelocalizedText("PLAY AGAIN", false)
-    
-    root:Q("vs_label"):SetPrelocalizedText("vs", false)
 
-    -- Register callbacks
-    -- root:Q("welcome_play_button"):RegisterPressCallback(CloseWelcomeScreen)
-    -- root:Q("result_play_button"):RegisterPressCallback(function()CloseResult(true)end)
-    -- root:Q("opponent_left_play_button"):RegisterPressCallback(function()CloseOpponentLeft(true)end)
+    root:Q("vs_label"):SetPrelocalizedText("vs", false)
 
     -- Set Intial State
     CloseResult(false)
@@ -143,17 +135,20 @@ end
 
 function SetPlayer(id,racer)
     if (racer == nil) then
-        root:Q("username_"..id).visible = false
+        root:Q("username_and_lap_"..id).visible = false
         -- root:Q("turn_indicator_"..id):AddToClassList("hide")
         root:Q("turn_indicator_"..id).visible = false
         root:Q("vs_label").visible = false
         return
     end
-    root:Q("username_"..id).visible = true
+    root:Q("username_and_lap_"..id).visible = true
     root:Q("vs_label").visible = true
-    root:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
     -- if(racer.isTurn) then root:Q("turn_indicator_"..id):RemoveFromClassList("hide") else root:Q("turn_indicator_"..id):AddToClassList("hide") end
     root:Q("turn_indicator_"..id).visible = racer.isTurn
+
+    root:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
+    root:Q("lap_"..id):SetPrelocalizedText(racer.lap.." / "..strings.totalLaps, false)
+
 end
 
 function SetSceneHeading(title,subtitle)
@@ -175,8 +170,8 @@ function SetSceneHelp(help)
 end
 
 function HandleDebugInput()
-    if(root:Q("welcome_group").visible and Input.isAltPressed) then CloseWelcomeScreen() end
-    if(root:Q("result_group").visible and Input.isAltPressed) then CloseResult(true) end
+    -- if(root:Q("welcome_group").visible and Input.isAltPressed) then CloseWelcomeScreen() end
+    -- if(root:Q("result_group").visible and Input.isAltPressed) then CloseResult(true) end
 end
 
 function HandleUiDebug()
@@ -196,6 +191,7 @@ function HandleUiDebug()
             SetSceneHeading(strings.title,"GAME")
             SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN")
             local debugRacer = {}
+            debugRacer.lap = 1
             debugRacer.isTurn = true
             debugRacer.player = {}
             debugRacer.player.name = "Debug Racer big name 01"

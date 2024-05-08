@@ -40,8 +40,8 @@
 
 #username_group{
     margin-top: 30px;
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
 }
 
 #vs_label{
@@ -50,10 +50,10 @@
     margin-right: 10px;
 }
 
-.username-block{
+/* .username-block{
     display: flex;
     flex-direction: row;
-}
+} */
 
 .title_text{
     color : #07A5C7;
@@ -79,13 +79,13 @@
 }
 
 .username_text{
-    -unity-text-align: middle-center;
+    /* -unity-text-align: middle-center; */
     font-size: 400%;
-    -unity-font-definition: var(--normal-font);
-    white-space: nowrap;
+    -unity-font-definition: var(--heading-font);
+    /* white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
-    width: 35%;
+    text-overflow: ellipsis; */
+    /* width: 35%; */
 }
 
 .button_text{
@@ -129,7 +129,7 @@
 
 .turn-indicator{
     width: 10%;
-    height: 60%;   
+    height: 60%;
     background-size: contain;
     background-image: var(--turn-indicator);
     margin-right: 7px;
@@ -137,7 +137,7 @@
 }
 
 
-#welcome_image{ 
+#welcome_image{
     width: 100%;
     height: 40%;
     background-size: contain;
@@ -146,7 +146,7 @@
 
 #result_win_image{
     width: 50%;
-    height: 20%;     
+    height: 20%;
     background-size: contain;
     margin: 50px;
     background-image: var(--win-graphic)
@@ -154,7 +154,7 @@
 
 #result_lose_image{
     width: 50%;
-    height: 20%;    
+    height: 20%;
     background-size: contain;
     margin: 50px;
     background-image: var(--lose-graphic)
@@ -162,7 +162,7 @@
 
 #opponent_left_image{
     width: 50%;
-    height: 20%;   
+    height: 20%;
     background-size: contain;
     margin: 50px;
     background-image: var(--opponent-left-graphic)

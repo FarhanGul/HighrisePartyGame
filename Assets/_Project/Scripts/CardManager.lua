@@ -28,7 +28,7 @@ function self:ClientAwake()
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
     e_sendCardsToClient:Connect(function(_cards)
         cards = _cards
-        -- print("Client received cards - player.id: "..player.id.." client.localPlayer.id: "..client.localPlayer.id)
+        print("Client received cards - client.localPlayer.id: "..client.localPlayer.id)
         if(cards[client.localPlayer] ~= nil)then
             -- print(client.localPlayer.name.." recieved cards from server and updated view")
             if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end

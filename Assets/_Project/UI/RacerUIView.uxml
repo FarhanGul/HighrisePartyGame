@@ -19,10 +19,16 @@
       </VisualElement>
       <VisualElement name="username_group" class="center" picking-mode="Ignore" >
         <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
-        <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
+        <VisualElement name="username_and_lap_1" class="center" picking-mode="Ignore">
+          <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
+          <hr:UILabel name="lap_1" class="subtitle_text" picking-mode="Ignore"/>
+        </VisualElement>
         <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/>
         <VisualElement name="turn_indicator_2" class="turn-indicator" picking-mode="Ignore"/>
-        <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
+          <VisualElement name="username_and_lap_2" class="center" picking-mode="Ignore">
+            <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
+            <hr:UILabel name="lap_2" class="subtitle_text" picking-mode="Ignore"/>
+          </VisualElement>
       </VisualElement>
     </VisualElement>
 
@@ -33,9 +39,6 @@
       <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
       <Image name="welcome_image" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_guide" class="normal_text" picking-mode="Ignore"/>
-      <!-- <hr:UIButton name="welcome_play_button" class="button">
-        <hr:UILabel name="welcome_play_button_text" class="button_text"/>
-      </hr:UIButton> -->
     </VisualElement>
 
     <VisualElement name="result_group" class="popup">
@@ -43,18 +46,12 @@
       <hr:UILabel name="result_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <VisualElement name="result_win_image"  picking-mode="Ignore"/>
       <VisualElement name="result_lose_image"  picking-mode="Ignore"/>
-      <!-- <hr:UIButton name="result_play_button" class="button">
-        <hr:UILabel name="result_play_button_text" class="button_text"/>
-      </hr:UIButton> -->
     </VisualElement>
 
     <VisualElement name="opponent_left_group" class="popup">
       <hr:UILabel name="opponent_left_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="opponent_left_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <VisualElement name="opponent_left_image"  picking-mode="Ignore"/>
-      <!-- <hr:UIButton name="opponent_left_play_button" class="button">
-        <hr:UILabel name="opponent_left_play_button_text" class="button_text"/>
-      </hr:UIButton> -->
     </VisualElement>
 
   </hr:UILuaView>

@@ -23,7 +23,8 @@ local function Racer(_id,_player,_isTurn)
     return {
         id = _id,
         player = _player,
-        isTurn = _isTurn
+        isTurn = _isTurn,
+        lap = 1
     }
 end
 
