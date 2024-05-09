@@ -12,6 +12,8 @@ local uiDebugMode : boolean = false
 -- local allowDebugInput : boolean = false
 --!SerializeField
 local playTapHandler : TapHandler = nil
+--!SerializeField
+local audioManagerGameObject : GameObject = nil
 
 --!Bind
 local root: VisualElement = nil
@@ -41,6 +43,7 @@ function self:ClientAwake()
             CloseOpponentLeft(true)
         end
         playTapHandler.gameObject:SetActive(false)
+        audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
     end)
 end
 

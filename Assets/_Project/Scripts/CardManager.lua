@@ -7,6 +7,8 @@ local cardSlot_01 : TapHandler = nil
 local cardSlot_02 : TapHandler = nil
 --!SerializeField
 local cardSlot_03 : TapHandler = nil
+--!SerializeField
+local audioManagerGameObject : GameObject = nil
 
 -- Private
 local cards = {}
@@ -91,6 +93,7 @@ function PlaySelectedCard()
     -- send it to server
     local playedCard = cards[client.localPlayer][selectedCard]
     e_sendPlayCardToServer:FireServer(playedCard) 
+    audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
 end
 
 function CardSlotClick(cardSlotIndex)

@@ -11,6 +11,8 @@ local matchmakerGameObject : GameObject = nil
 local cardManagerGameObject : GameObject = nil
 --!SerializeField
 local playerHudGameObject : GameObject = nil
+--!SerializeField
+local audioManagerGameObject : GameObject = nil
 
 local tiles = {}
 local location = {0,0}
@@ -54,9 +56,9 @@ function Move(id,roll,_onMoveFinished)
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     onMoveFinished = _onMoveFinished
-    -- if(Input.isAltPressed) then modifiedRoll = 25 end
+    -- if(Input.isAltPressed) then modifiedRoll = 3 end
     _DiceAnimation(roll)
-    _MovePiece(id,modifiedRoll)
+    Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
 
 function TurnChanged()
@@ -87,6 +89,7 @@ function _MovePiece(id, amount)
         playerHudGameObject:GetComponent("RacerUIView").UpdateView()
     end
     SetPiecePosition(id)
+    audioManagerGameObject:GetComponent("AudioManager"):PlayMove()
     amount -= 1
     local newTimer = Timer.new(0.25,function() _MovePiece(id, amount) end,false)
 end
@@ -125,4 +128,5 @@ function _DiceAnimation(randomFace)
     rotation = Vector3.new(x,y,z)
     dice.transform.localEulerAngles = rotation
     dice.transform.GetChild(dice.transform,0).gameObject:GetComponent(Animator):SetTrigger("Flip")
+    audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
 end
