@@ -45,9 +45,9 @@
 }
 
 #vs_label{
-    width: 10%;
+    /* width: 10%;
     margin-left: 10px;
-    margin-right: 10px;
+    margin-right: 10px; */
 }
 
 /* .username-block{
@@ -113,14 +113,14 @@
 }
 
 .popup{
-    background-color: var(--color-03);
-    /* background-color: rgba(0, 0, 0, 0); */
+    /* background-color: var(--color-03); */
+    background-color: rgba(0, 0, 0, 0);
     position: absolute;
     width: 100%;
     height: 100%;
     align-items : center;
     justify-content: center;
-    padding: 5%;
+    /* padding: 5%; */
 }
 
 .hide{
@@ -128,12 +128,13 @@
 }
 
 .turn-indicator{
-    width: 10%;
-    height: 60%;
+    /* width: 10%;*/
+    display: none;
+    /* height: 60%;
     background-size: contain;
-    background-image: var(--turn-indicator);
-    margin-right: 7px;
-    margin-bottom: 5px;
+    background-image: var(--turn-indicator); */
+    /* margin-right: 7px;
+    margin-bottom: 5px; */
 }
 
 
@@ -141,7 +142,7 @@
     width: 100%;
     height: 40%;
     background-size: contain;
-    --unity-image: var(--alien-graphic)
+    background-image: var(--alien-graphic)
 }
 
 #result_win_image{

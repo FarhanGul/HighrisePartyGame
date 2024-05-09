@@ -17,7 +17,7 @@
           <hr:UILabel name="scene_help" class="subtitle_text" picking-mode="Ignore"/>
         </VisualElement>
       </VisualElement>
-      <VisualElement name="username_group" class="center" picking-mode="Ignore" >
+      <VisualElement name="username_group" class="center hide" picking-mode="Ignore" >
         <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
         <VisualElement name="username_and_lap_1" class="center" picking-mode="Ignore">
           <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
@@ -37,7 +37,7 @@
       <hr:UILabel name="welcome_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
-      <Image name="welcome_image" picking-mode="Ignore"/>
+      <VisualElement name="welcome_image"  picking-mode="Ignore"/>
       <hr:UILabel name="welcome_guide" class="normal_text" picking-mode="Ignore"/>
     </VisualElement>
 

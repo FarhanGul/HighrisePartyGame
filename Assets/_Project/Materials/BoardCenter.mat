@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DefaultTile
+  m_Name: BoardCenter
   m_Shader: {fileID: -6465566751694194690, guid: 1c60b97cd58b7d046a7bd8af7a8808f3,
     type: 3}
   m_Parent: {fileID: 0}
@@ -125,8 +125,8 @@ Material:
     - _ZWriteControl: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.28235295, g: 0.36078432, b: 0.45490196, a: 1}
-    - _Emission: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 0.24131261, g: 0.22182271, b: 0.3509434, a: 1}
+    - _Emission: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _SpecularColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0}

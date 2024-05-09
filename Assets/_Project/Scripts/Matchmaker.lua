@@ -1,13 +1,15 @@
 local gamesInfo = {
     count = 2,
-    positions = {
+    playerGamePositions = {
         Vector3.new(500,0,0)
     },
-    worldSpaceUiRelativeGamePositions = {
-        Vector3.new(500.37,4.2,1.65)
-    },
+    -- worldSpaceUiGamePositions = {
+    --     Vector3.new(500.37,4.2,1.65)
+    -- },
+
     waitingAreaPosition = Vector3.new(0,0,0),
-    worldSpaceUiRelativeWaitingAreaPosition = Vector3.new(0,3.58,8.36)
+    worldSpaceUiWaitingAreaPosition = Vector3.new(0,3.61,-8.06),
+    worldSpaceUiRelativeGamePosition = Vector3.new(0,3.61,-8.06)
 }
 
 --Public Variables
@@ -111,8 +113,8 @@ function GameInstances()
                 if (v.p1 ~= nil and v.p2 == nil  ) then
                     v.p2 = player
                     v.firstTurn = math.random(1,2)
-                    v.p1.character.transform.position = gamesInfo.positions[v.gameIndex]
-                    v.p2.character.transform.position = gamesInfo.positions[v.gameIndex]
+                    v.p1.character.transform.position = gamesInfo.playerGamePositions[v.gameIndex]
+                    v.p2.character.transform.position = gamesInfo.playerGamePositions[v.gameIndex]
                     e_sendStartMatchToClient:FireAllClients(v.p1,v.gameIndex,v.p1,v.p2,v.firstTurn)
                     e_sendStartMatchToClient:FireAllClients(v.p2,v.gameIndex,v.p1,v.p2,v.firstTurn)
                     return
@@ -156,7 +158,7 @@ end
 
 function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
-    playerHudGameObject.transform.position = gamesInfo.worldSpaceUiRelativeWaitingAreaPosition
+    playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
 
     playerHud.ShowWelcomeScreen(function()
         e_sendReadyForMatchmakingToServer:FireServer()
@@ -166,7 +168,8 @@ function self:ClientAwake()
             local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
             p1.character:Teleport(raceGame.transform.position,function() end)
             p2.character:Teleport(raceGame.transform.position,function() end)
-            playerHudGameObject.transform.position = gamesInfo.worldSpaceUiRelativeGamePositions[gameIndex]
+            playerHudGameObject.transform.parent:SetParent(raceGame.transform)
+            playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
             playerHud.SetLocation( playerHud.Location().Game )
@@ -178,7 +181,7 @@ function self:ClientAwake()
             playerHud.SetLocation( playerHud.Location().Lobby )
             playerHud.UpdateView()
             player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
-            playerHudGameObject.transform.position = gamesInfo.worldSpaceUiRelativeWaitingAreaPosition
+            playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
     end)

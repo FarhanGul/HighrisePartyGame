@@ -58,6 +58,7 @@ function SetRacers(_racers)
 end
 
 function UpdateView()
+    ShowSceneView()
     if (location == Location().Lobby) then SetSceneHeading(strings.title,"WAITING AREA") else SetSceneHeading(strings.title,"GAME") end
     if (location == Location().Lobby) then SetSceneHelp("PLEASE WAIT FOR MATCH") else
         if(racers.IsLocalRacerTurn()) then SetSceneHelp("IT IS YOUR TURN") else SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN") end
@@ -89,9 +90,23 @@ function Initialize()
     -- Set Intial State
     CloseResult(false)
     CloseOpponentLeft(false)
+    CloseSceneView()
+end
+
+function ShowSceneView()
+    root:Q("scene_heading_group").visible = true
+    root:Q("scene_help_group").visible = true
+    root:Q("username_group"):EnableInClassList("hide",false)
+end
+
+function CloseSceneView()
+    root:Q("scene_heading_group").visible = false
+    root:Q("scene_help_group").visible = false
+    root:Q("username_group"):EnableInClassList("hide",true)
 end
 
 function ShowWelcomeScreen(onClose)
+    CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
     OnWelcomeScreenClosed = onClose
     root:Q("welcome_group").visible = true
@@ -103,6 +118,7 @@ function CloseWelcomeScreen()
 end
 
 function ShowResult(didWin,onClose)
+    CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
     OnResultScreenClosed = onClose
     root:Q("result_group").visible = true
@@ -123,6 +139,7 @@ function CloseResult(invokeCallback)
 end
 
 function ShowOpponentLeft(onClose)
+    CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
     OnOpponentLeftScreenClosed = onClose
     root:Q("opponent_left_group").visible = true
