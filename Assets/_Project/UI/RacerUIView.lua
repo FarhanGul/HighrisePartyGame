@@ -60,6 +60,16 @@ function SetRacers(_racers)
     racers = _racers
 end
 
+function UpdateAction(_action)
+    if(_action ~= nil) then 
+        root:Q("action_group"):EnableInClassList("hide",false)
+        root:Q("action_player"):SetPrelocalizedText(_action.player, false)
+        root:Q("action_text"):SetPrelocalizedText(_action.text, false)
+    else
+        root:Q("action_group"):EnableInClassList("hide",true)
+    end
+end
+
 function UpdateView()
     ShowSceneView()
     if (location == Location().Lobby) then SetSceneHeading(strings.title,"WAITING AREA") else SetSceneHeading(strings.title,"GAME") end
@@ -100,12 +110,14 @@ function ShowSceneView()
     root:Q("scene_heading_group").visible = true
     root:Q("scene_help_group").visible = true
     root:Q("username_group"):EnableInClassList("hide",false)
+    -- root:Q("action_group"):EnableInClassList("hide",false)
 end
 
 function CloseSceneView()
     root:Q("scene_heading_group").visible = false
     root:Q("scene_help_group").visible = false
     root:Q("username_group"):EnableInClassList("hide",true)
+    -- root:Q("action_group"):EnableInClassList("hide",true)
 end
 
 function ShowWelcomeScreen(onClose)
@@ -122,6 +134,7 @@ end
 
 function ShowResult(didWin,onClose)
     CloseSceneView()
+    UpdateAction(nil)
     playTapHandler.gameObject:SetActive(true)
     OnResultScreenClosed = onClose
     root:Q("result_group").visible = true
@@ -142,6 +155,7 @@ function CloseResult(invokeCallback)
 end
 
 function ShowOpponentLeft(onClose)
+    UpdateAction(nil)
     audioManagerGameObject:GetComponent("AudioManager"):PlayDisconnect()
     CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
@@ -220,6 +234,7 @@ function HandleUiDebug()
             debugRacer.isTurn = false
             debugRacer.player.name = "sn"
             SetPlayer(2,debugRacer)
+            UpdateAction({player = "Debug Racer big name 01",text = " played zap"})
         elseif(uiDebugCycleIndex == 3) then
             ShowOpponentLeft(function()end)
         elseif(uiDebugCycleIndex == 4) then

@@ -9,14 +9,17 @@
   <hr:UILuaView name="root" class="racer-u-i-view" picking-mode="Ignore" >
 
     <VisualElement name="game_view_group" picking-mode="Ignore">
+
       <VisualElement name="scene_heading_group" class="center" picking-mode="Ignore">
         <hr:UILabel name="scene_title" class="title_text" picking-mode="Ignore"/>
       </VisualElement>
+
       <VisualElement name="scene_help_group" class="center" picking-mode="Ignore">
         <VisualElement name="scene_help_background"  picking-mode="Ignore">
           <hr:UILabel name="scene_help" class="subtitle_text" picking-mode="Ignore"/>
         </VisualElement>
       </VisualElement>
+
       <VisualElement name="username_group" class="center hide" picking-mode="Ignore" >
         <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
         <VisualElement name="username_and_lap_1" class="center" picking-mode="Ignore">
@@ -30,8 +33,16 @@
             <hr:UILabel name="lap_2" class="subtitle_text" picking-mode="Ignore"/>
           </VisualElement>
       </VisualElement>
-    </VisualElement>
 
+        <VisualElement name="action_group" class="hide" picking-mode="Ignore">
+          <VisualElement name="action_image" picking-mode="Ignore"/>
+          <VisualElement name="action_text_background" picking-mode="Ignore">
+            <hr:UILabel name="action_player" class="subtitle_text" picking-mode="Ignore"/>
+            <hr:UILabel name="action_text" class="normal_text" picking-mode="Ignore"/>
+          </VisualElement>
+        </VisualElement>
+      
+    </VisualElement>
 
     <VisualElement name="welcome_group" class="popup">
       <hr:UILabel name="welcome_title" class="title_text" picking-mode="Ignore"/>

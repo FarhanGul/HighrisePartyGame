@@ -54,6 +54,10 @@ function SetPiecePosition(id)
 end
 
 function Move(id,roll,_onMoveFinished)
+    playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+        player = racers:GetFromId(id).player.name,
+        text  = "Rolled "..tostring(roll)
+    })
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     onMoveFinished = _onMoveFinished

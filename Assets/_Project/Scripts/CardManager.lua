@@ -9,6 +9,8 @@ local cardSlot_02 : TapHandler = nil
 local cardSlot_03 : TapHandler = nil
 --!SerializeField
 local audioManagerGameObject : GameObject = nil
+--!SerializeField
+local playerHudGameObject : GameObject = nil
 
 -- Private
 local cards = {}
@@ -39,6 +41,10 @@ function self:ClientAwake()
     end)
     e_sendPlayCardToClient:Connect(function(_playedCard)
         print("Card Played : ".._playedCard)
+        playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+            player = client.localPlayer.name,
+            text  = "Played ".._playedCard
+        })
         if(_playedCard == "Zap") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
         elseif(_playedCard == "Nos") then
