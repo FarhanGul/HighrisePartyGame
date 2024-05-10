@@ -26,13 +26,14 @@ local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
 local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
 
 function self:ClientAwake()
+    print("Client registered event - client.localPlayer.id: "..client.localPlayer.id)
     playCardTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(PlaySelectedCard)
     cardSlot_01.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(1) end)
     cardSlot_02.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(2) end)
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
     e_sendCardsToClient:Connect(function(_cards)
         cards = _cards
-        -- print("Client received cards - client.localPlayer.id: "..client.localPlayer.id)
+        print("Client received cards - client.localPlayer.id: "..client.localPlayer.id)
         if(cards[client.localPlayer] ~= nil)then
             -- print(client.localPlayer.name.." recieved cards from server and updated view")
             if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
@@ -63,7 +64,7 @@ end
 function self:ServerAwake()
     e_sendInitializeToServer:Connect(function(player)
         -- print("Server recieved Initialize request from "..player.name)
-        -- print("Server recieved Initialize request - player.id: "..player.id)
+        print("Server recieved Initialize request - player.id: "..player.id)
         cards[player] = {}
         e_sendCardsToClient:FireAllClients(cards)
     end)
