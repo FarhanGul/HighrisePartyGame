@@ -20,6 +20,8 @@ local raceStart : AudioSource = nil
 local disconnect : AudioSource = nil
 --!SerializeField
 local resultNotify : AudioSource = nil
+--!SerializeField
+local honk : AudioSource = nil
 
 function PlayMove()
     move:Play()
@@ -59,4 +61,8 @@ end
 
 function PlayResultNotify()
     resultNotify:Play()
+end
+
+function PlayHonk()
+    honk:Play()
 end

@@ -49,6 +49,8 @@ function self:ClientAwake()
             audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
         elseif(_playedCard == "Nos") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
+        elseif(_playedCard == "Honk") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayHonk()
         end
         playedCard = _playedCard
     end)
@@ -101,8 +103,6 @@ end
 
 
 function PlaySelectedCard()
-    -- print("Card Played : "..cards[client.localPlayer][selectedCard])
-    -- send it to server
     local playedCard = cards[client.localPlayer][selectedCard]
     e_sendPlayCardToServer:FireServer(playedCard) 
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
