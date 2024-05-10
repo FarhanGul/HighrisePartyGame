@@ -44,6 +44,7 @@ function Initialize(_gameIndex,_racers,p1,p2)
     SetPiecePosition(1)
     SetPiecePosition(2)
     cardManager.Initialize(racers)
+    audioManagerGameObject:GetComponent("AudioManager"):PlayRaceStart()
 end
 
 function SetPiecePosition(id)
@@ -80,6 +81,8 @@ function _MovePiece(id, amount)
     location[id] += 1
     if( location[id] == #tiles + 1) then
         if(laps[id] == TotalLaps ) then
+            print("Game Finished")
+            audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
             matchmaker.GameFinished(gameIndex)
             return
         end

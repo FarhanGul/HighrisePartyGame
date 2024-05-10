@@ -142,6 +142,7 @@ function CloseResult(invokeCallback)
 end
 
 function ShowOpponentLeft(onClose)
+    audioManagerGameObject:GetComponent("AudioManager"):PlayDisconnect()
     CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
     OnOpponentLeftScreenClosed = onClose

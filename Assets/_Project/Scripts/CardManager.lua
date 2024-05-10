@@ -39,6 +39,11 @@ function self:ClientAwake()
     end)
     e_sendPlayCardToClient:Connect(function(_playedCard)
         print("Card Played : ".._playedCard)
+        if(_playedCard == "Zap") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
+        elseif(_playedCard == "Nos") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
+        end
         playedCard = _playedCard
     end)
 end
@@ -73,6 +78,7 @@ end
 function LandedOnDrawCardTile()
     -- print(client.localPlayer.name.." Sent Draw request to server")
     e_sendDrawCardToServer:FireServer() 
+    audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
 end
 
 function Initialize(_racers)
@@ -98,6 +104,7 @@ end
 
 function CardSlotClick(cardSlotIndex)
     selectedCard = cardSlotIndex
+    audioManagerGameObject:GetComponent("AudioManager"):PlayHit()
     UpdateView()
 end
 
