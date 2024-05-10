@@ -26,22 +26,18 @@ local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
 local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
 
 function self:ClientAwake()
-    print("Client registered event - client.localPlayer.id: "..client.localPlayer.id)
     playCardTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(PlaySelectedCard)
     cardSlot_01.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(1) end)
     cardSlot_02.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(2) end)
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
     e_sendCardsToClient:Connect(function(_cards)
         cards = _cards
-        print("Client received cards - client.localPlayer.id: "..client.localPlayer.id)
         if(cards[client.localPlayer] ~= nil)then
-            -- print(client.localPlayer.name.." recieved cards from server and updated view")
             if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
             UpdateView()
         end
     end)
     e_sendPlayCardToClient:Connect(function(_playedCard)
-        print("Card Played : ".._playedCard)
         playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
             player = client.localPlayer.name,
             text  = "Played ".._playedCard
@@ -63,38 +59,39 @@ end
 
 function self:ServerAwake()
     e_sendInitializeToServer:Connect(function(player)
-        -- print("Server recieved Initialize request from "..player.name)
-        print("Server recieved Initialize request - player.id: "..player.id)
         cards[player] = {}
-        e_sendCardsToClient:FireAllClients(cards)
     end)
-    e_sendDrawCardToServer:Connect(function(player)
+    e_sendDrawCardToServer:Connect(function(player,opponentPlayer)
         if(#cards[player] < 3) then
             local deck = {"Nos","Zap"}
             local newCard = deck[math.random(1,2)]
             table.insert(cards[player],newCard)
-            e_sendCardsToClient:FireAllClients(cards)
+            e_sendCardsToClient:FireClient(player,cards)
+            e_sendCardsToClient:FireClient(opponentPlayer,cards)
         end
     end)
-    e_sendPlayCardToServer:Connect(function(player,_playedCard)
+    e_sendPlayCardToServer:Connect(function(player,opponentPlayer,_playedCard)
         table.remove(cards[player],table.find(cards[player], _playedCard))
-        e_sendCardsToClient:FireAllClients(cards)
-        e_sendPlayCardToClient:FireAllClients(_playedCard)
+        e_sendCardsToClient:FireClient(player,cards)
+        e_sendCardsToClient:FireClient(opponentPlayer,cards)
+        e_sendPlayCardToClient:FireClient(player,_playedCard)
+        e_sendPlayCardToClient:FireClient(opponentPlayer,_playedCard)
     end
     )
 end
 
 function LandedOnDrawCardTile()
-    -- print(client.localPlayer.name.." Sent Draw request to server")
-    e_sendDrawCardToServer:FireServer() 
+    e_sendDrawCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer)) 
     audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
 end
 
 function Initialize(_racers)
-    e_sendInitializeToServer:FireServer() 
-    -- print("Initialize Request sent to server- client.localPlayer.id: "..client.localPlayer.id)
-    -- print(client.localPlayer.name.." Sent Initialize request to server")
     racers = _racers
+    cards[client.localPlayer] = {}
+    cards[racers:GetOpponentPlayer(client.localPlayer)] = {}
+    e_sendInitializeToServer:FireServer() 
+    selectedCard = -1
+    UpdateView()
 end
 
 function TurnChanged()
@@ -105,13 +102,15 @@ end
 
 function PlaySelectedCard()
     local playedCard = cards[client.localPlayer][selectedCard]
-    e_sendPlayCardToServer:FireServer(playedCard) 
+    e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard) 
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
 end
 
 function CardSlotClick(cardSlotIndex)
     selectedCard = cardSlotIndex
-    audioManagerGameObject:GetComponent("AudioManager"):PlayHit()
+    if(selectedCard ~= -1) then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayHit()
+    end
     UpdateView()
 end
 

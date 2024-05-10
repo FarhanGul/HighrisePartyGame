@@ -92,14 +92,15 @@ function self:ClientAwake()
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
         if(localRacer.isTurn and not isRollSentToServer) then
             isRollSentToServer = true
-            e_sendRollToServer:FireServer(localRacer.id ,math.random(1,6)) 
+            e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),localRacer.id ,math.random(1,6)) 
         end
     end)
 end
 
 function self:ServerAwake()
-    e_sendRollToServer:Connect(function(player,id, roll)
-        e_sendRollToClients:FireAllClients(id,roll)
+    e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
+        e_sendRollToClients:FireClient(player,id,roll)
+        e_sendRollToClients:FireClient(opponentPlayer,id,roll)
     end)
 end
 

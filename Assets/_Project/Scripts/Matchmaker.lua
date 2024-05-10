@@ -58,9 +58,9 @@ function GameInstances()
         HandleGameFinished = function(self,gameIndex)
             if(self._table[gameIndex].p1 == nil or self._table[gameIndex].p2 == nil) then return end
             self._table[gameIndex].p1.character.transform.position = gamesInfo.waitingAreaPosition
-            e_sendMoveToWaitingAreaToClient:FireAllClients(self._table[gameIndex].p1)
+            e_sendMoveToWaitingAreaToClient:FireClient(self._table[gameIndex].p1)
             self._table[gameIndex].p2.character.transform.position = gamesInfo.waitingAreaPosition
-            e_sendMoveToWaitingAreaToClient:FireAllClients(self._table[gameIndex].p2)
+            e_sendMoveToWaitingAreaToClient:FireClient(self._table[gameIndex].p2)
             self._table[gameIndex].p1 = nil
             self._table[gameIndex].p2 = nil
             self:HandlePlayerSlotsFreed(2)
@@ -98,8 +98,8 @@ function GameInstances()
                         v.p1 = nil
                         v.p2 = nil
                         otherPlayer.character.transform.position = gamesInfo.waitingAreaPosition
-                        e_sendMoveToWaitingAreaToClient:FireAllClients(otherPlayer)
-                        e_sendMatchCancelledToClient:FireAllClients(otherPlayer)
+                        e_sendMoveToWaitingAreaToClient:FireClient(otherPlayer)
+                        e_sendMatchCancelledToClient:FireClient(otherPlayer)
                         self:HandlePlayerSlotsFreed(2)
                         return
                     end
@@ -115,8 +115,8 @@ function GameInstances()
                     v.firstTurn = math.random(1,2)
                     v.p1.character.transform.position = gamesInfo.playerGamePositions[v.gameIndex]
                     v.p2.character.transform.position = gamesInfo.playerGamePositions[v.gameIndex]
-                    e_sendStartMatchToClient:FireAllClients(v.p1,v.gameIndex,v.p1,v.p2,v.firstTurn)
-                    e_sendStartMatchToClient:FireAllClients(v.p2,v.gameIndex,v.p1,v.p2,v.firstTurn)
+                    e_sendStartMatchToClient:FireClient(v.p1,v.gameIndex,v.p1,v.p2,v.firstTurn)
+                    e_sendStartMatchToClient:FireClient(v.p2,v.gameIndex,v.p1,v.p2,v.firstTurn)
                     return
                 end
             end
@@ -126,14 +126,14 @@ function GameInstances()
                 if (v.p1 == nil and v.p2 == nil ) then 
                     v.p1 = player
                     v.p1.character.transform.position = gamesInfo.waitingAreaPosition
-                    e_sendMoveToWaitingAreaToClient:FireAllClients(v.p1)
+                    e_sendMoveToWaitingAreaToClient:FireClient(v.p1)
                     return
                 end
             end
             -- We are out of game instances
             -- add player to waiting queue and send player to waiting area
             player.character.transform.position = gamesInfo.waitingAreaPosition
-            e_sendMoveToWaitingAreaToClient:FireAllClients(player)
+            e_sendMoveToWaitingAreaToClient:FireClient(player)
             table.insert(self.playersInWaitingQueue,player)
         end
     }
@@ -143,7 +143,7 @@ function self:ServerAwake()
     gameInstances = GameInstances()
     gameInstances:Initialize()
     server.PlayerConnected:Connect(function(player)
-        print(player.name.." connected with id "..player.id)
+        -- print(player.name.." connected with id "..player.id)
     end)
     server.PlayerDisconnected:Connect(function(player)
         gameInstances:HandlePlayerLeft(player)
@@ -163,8 +163,8 @@ function self:ClientAwake()
     playerHud.ShowWelcomeScreen(function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
-    e_sendStartMatchToClient:Connect(function(player,gameIndex,p1,p2,firstTurn)
-        if(client.localPlayer == player)then
+    e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn)
+        if(client.localPlayer == p1 or client.localPlayer == p2)then
             local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
             p1.character:Teleport(raceGame.transform.position,function() end)
             p2.character:Teleport(raceGame.transform.position,function() end)
@@ -176,21 +176,17 @@ function self:ClientAwake()
             playerHud.UpdateView()
         end
     end)
-    e_sendMoveToWaitingAreaToClient:Connect(function(player)
-        if(client.localPlayer == player) then 
-            playerHud.SetLocation( playerHud.Location().Lobby )
-            playerHud.UpdateView()
-            player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
-            playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
-            cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
-        end
+    e_sendMoveToWaitingAreaToClient:Connect(function()
+        playerHud.SetLocation( playerHud.Location().Lobby )
+        playerHud.UpdateView()
+        client.localPlayer.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
+        playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
+        cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
     end)
-    e_sendMatchCancelledToClient:Connect(function(player)
-        if(client.localPlayer == player) then 
-            playerHud.ShowOpponentLeft(function()
-                e_sendReadyForMatchmakingToServer:FireServer()
-            end)
-        end
+    e_sendMatchCancelledToClient:Connect(function()
+        playerHud.ShowOpponentLeft(function()
+            e_sendReadyForMatchmakingToServer:FireServer()
+        end)
     end)
 end
 

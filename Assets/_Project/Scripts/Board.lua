@@ -74,7 +74,6 @@ function _MovePiece(id, amount)
     if( amount == 0 ) then
         -- This is the final tile
         if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
-            -- print("Temporarily treating every tile as Draw Tile")
             if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
                 cardManager.LandedOnDrawCardTile()
             end
@@ -85,7 +84,6 @@ function _MovePiece(id, amount)
     location[id] += 1
     if( location[id] == #tiles + 1) then
         if(laps[id] == TotalLaps ) then
-            print("Game Finished")
             audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
             matchmaker.GameFinished(gameIndex)
             return
