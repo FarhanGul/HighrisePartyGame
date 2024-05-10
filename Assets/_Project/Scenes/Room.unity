@@ -467,47 +467,47 @@ MonoBehaviour:
   - Property: {fileID: -2012488032003055102, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759237
+      rid: 8113457065719759305
   - Property: {fileID: -4929347213015332154, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759238
+      rid: 8113457065719759306
   - Property: {fileID: 778446020416518925, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759239
+      rid: 8113457065719759307
   - Property: {fileID: -1261922097589538804, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759240
+      rid: 8113457065719759308
   - Property: {fileID: 8785172891499016047, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759241
+      rid: 8113457065719759309
   - Property: {fileID: -3361061211194992072, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759242
+      rid: 8113457065719759310
   - Property: {fileID: -2117879380365811895, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759243
+      rid: 8113457065719759311
   - Property: {fileID: 2315932168227476440, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759244
+      rid: 8113457065719759312
   - Property: {fileID: 7295265858775112386, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759245
+      rid: 8113457065719759313
   - Property: {fileID: -7417108062950532299, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759246
+      rid: 8113457065719759314
   - Property: {fileID: 7799356667721934828, guid: 04eadf4167943ab43a4c1fe5acc86f1a,
       type: 3}
     Value:
-      rid: 8113457065719759247
+      rid: 8113457065719759315
   _uiOutput: 0
   _uiOutputSettings:
     rid: -2
@@ -522,67 +522,67 @@ MonoBehaviour:
   m_raceStart: {fileID: 1355605850}
   m_disconnect: {fileID: 1548363683}
   m_resultNotify: {fileID: 1588312282}
-  m_honk: {fileID: 0}
+  m_honk: {fileID: 174997001}
   references:
     version: 2
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 8113457065719759237
+    - rid: 8113457065719759305
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 674403852}
-    - rid: 8113457065719759238
+    - rid: 8113457065719759306
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 1906362781}
-    - rid: 8113457065719759239
+    - rid: 8113457065719759307
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 895083268}
-    - rid: 8113457065719759240
+    - rid: 8113457065719759308
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 2141101389}
-    - rid: 8113457065719759241
+    - rid: 8113457065719759309
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 292327535}
-    - rid: 8113457065719759242
+    - rid: 8113457065719759310
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 243617012}
-    - rid: 8113457065719759243
+    - rid: 8113457065719759311
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 554610086}
-    - rid: 8113457065719759244
+    - rid: 8113457065719759312
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 1355605850}
-    - rid: 8113457065719759245
+    - rid: 8113457065719759313
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 1548363683}
-    - rid: 8113457065719759246
+    - rid: 8113457065719759314
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
         _value: {fileID: 1588312282}
-    - rid: 8113457065719759247
+    - rid: 8113457065719759315
       type: {class: AudioSourceGlue/AudioSourceLuaPropertyValue, ns: Highrise.Lua.Glue,
         asm: com.pz.highrise.lua.glue}
       data:
-        _value: {fileID: 0}
+        _value: {fileID: 174997001}
 --- !u!1 &174996999
 GameObject:
   m_ObjectHideFlags: 0
