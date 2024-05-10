@@ -63,8 +63,8 @@ function self:ServerAwake()
     end)
     e_sendDrawCardToServer:Connect(function(player,opponentPlayer)
         if(#cards[player] < 3) then
-            local deck = {"Nos","Zap"}
-            local newCard = deck[math.random(1,2)]
+            local deck = {"Nos","Zap","Honk"}
+            local newCard = deck[math.random(1,#deck)]
             table.insert(cards[player],newCard)
             e_sendCardsToClient:FireClient(player,cards)
             e_sendCardsToClient:FireClient(opponentPlayer,cards)
@@ -82,7 +82,9 @@ end
 
 function LandedOnDrawCardTile()
     e_sendDrawCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer)) 
-    audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
+    if(#cards[client.localPlayer] ~= 3) then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
+    end
 end
 
 function Initialize(_racers)
@@ -99,24 +101,30 @@ function TurnChanged()
     UpdateView()
 end
 
-
 function PlaySelectedCard()
-    local playedCard = cards[client.localPlayer][selectedCard]
+    playedCard = cards[client.localPlayer][selectedCard]
     e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard) 
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+    UpdateView()
 end
 
 function CardSlotClick(cardSlotIndex)
-    selectedCard = cardSlotIndex
-    if(selectedCard ~= -1) then
+    if(CanPlaycard() and selectedCard ~= cardSlotIndex) then
         audioManagerGameObject:GetComponent("AudioManager"):PlayHit()
     end
+    selectedCard = cardSlotIndex
+    -- print("Can Play Card :"..tostring(CanPlaycard()))
+    -- print("selectedCard ~= cardSlotIndex:"..tostring(selectedCard ~= cardSlotIndex))
     UpdateView()
+end
+
+function CanPlaycard()
+    return #cards[client.localPlayer] > 0 and racers.IsLocalRacerTurn() and playedCard == nil
 end
 
 function UpdateView()
     local c = cards[client.localPlayer]
-    local canPlayCard = #c > 0 and racers.IsLocalRacerTurn() and playedCard == nil
+    local canPlayCard = CanPlaycard()
     playCardTapHandler.gameObject:SetActive(canPlayCard)
     cardSlot_01.gameObject:SetActive(#c > 0)
     cardSlot_02.gameObject:SetActive(#c > 1)
@@ -138,7 +146,7 @@ function UpdateView()
 end
 
 function ActivateCardInSlot(cardSlot,card,isSelected)
-    for i=0,2 do
+    for i=0,cardSlot.transform.childCount - 1 do
         local child = cardSlot.transform:GetChild(i).gameObject
         child:SetActive(card == child.name)
     end

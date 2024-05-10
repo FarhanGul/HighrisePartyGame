@@ -61,7 +61,7 @@ function Move(id,roll,_onMoveFinished)
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     onMoveFinished = _onMoveFinished
-    -- if(Input.isAltPressed) then modifiedRoll = 3 end
+    if(Input.isAltPressed) then modifiedRoll = 3 end
     _DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
@@ -74,9 +74,9 @@ function _MovePiece(id, amount)
     if( amount == 0 ) then
         -- This is the final tile
         if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
-            if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
+            -- if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
                 cardManager.LandedOnDrawCardTile()
-            end
+            -- end
         end
         onMoveFinished()
         return
