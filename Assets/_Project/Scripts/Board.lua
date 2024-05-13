@@ -113,7 +113,8 @@ function LandedOnTile(id)
     elseif(tileType == "Overclock") then
         overclock[id] += 1
     elseif(tileType == "Anomaly") then
-            overclock[id] = 0
+        overclock[id] = 0
+        cardManager.SendHandDiscardedToServer(racers:GetPlayerWhoseTurnItIs())
     end
 end
 

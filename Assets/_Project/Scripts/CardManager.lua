@@ -21,10 +21,41 @@ local board = nil
 
 -- Events
 local e_sendInitializeToServer = Event.new("sendInitializeToServer")
+local e_sendHandDiscardedToServer = Event.new("sendHandDiscardedToServer")
 local e_sendDrawCardToServer = Event.new("sendDrawCardToServer")
 local e_sendCardsToClient = Event.new("sendCardsToClient")
 local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
 local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
+
+function self:ServerAwake()
+    e_sendInitializeToServer:Connect(function(player)
+        cards[player] = {}
+    end)
+    e_sendHandDiscardedToServer:Connect(function(player,opponentPlayer)
+        cards[player] = {}
+        e_sendCardsToClient:FireClient(player,cards)
+        e_sendCardsToClient:FireClient(opponentPlayer,cards)
+    end)
+    e_sendDrawCardToServer:Connect(function(player,opponentPlayer,count)
+        if(#cards[player] < 3) then
+            local cardsToDraw = 3 - #cards[player]
+            for i = 1, cardsToDraw do
+                local newCard = GetRandomCard()
+                table.insert(cards[player],newCard)
+            end
+            e_sendCardsToClient:FireClient(player,cards)
+            e_sendCardsToClient:FireClient(opponentPlayer,cards)
+        end
+    end)
+    e_sendPlayCardToServer:Connect(function(player,opponentPlayer,_playedCard)
+        table.remove(cards[player],table.find(cards[player], _playedCard))
+        e_sendCardsToClient:FireClient(player,cards)
+        e_sendCardsToClient:FireClient(opponentPlayer,cards)
+        e_sendPlayCardToClient:FireClient(player,_playedCard)
+        e_sendPlayCardToClient:FireClient(opponentPlayer,_playedCard)
+    end
+    )
+end
 
 function self:ClientAwake()
     playCardTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(PlaySelectedCard)
@@ -59,6 +90,12 @@ function self:ClientAwake()
     end)
 end
 
+function SendHandDiscardedToServer(player)
+    if(#cards[player] > 0) then
+        e_sendHandDiscardedToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer)) 
+    end
+end
+
 function GetPlayedCard()
     return playedCard
 end
@@ -82,31 +119,6 @@ function GetRandomCard()
         end
     end
     return filterdCards[math.random(1,#filterdCards)]
-end
-
-function self:ServerAwake()
-    e_sendInitializeToServer:Connect(function(player)
-        cards[player] = {}
-    end)
-    e_sendDrawCardToServer:Connect(function(player,opponentPlayer,count)
-        if(#cards[player] < 3) then
-            local cardsToDraw = 3 - #cards[player]
-            for i = 1, cardsToDraw do
-                local newCard = GetRandomCard()
-                table.insert(cards[player],newCard)
-            end
-            e_sendCardsToClient:FireClient(player,cards)
-            e_sendCardsToClient:FireClient(opponentPlayer,cards)
-        end
-    end)
-    e_sendPlayCardToServer:Connect(function(player,opponentPlayer,_playedCard)
-        table.remove(cards[player],table.find(cards[player], _playedCard))
-        e_sendCardsToClient:FireClient(player,cards)
-        e_sendCardsToClient:FireClient(opponentPlayer,cards)
-        e_sendPlayCardToClient:FireClient(player,_playedCard)
-        e_sendPlayCardToClient:FireClient(opponentPlayer,_playedCard)
-    end
-    )
 end
 
 function LandedOnDrawCardTile(count)
