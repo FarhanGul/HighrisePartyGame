@@ -74,9 +74,9 @@ function _MovePiece(id, amount)
     if( amount == 0 ) then
         -- This is the final tile
         if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
-            -- if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
+            if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
                 cardManager.LandedOnDrawCardTile()
-            -- end
+            end
         end
         onMoveFinished()
         return
