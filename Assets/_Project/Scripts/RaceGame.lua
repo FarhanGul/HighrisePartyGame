@@ -86,7 +86,7 @@ function self:ClientAwake()
                 playerHud.UpdateView()
             end
             isRollSentToServer = false
-            boardGameObject:GetComponent("Board").TurnChanged()
+            boardGameObject:GetComponent("Board").TurnEnd()
         end)
     end)
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()

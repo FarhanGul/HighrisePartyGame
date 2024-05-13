@@ -16,11 +16,13 @@ local audioManagerGameObject : GameObject = nil
 
 local tiles = {}
 local location = {0,0}
+local overclock = {0,0}
 local laps = {1,1}
 local matchmaker
 local cardManager
 local gameIndex
 local racers
+local teleportTileLocations
 local onMoveFinished
 
 function self:ClientAwake()
@@ -36,14 +38,34 @@ function GetPiece(id)
     return piecesGameObject.transform:GetChild(id-1).gameObject
 end
 
+function SetTeleportTileLocations()
+    teleportTileLocations = {}
+    for i = 0,self.transform.childCount-1,1
+    do 
+        if(tiles[i]:GetComponent("BoardTile").GetType() == "Teleport") then
+            table.insert(teleportTileLocations,i)
+        end
+    end
+end
+
+function SwapPieces()
+    local temp = location[1]
+    location[1] = location[2]
+    location[2] = temp
+    SetPiecePosition(1)
+    SetPiecePosition(2)
+end
+
 function Initialize(_gameIndex,_racers,p1,p2)
     laps = {1,1}
     location = {0,0}
+    overclock = {0,0}
     racers = _racers
     gameIndex = _gameIndex
     SetPiecePosition(1)
     SetPiecePosition(2)
-    cardManager.Initialize(racers)
+    SetTeleportTileLocations()
+    cardManager.Initialize(racers,self)
     audioManagerGameObject:GetComponent("AudioManager"):PlayRaceStart()
 end
 
@@ -60,23 +82,46 @@ function Move(id,roll,_onMoveFinished)
     })
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
+    if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
+    modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
-    if(Input.isAltPressed) then modifiedRoll = 3 end
+    if(Input.isAltPressed) then modifiedRoll = 6 end
     _DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
 
-function TurnChanged()
-    cardManager.TurnChanged()
+function TurnEnd()
+    cardManager.TurnEnd()
+end
+
+function LandedOnTile(id)
+    local tileType = tiles[location[id]]:GetComponent("BoardTile").GetType()
+    if(tileType == "Draw") then
+        cardManager.LandedOnDrawCardTile(1)
+    elseif(tileType == "Draw3") then
+            cardManager.LandedOnDrawCardTile(3)
+    elseif(tileType == "Teleport") then
+        local destination
+        if(location[id] == teleportTileLocations[1] ) then
+            destination = teleportTileLocations[2] 
+        else 
+            destination = teleportTileLocations[1]
+        end
+        location[id] = destination
+        SetPiecePosition(id)
+        print("Missing Teleport sound effect")
+    elseif(tileType == "Overclock") then
+        overclock[id] += 1
+    elseif(tileType == "Anomaly") then
+            overclock[id] = 0
+    end
 end
 
 function _MovePiece(id, amount)
     if( amount == 0 ) then
         -- This is the final tile
         if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
-            if(tiles[location[id]]:GetComponent("BoardTile")).GetType() == "Draw" then
-                cardManager.LandedOnDrawCardTile()
-            end
+            LandedOnTile(id)
         end
         onMoveFinished()
         return

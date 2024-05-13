@@ -17,6 +17,7 @@ local cards = {}
 local selectedCard
 local racers
 local playedCard = nil
+local board = nil
 
 -- Events
 local e_sendInitializeToServer = Event.new("sendInitializeToServer")
@@ -48,6 +49,11 @@ function self:ClientAwake()
             audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
         elseif(_playedCard == "Honk") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayHonk()
+        elseif(_playedCard == "WarpDrive") then
+            print("Missing Warp Drive sound effect")
+        elseif(_playedCard == "WormHole") then
+            board.SwapPieces()
+            print("Missing Worm Hole sound effect")
         end
         playedCard = _playedCard
     end)
@@ -57,15 +63,38 @@ function GetPlayedCard()
     return playedCard
 end
 
+function GetRandomCard()
+    local deck = {
+        -- {card="Nos",probablity=1},
+        -- {card="Zap",probablity=1},
+        -- {card="Honk",probablity=1},
+        -- {card="WarpDrive",probablity=0.5},
+        -- {card="WormHole",probablity=0.4},
+
+        {card="WarpDrive",probablity=1},
+        {card="WormHole",probablity=1}
+    }
+    local rand = math.random()
+    local filterdCards = {}
+    for k , v in pairs(deck) do
+        if v.probablity >= rand then
+            table.insert(filterdCards,v.card)
+        end
+    end
+    return filterdCards[math.random(1,#filterdCards)]
+end
+
 function self:ServerAwake()
     e_sendInitializeToServer:Connect(function(player)
         cards[player] = {}
     end)
-    e_sendDrawCardToServer:Connect(function(player,opponentPlayer)
+    e_sendDrawCardToServer:Connect(function(player,opponentPlayer,count)
         if(#cards[player] < 3) then
-            local deck = {"Nos","Zap","Honk"}
-            local newCard = deck[math.random(1,#deck)]
-            table.insert(cards[player],newCard)
+            local cardsToDraw = 3 - #cards[player]
+            for i = 1, cardsToDraw do
+                local newCard = GetRandomCard()
+                table.insert(cards[player],newCard)
+            end
             e_sendCardsToClient:FireClient(player,cards)
             e_sendCardsToClient:FireClient(opponentPlayer,cards)
         end
@@ -80,14 +109,15 @@ function self:ServerAwake()
     )
 end
 
-function LandedOnDrawCardTile()
-    e_sendDrawCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer)) 
+function LandedOnDrawCardTile(count)
+    e_sendDrawCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),count) 
     if(#cards[client.localPlayer] ~= 3) then
         audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
     end
 end
 
-function Initialize(_racers)
+function Initialize(_racers, _board)
+    board = _board
     racers = _racers
     cards[client.localPlayer] = {}
     cards[racers:GetOpponentPlayer(client.localPlayer)] = {}
@@ -96,7 +126,7 @@ function Initialize(_racers)
     UpdateView()
 end
 
-function TurnChanged()
+function TurnEnd()
     playedCard = nil
     UpdateView()
 end
