@@ -91,6 +91,7 @@ function Move(id,roll,_onMoveFinished)
 end
 
 function TurnEnd()
+    playerHudGameObject:GetComponent("RacerUIView").UpdateView()
     cardManager.TurnEnd()
 end
 
@@ -116,6 +117,14 @@ function LandedOnTile(id)
         overclock[id] = 0
         cardManager.SendHandDiscardedToServer(racers:GetPlayerWhoseTurnItIs())
     end
+    if(tileType ~= "Default")then
+        local label = tileType
+        if(label == "Draw3") then label = "Draw 3x" end
+        playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+            player = racers:GetPlayerWhoseTurnItIs().name,
+            text  = "Landed on  "..label
+        })
+    end
 end
 
 function _MovePiece(id, amount)
@@ -137,7 +146,6 @@ function _MovePiece(id, amount)
         laps[id] += 1
         location[id] = 0
         racers:GetFromId(id).lap = laps[id]
-        playerHudGameObject:GetComponent("RacerUIView").UpdateView()
     end
     SetPiecePosition(id)
     audioManagerGameObject:GetComponent("AudioManager"):PlayMove()
@@ -180,4 +188,12 @@ function _DiceAnimation(randomFace)
     dice.transform.localEulerAngles = rotation
     dice.transform.GetChild(dice.transform,0).gameObject:GetComponent(Animator):SetTrigger("Flip")
     audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
+end
+
+function GetOverclock()
+    return overclock
+end
+
+function GetCardManager()
+    return cardManager
 end

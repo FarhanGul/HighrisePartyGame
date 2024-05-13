@@ -21,17 +21,37 @@
       </VisualElement>
 
       <VisualElement name="username_group" class="center hide" picking-mode="Ignore" >
-        <VisualElement name="turn_indicator_1" class="turn-indicator" picking-mode="Ignore"/>
-        <VisualElement name="username_and_lap_1" class="center" picking-mode="Ignore">
+        <VisualElement name="user_1" class="center" picking-mode="Ignore">
           <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
-          <hr:UILabel name="lap_1" class="subtitle_text" picking-mode="Ignore"/>
-        </VisualElement>
-        <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/>
-        <VisualElement name="turn_indicator_2" class="turn-indicator" picking-mode="Ignore"/>
-          <VisualElement name="username_and_lap_2" class="center" picking-mode="Ignore">
-            <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
-            <hr:UILabel name="lap_2" class="subtitle_text" picking-mode="Ignore"/>
+          <VisualElement class="race_stat">
+            <hr:UILabel name="lap_label_1" class="normal_text" picking-mode="Ignore"/>
+            <hr:UILabel name="lap_1" class="normal_text" picking-mode="Ignore"/>
           </VisualElement>
+          <VisualElement class="race_stat">
+            <hr:UILabel name="overclock_label_1" class="normal_text" picking-mode="Ignore"/>
+            <hr:UILabel name="overclock_1" class="normal_text" picking-mode="Ignore"/>
+          </VisualElement>
+          <VisualElement class="race_stat">
+            <hr:UILabel name="card_count_label_1" class="normal_text" picking-mode="Ignore"/>
+            <hr:UILabel name="card_count_1" class="normal_text" picking-mode="Ignore"/>
+          </VisualElement>
+        </VisualElement>
+        <!-- <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/> -->
+        <VisualElement name="user_2" class="center" picking-mode="Ignore">
+          <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
+          <VisualElement class="race_stat">
+            <hr:UILabel name="lap_label_2" class="normal_text" picking-mode="Ignore"/>
+            <hr:UILabel name="lap_2" class="normal_text" picking-mode="Ignore"/>
+          </VisualElement>
+          <VisualElement class="race_stat">
+            <hr:UILabel name="overclock_label_2" class="normal_text" picking-mode="Ignore"/>
+            <hr:UILabel name="overclock_2" class="normal_text" picking-mode="Ignore"/>
+          </VisualElement>
+          <VisualElement class="race_stat">
+            <hr:UILabel name="card_count_label_2" class="normal_text" picking-mode="Ignore"/>
+            <hr:UILabel name="card_count_2" class="normal_text" picking-mode="Ignore"/>
+          </VisualElement>
+        </VisualElement>
       </VisualElement>
 
         <VisualElement name="action_group" class="hide" picking-mode="Ignore">

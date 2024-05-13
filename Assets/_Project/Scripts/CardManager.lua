@@ -38,7 +38,7 @@ function self:ServerAwake()
     end)
     e_sendDrawCardToServer:Connect(function(player,opponentPlayer,count)
         if(#cards[player] < 3) then
-            local cardsToDraw = 3 - #cards[player]
+            local cardsToDraw = math.min(count,3 - #cards[player])
             for i = 1, cardsToDraw do
                 local newCard = GetRandomCard()
                 table.insert(cards[player],newCard)
@@ -66,6 +66,7 @@ function self:ClientAwake()
         cards = _cards
         if(cards[client.localPlayer] ~= nil)then
             if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
+            playerHudGameObject:GetComponent("RacerUIView").UpdateView()
             UpdateView()
         end
     end)
@@ -102,14 +103,11 @@ end
 
 function GetRandomCard()
     local deck = {
-        -- {card="Nos",probablity=1},
-        -- {card="Zap",probablity=1},
-        -- {card="Honk",probablity=1},
-        -- {card="WarpDrive",probablity=0.5},
-        -- {card="WormHole",probablity=0.4},
-
-        {card="WarpDrive",probablity=1},
-        {card="WormHole",probablity=1}
+        {card="Nos",probablity=1},
+        {card="Zap",probablity=1},
+        {card="Honk",probablity=1},
+        {card="WarpDrive",probablity=0.5},
+        {card="WormHole",probablity=0.4}
     }
     local rand = math.random()
     local filterdCards = {}
@@ -193,4 +191,8 @@ function ActivateCardInSlot(cardSlot,card,isSelected)
         child:SetActive(card == child.name)
     end
     cardSlot.transform:Find("Outline").gameObject:SetActive(isSelected)
+end
+
+function GetCardCount(player)
+    return #cards[player]
 end

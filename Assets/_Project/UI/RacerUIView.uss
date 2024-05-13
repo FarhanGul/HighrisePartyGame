@@ -12,7 +12,6 @@
     --win-graphic: url("project://database/Assets/_Project/Textures/WinGraphic.png");
     --lose-graphic: url("project://database/Assets/_Project/Textures/LoseGraphic.png");
     --opponent-left-graphic: url("project://database/Assets/_Project/Textures/OpponentLeftGraphic.png");
-    --turn-indicator: url("project://database/Assets/_Project/Textures/TurnIndicator.png");
     --action-graphic: url("project://database/Assets/_Project/Textures/ActionGraphic.png");
 }
 
@@ -39,8 +38,14 @@
     padding-right:50px;
 }
 
+#user_1 , #user_2{
+    /* background-color: green; */
+    width: 100%;
+}
+
 #username_group{
     margin-top: 30px;
+    /* background-color: red; */
     /* display: flex;
     flex-direction: row; */
 }
@@ -109,8 +114,17 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    align-items : center;
-    padding: 10%;
+    /* align-items : center;
+    padding: 10%; */
+}
+
+.race_stat{
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom-width: 4px;
+    border-bottom-style: solid;
+    border-bottom-color: black;
 }
 
 .popup{
@@ -127,17 +141,6 @@
 .hide{
     display: none;
 }
-
-.turn-indicator{
-    /* width: 10%;*/
-    display: none;
-    /* height: 60%;
-    background-size: contain;
-    background-image: var(--turn-indicator); */
-    /* margin-right: 7px;
-    margin-bottom: 5px; */
-}
-
 
 #welcome_image{
     width: 100%;

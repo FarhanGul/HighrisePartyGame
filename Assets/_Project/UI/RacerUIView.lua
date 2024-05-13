@@ -8,8 +8,6 @@ local strings={
 
 --!SerializeField
 local uiDebugMode : boolean = false
--- --!SerializeField
--- local allowDebugInput : boolean = false
 --!SerializeField
 local playTapHandler : TapHandler = nil
 --!SerializeField
@@ -21,6 +19,7 @@ local root: VisualElement = nil
 --Variables
 local location
 local racers
+local board
 local OnWelcomeScreenClosed
 local OnResultScreenClosed
 local OnOpponentLeftScreenClosed
@@ -48,8 +47,11 @@ function self:ClientAwake()
 end
 
 function self:ClientUpdate()
-    -- if(allowDebugInput) then HandleDebugInput() end
     if(uiDebugMode) then HandleUiDebug() end
+end
+
+function SetBoard(_board)
+    board = _board
 end
 
 function SetLocation(_location)
@@ -80,7 +82,10 @@ function UpdateView()
         if(location == Location().Lobby) then
             SetPlayer(i,nil)
         else
-            SetPlayer(i,racers:GetFromId(i))
+            local data = racers:GetFromId(i)
+            data.overclock = board.GetOverclock()[i]
+            data.cardCount = board.GetCardManager().GetCardCount(racers:GetFromId(i).player)
+            SetPlayer(i,data)
         end
     end
 end
@@ -98,7 +103,14 @@ function Initialize()
     root:Q("opponent_left_title"):SetPrelocalizedText(strings.title, false)
     root:Q("opponent_left_subtitle"):SetPrelocalizedText("OPPONENT LEFT THE MATCH", false)
 
-    root:Q("vs_label"):SetPrelocalizedText("vs", false)
+    root:Q("lap_label_1"):SetPrelocalizedText("Lap", false)
+    root:Q("lap_label_2"):SetPrelocalizedText("Lap", false)
+    root:Q("overclock_label_1"):SetPrelocalizedText("Overclock", false)
+    root:Q("overclock_label_2"):SetPrelocalizedText("Overclock", false)
+    root:Q("card_count_label_1"):SetPrelocalizedText("Cards", false)
+    root:Q("card_count_label_2"):SetPrelocalizedText("Cards", false)
+
+    -- root:Q("vs_label"):SetPrelocalizedText("vs", false)
 
     -- Set Intial State
     CloseResult(false)
@@ -168,21 +180,18 @@ function CloseOpponentLeft(invokeCallback)
     root:Q("opponent_left_group").visible = false
 end
 
-function SetPlayer(id,racer)
-    if (racer == nil) then
-        root:Q("username_and_lap_"..id).visible = false
-        -- root:Q("turn_indicator_"..id):AddToClassList("hide")
-        root:Q("turn_indicator_"..id).visible = false
-        root:Q("vs_label").visible = false
+function SetPlayer(id,data)
+    if (data == nil) then
+        root:Q("user_"..id).visible = false
+        -- root:Q("vs_label").visible = false
         return
     end
-    root:Q("username_and_lap_"..id).visible = true
-    root:Q("vs_label").visible = true
-    -- if(racer.isTurn) then root:Q("turn_indicator_"..id):RemoveFromClassList("hide") else root:Q("turn_indicator_"..id):AddToClassList("hide") end
-    root:Q("turn_indicator_"..id).visible = racer.isTurn
-
-    root:Q("username_"..id):SetPrelocalizedText(racer.player.name, false)
-    root:Q("lap_"..id):SetPrelocalizedText(racer.lap.." / "..strings.totalLaps, false)
+    root:Q("user_"..id).visible = true
+    -- root:Q("vs_label").visible = true
+    root:Q("username_"..id):SetPrelocalizedText(data.player.name, false)
+    root:Q("lap_"..id):SetPrelocalizedText(data.lap.." / "..strings.totalLaps, false)
+    root:Q("overclock_"..id):SetPrelocalizedText(data.overclock, false)
+    root:Q("card_count_"..id):SetPrelocalizedText(data.cardCount.." / 3", false)
 
 end
 
@@ -204,11 +213,6 @@ function SetSceneHelp(help)
     root:Q("scene_help"):SetPrelocalizedText(help, false)
 end
 
-function HandleDebugInput()
-    -- if(root:Q("welcome_group").visible and Input.isAltPressed) then CloseWelcomeScreen() end
-    -- if(root:Q("result_group").visible and Input.isAltPressed) then CloseResult(true) end
-end
-
 function HandleUiDebug()
     if(not isAltReleased and not Input.isAltPressed) then
         isAltReleased = true
@@ -225,15 +229,17 @@ function HandleUiDebug()
         elseif(uiDebugCycleIndex == 2) then
             SetSceneHeading(strings.title,"GAME")
             SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN")
-            local debugRacer = {}
-            debugRacer.lap = 1
-            debugRacer.isTurn = true
-            debugRacer.player = {}
-            debugRacer.player.name = "Debug Racer big name 01"
-            SetPlayer(1,debugRacer)
-            debugRacer.isTurn = false
-            debugRacer.player.name = "sn"
-            SetPlayer(2,debugRacer)
+            local debugData = {}
+            debugData.lap = 1
+            debugData.isTurn = true
+            debugData.player = {}
+            debugData.player.name = "Debug Racer big name 01"
+            debugData.overclock = 2
+            debugData.cardCount = 1
+            SetPlayer(1,debugData)
+            debugData.isTurn = false
+            debugData.player.name = "sn"
+            SetPlayer(2,debugData)
             UpdateAction({player = "Debug Racer big name 01",text = " played zap"})
         elseif(uiDebugCycleIndex == 3) then
             ShowOpponentLeft(function()end)
