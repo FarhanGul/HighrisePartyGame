@@ -18,6 +18,7 @@ local selectedCard
 local racers
 local playedCard = nil
 local board = nil
+local isPlayCardRequestInProgress
 
 -- Events
 local e_sendInitializeToServer = Event.new("sendInitializeToServer")
@@ -88,6 +89,7 @@ function self:ClientAwake()
             audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
         end
         playedCard = _playedCard
+        isPlayCardRequestInProgress = false
     end)
 end
 
@@ -143,6 +145,7 @@ end
 
 function PlaySelectedCard()
     playedCard = cards[client.localPlayer][selectedCard]
+    isPlayCardRequestInProgress = true
     e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard) 
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
     UpdateView()
@@ -153,8 +156,6 @@ function CardSlotClick(cardSlotIndex)
         audioManagerGameObject:GetComponent("AudioManager"):PlayHit()
     end
     selectedCard = cardSlotIndex
-    -- print("Can Play Card :"..tostring(CanPlaycard()))
-    -- print("selectedCard ~= cardSlotIndex:"..tostring(selectedCard ~= cardSlotIndex))
     UpdateView()
 end
 
@@ -195,4 +196,8 @@ end
 
 function GetCardCount(player)
     return #cards[player]
+end
+
+function GetIsPlayCardRequestInProgress()
+    return isPlayCardRequestInProgress
 end

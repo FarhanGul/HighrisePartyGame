@@ -16,7 +16,7 @@ local e_sendRollToClients = Event.new("sendRollToClients")
 local racers
 local localRacer
 local playerHud
-local isRollSentToServer
+local isRollRequestInProgress
 
 --Classes
 local function Racer(_id,_player,_isTurn)
@@ -85,13 +85,13 @@ function self:ClientAwake()
                 diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
                 playerHud.UpdateView()
             end
-            isRollSentToServer = false
+            isRollRequestInProgress = false
             boardGameObject:GetComponent("Board").TurnEnd()
         end)
     end)
     diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        if(localRacer.isTurn and not isRollSentToServer) then
-            isRollSentToServer = true
+        if(localRacer.isTurn and not isRollRequestInProgress and not cardManagerGameObject:GetComponent("CardManager").GetIsPlayCardRequestInProgress()) then
+            isRollRequestInProgress = true
             e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),localRacer.id ,math.random(1,6)) 
         end
     end)
@@ -105,6 +105,7 @@ function self:ServerAwake()
 end
 
 function StartMatch(gameIndex, p1,p2,firstTurn)
+    isRollRequestInProgress = false
     racers = Racers()
     racers:Add(Racer(1,p1,firstTurn == 1))
     racers:Add(Racer(2,p2,firstTurn == 2))
