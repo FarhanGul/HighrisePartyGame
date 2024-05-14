@@ -31,20 +31,23 @@ local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
 function self:ServerAwake()
     e_sendInitializeToServer:Connect(function(player)
         cards[player] = {}
+        -- print("Server Initialized "..player.name.." Cards to empty")
     end)
     e_sendHandDiscardedToServer:Connect(function(player,opponentPlayer)
         cards[player] = {}
         e_sendCardsToClient:FireClient(player,cards)
         e_sendCardsToClient:FireClient(opponentPlayer,cards)
     end)
-    e_sendDrawCardToServer:Connect(function(player,opponentPlayer,count)
-        if(#cards[player] < 3) then
-            local cardsToDraw = math.min(count,3 - #cards[player])
+    e_sendDrawCardToServer:Connect(function(_player,playerWhoDrew,opponentPlayer,count)
+        if(#cards[playerWhoDrew] < 3) then
+            local cardsToDraw = math.min(count,3 - #cards[playerWhoDrew])
             for i = 1, cardsToDraw do
                 local newCard = GetRandomCard()
-                table.insert(cards[player],newCard)
+                table.insert(cards[playerWhoDrew],newCard)
             end
-            e_sendCardsToClient:FireClient(player,cards)
+            print("Server sending cards to "..playerWhoDrew.name)
+            print("Server sending cards to "..opponentPlayer.name)
+            e_sendCardsToClient:FireClient(playerWhoDrew,cards)
             e_sendCardsToClient:FireClient(opponentPlayer,cards)
         end
     end)
@@ -65,7 +68,9 @@ function self:ClientAwake()
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
     e_sendCardsToClient:Connect(function(_cards)
         cards = _cards
+        print("client "..client.localPlayer.name.." recieved cards "..#cards[client.localPlayer])
         if(cards[client.localPlayer] ~= nil)then
+            -- print("client "..client.localPlayer.name.." Updated view")
             if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
             playerHudGameObject:GetComponent("RacerUIView").UpdateView()
             UpdateView()
@@ -107,7 +112,7 @@ function GetRandomCard()
     local deck = {
         {card="Nos",probablity=1},
         {card="Zap",probablity=0.85},
-        {card="Honk",probablity=0.75},
+        {card="Honk",probablity=0.3},
         {card="WarpDrive",probablity=0.4},
         {card="WormHole",probablity=0.5}
     }
@@ -122,10 +127,10 @@ function GetRandomCard()
 end
 
 function LandedOnDrawCardTile(count)
-    e_sendDrawCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),count) 
-    if(#cards[client.localPlayer] ~= 3) then
+    if(#cards[racers:GetPlayerWhoseTurnItIs()] ~= 3) then
         audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
     end
+    e_sendDrawCardToServer:FireServer(racers:GetPlayerWhoseTurnItIs(),racers:GetOpponentPlayer(racers:GetPlayerWhoseTurnItIs()),count) 
 end
 
 function Initialize(_racers, _board)
@@ -136,6 +141,7 @@ function Initialize(_racers, _board)
     e_sendInitializeToServer:FireServer() 
     selectedCard = -1
     UpdateView()
+    -- print(client.localPlayer.name.." Cardmanager initialized")
 end
 
 function TurnEnd()

@@ -168,19 +168,18 @@ function self:ClientAwake()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
     e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn)
-        if(client.localPlayer == p1 or client.localPlayer == p2)then
-            local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
-            p1.character:Teleport(raceGame.transform.position,function() end)
-            p2.character:Teleport(raceGame.transform.position,function() end)
-            playerHudGameObject.transform.parent:SetParent(raceGame.transform)
-            playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
-            cardManagerGameObject.transform:SetParent(raceGame.transform)
-            cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
-            cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
-            raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
-            playerHud.SetLocation( playerHud.Location().Game )
-            playerHud.UpdateView()
-        end
+        local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
+        p1.character:Teleport(raceGame.transform.position,function() end)
+        p2.character:Teleport(raceGame.transform.position,function() end)
+        playerHudGameObject.transform.parent:SetParent(raceGame.transform)
+        playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
+        cardManagerGameObject.transform:SetParent(raceGame.transform)
+        cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
+        -- print(client.localPlayer.name.." set card manager")
+        cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
+        raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
+        playerHud.SetLocation( playerHud.Location().Game )
+        playerHud.UpdateView()
     end)
     e_sendMoveToWaitingAreaToClient:Connect(function()
         playerHud.SetLocation( playerHud.Location().Lobby )
