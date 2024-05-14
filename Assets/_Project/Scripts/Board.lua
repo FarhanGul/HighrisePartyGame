@@ -25,6 +25,29 @@ local racers
 local teleportTileLocations
 local onMoveFinished
 
+-- Events
+local e_sendOverclockToServer = Event.new("sendOverclockToServer")
+local e_sendOverclockToClient = Event.new("sendOverclockToClient")
+local e_sendLocationToServer = Event.new("sendLocationToServer")
+local e_sendLocationToClient = Event.new("sendLocationToClient")
+local e_sendLandedOnSpecialTileToServer = Event.new("sendLandedOnSpecialTileToServer")
+local e_sendLandedOnSpecialTileToClient = Event.new("sendLandedOnSpecialTileToClient")
+
+function self:ServerAwake()
+    e_sendOverclockToServer:Connect(function(player,opponentPlayer,id,_overclock)
+        e_sendOverclockToClient:FireClient(player,id,_overclock)
+        e_sendOverclockToClient:FireClient(opponentPlayer,id,_overclock)
+    end)
+    e_sendLocationToServer:Connect(function(player,opponentPlayer,id,_location)
+        e_sendLocationToClient:FireClient(player,id,_location)
+        e_sendLocationToClient:FireClient(opponentPlayer,id,_location)
+    end)
+    e_sendLandedOnSpecialTileToServer:Connect(function(player,opponentPlayer,playerName,tileType)
+        e_sendLandedOnSpecialTileToClient:FireClient(player,playerName,tileType)
+        e_sendLandedOnSpecialTileToClient:FireClient(opponentPlayer,playerName,tileType)
+    end)
+end
+
 function self:ClientAwake()
     matchmaker = matchmakerGameObject:GetComponent("Matchmaker")
     cardManager = cardManagerGameObject:GetComponent("CardManager")
@@ -32,6 +55,24 @@ function self:ClientAwake()
     do 
         tiles[i] = self.transform.GetChild(self.transform,i).gameObject;
     end
+    e_sendOverclockToClient:Connect(function(id,_overclock)
+        overclock[id] = _overclock
+        playerHudGameObject:GetComponent("RacerUIView").UpdateView()
+    end)
+    e_sendLocationToClient:Connect(function(id,_location)
+        location[id] = _location
+        SetPiecePosition(id)
+    end)
+    e_sendLandedOnSpecialTileToClient:Connect(function(playerName,tileType)
+        if(tileType ~= "Default")then
+            local label = tileType
+            if(label == "Draw3") then label = "Draw 3x" end
+            playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+                player = playerName,
+                text  = "Landed on  "..label
+            })
+        end
+    end)
 end
 
 function GetPiece(id)
@@ -85,7 +126,7 @@ function Move(id,roll,_onMoveFinished)
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
     modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
-    if(Input.isAltPressed) then modifiedRoll = 6 end
+    if(Input.isAltPressed) then modifiedRoll = 3 end
     _DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
@@ -108,23 +149,22 @@ function LandedOnTile(id)
         else 
             destination = teleportTileLocations[1]
         end
-        location[id] = destination
-        SetPiecePosition(id)
+        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,destination)
         print("Missing Teleport sound effect")
     elseif(tileType == "Overclock") then
-        overclock[id] += 1
+        e_sendOverclockToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,GetNextOverclockValue(overclock[id]))
     elseif(tileType == "Anomaly") then
-        overclock[id] = 0
-        cardManager.SendHandDiscardedToServer(racers:GetPlayerWhoseTurnItIs())
+        e_sendOverclockToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
+        cardManager.SendHandDiscardedToServer(client.localPlayer)
+        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
+        print("Missing Anomaly sound effect")
     end
-    if(tileType ~= "Default")then
-        local label = tileType
-        if(label == "Draw3") then label = "Draw 3x" end
-        playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-            player = racers:GetPlayerWhoseTurnItIs().name,
-            text  = "Landed on  "..label
-        })
-    end
+    e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer.name,tileType)
+end
+
+function GetNextOverclockValue(current)
+    if(current == 0 ) then return 1
+    else return current*2 end
 end
 
 function _MovePiece(id, amount)
