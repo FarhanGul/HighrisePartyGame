@@ -1,15 +1,17 @@
 local gamesInfo = {
     count = 2,
     playerGamePositions = {
-        Vector3.new(500,0,0)
+        Vector3.new(500,0,0),
+        Vector3.new(-500,0,0),
+        Vector3.new(1000,0,0),
+        Vector3.new(-1000,0,0),
+        Vector3.new(1500,0,0),
+        Vector3.new(-1500,0,0),
     },
-    -- worldSpaceUiGamePositions = {
-    --     Vector3.new(500.37,4.2,1.65)
-    -- },
-
     waitingAreaPosition = Vector3.new(0,0,0),
     worldSpaceUiWaitingAreaPosition = Vector3.new(0,3.61,-8.06),
-    worldSpaceUiRelativeGamePosition = Vector3.new(0,3.61,-8.06)
+    worldSpaceUiRelativeGamePosition = Vector3.new(0,3.61,-8.06),
+    cardManagerRelativePosition = Vector3.new(0.4,5,-1.28)
 }
 
 --Public Variables
@@ -19,6 +21,8 @@ local raceGames : GameObject = nil
 local cameraRoot : GameObject = nil
 --!SerializeField
 local playerHudGameObject : GameObject = nil
+--!SerializeField
+local cardManagerGameObject : GameObject = nil
 
 --Private Variables
 -- local maxMatches = 1
@@ -170,6 +174,8 @@ function self:ClientAwake()
             p2.character:Teleport(raceGame.transform.position,function() end)
             playerHudGameObject.transform.parent:SetParent(raceGame.transform)
             playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
+            cardManagerGameObject.transform:SetParent(raceGame.transform)
+            cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
             playerHud.SetLocation( playerHud.Location().Game )

@@ -108,8 +108,8 @@ function GetRandomCard()
         {card="Nos",probablity=1},
         {card="Zap",probablity=0.85},
         {card="Honk",probablity=0.75},
-        {card="WarpDrive",probablity=0.5},
-        {card="WormHole",probablity=0.4}
+        {card="WarpDrive",probablity=0.4},
+        {card="WormHole",probablity=0.5}
     }
     local rand = math.random()
     local filterdCards = {}
