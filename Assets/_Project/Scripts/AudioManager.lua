@@ -28,6 +28,8 @@ local anomaly : AudioSource = nil
 local teleport : AudioSource = nil
 --!SerializeField
 local upgrade : AudioSource = nil
+--!SerializeField
+local checkpoint : AudioSource = nil
 
 function PlayMove()
     move:Play()
@@ -83,4 +85,8 @@ end
 
 function PlayUpgrade()
     upgrade:Play()
+end
+
+function PlayCheckpoint()
+    checkpoint:Play()
 end

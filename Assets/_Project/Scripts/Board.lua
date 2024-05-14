@@ -123,8 +123,15 @@ function SetPiecePosition(id)
     local offset
     if(id == 1) then offset = 0.4 else offset = -0.4 end
     GetPiece(id).transform.position = tiles[location[id]].transform.position + Vector3.new(offset, 0.41, 0)
-    if(tiles[location[id]]:GetComponent("BoardTile").GetRotatePiece()) then
-        GetPiece(id).transform.eulerAngles = tiles[location[id]]:GetComponent("BoardTile").GetTargetRotation()
+    GetPiece(id).transform.eulerAngles = GetTileRotation(location[id])
+end
+
+function GetTileRotation(_location)
+    for i = _location,0,-1
+    do 
+        if(tiles[i]:GetComponent("BoardTile").GetRotatePiece()) then
+            return tiles[i]:GetComponent("BoardTile").GetTargetRotation()
+        end
     end
 end
 
@@ -193,6 +200,7 @@ function _MovePiece(id, amount)
             matchmaker.GameFinished(gameIndex)
             return
         end
+        audioManagerGameObject:GetComponent("AudioManager"):PlayCheckpoint()
         laps[id] += 1
         location[id] = 0
         racers:GetFromId(id).lap = laps[id]
