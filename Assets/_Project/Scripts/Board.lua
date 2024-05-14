@@ -64,6 +64,15 @@ function self:ClientAwake()
         SetPiecePosition(id)
     end)
     e_sendLandedOnSpecialTileToClient:Connect(function(playerName,tileType)
+        if(tileType == "Teleport") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
+        end
+        if(tileType == "Overclock") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayUpgrade()
+        end
+        if(tileType == "Anomaly") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayAnomaly()
+        end
         if(tileType ~= "Default")then
             local label = tileType
             if(label == "Draw3") then label = "Draw 3x" end
@@ -113,7 +122,10 @@ end
 function SetPiecePosition(id)
     local offset
     if(id == 1) then offset = 0.4 else offset = -0.4 end
-    GetPiece(id).transform.position = tiles[location[id]].transform.position + Vector3.new(offset, 0.19, 0)
+    GetPiece(id).transform.position = tiles[location[id]].transform.position + Vector3.new(offset, 0.41, 0)
+    if(tiles[location[id]]:GetComponent("BoardTile").GetRotatePiece()) then
+        GetPiece(id).transform.eulerAngles = tiles[location[id]]:GetComponent("BoardTile").GetTargetRotation()
+    end
 end
 
 function Move(id,roll,_onMoveFinished)
@@ -126,7 +138,7 @@ function Move(id,roll,_onMoveFinished)
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
     modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
-    if(Input.isAltPressed) then modifiedRoll = 3 end
+    -- if(Input.isAltPressed) then modifiedRoll = 10 end
     _DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
@@ -150,14 +162,12 @@ function LandedOnTile(id)
             destination = teleportTileLocations[1]
         end
         e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,destination)
-        print("Missing Teleport sound effect")
     elseif(tileType == "Overclock") then
         e_sendOverclockToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,GetNextOverclockValue(overclock[id]))
     elseif(tileType == "Anomaly") then
         e_sendOverclockToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
         cardManager.SendHandDiscardedToServer(client.localPlayer)
         e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
-        print("Missing Anomaly sound effect")
     end
     e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer.name,tileType)
 end

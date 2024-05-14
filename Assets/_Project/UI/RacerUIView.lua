@@ -94,8 +94,8 @@ function Initialize()
     -- Set Text
     root:Q("welcome_title"):SetPrelocalizedText(strings.title, false)
     root:Q("welcome_subtitle"):SetPrelocalizedText("WELCOME", false)
-    root:Q("welcome_description"):SetPrelocalizedText("A tabletop game where players compete in a high-stakes race. Along the way, you'll roll dice, play powerful cards, and unleash unique abilities. Gather your friends, grab your dice, and let's have some fun.", false)
-    root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn tap the dice to roll. Your piece will move automatically. Get to the finish spot before your opponent to win. Best of luck!", false)
+    root:Q("welcome_description"):SetPrelocalizedText("A tabletop race where you'll roll dice and play cards. Get to the finish spot before your opponent to win. Best of luck!", false)
+    root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn , tap the dice to roll. You can play only one card before your dice roll so choose wisely, tap the card to select it. Overclock increases your dice roll and anomaly discards your hand, resets your overclock and returns you back to the checkpoint.", false)
 
     root:Q("result_title"):SetPrelocalizedText(strings.title, false)
     root:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)

@@ -22,6 +22,12 @@ local disconnect : AudioSource = nil
 local resultNotify : AudioSource = nil
 --!SerializeField
 local honk : AudioSource = nil
+--!SerializeField
+local anomaly : AudioSource = nil
+--!SerializeField
+local teleport : AudioSource = nil
+--!SerializeField
+local upgrade : AudioSource = nil
 
 function PlayMove()
     move:Play()
@@ -65,4 +71,16 @@ end
 
 function PlayHonk()
     honk:Play()
+end
+
+function PlayAnomaly()
+    anomaly:Play()
+end
+
+function PlayTeleport()
+    teleport:Play()
+end
+
+function PlayUpgrade()
+    upgrade:Play()
 end

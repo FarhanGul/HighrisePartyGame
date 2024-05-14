@@ -82,10 +82,10 @@ function self:ClientAwake()
         elseif(_playedCard == "Honk") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayHonk()
         elseif(_playedCard == "WarpDrive") then
-            print("Missing Warp Drive sound effect")
+            audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
         elseif(_playedCard == "WormHole") then
             board.SwapPieces()
-            print("Missing Worm Hole sound effect")
+            audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
         end
         playedCard = _playedCard
     end)
@@ -104,8 +104,8 @@ end
 function GetRandomCard()
     local deck = {
         {card="Nos",probablity=1},
-        {card="Zap",probablity=1},
-        {card="Honk",probablity=1},
+        {card="Zap",probablity=0.85},
+        {card="Honk",probablity=0.75},
         {card="WarpDrive",probablity=0.5},
         {card="WormHole",probablity=0.4}
     }
