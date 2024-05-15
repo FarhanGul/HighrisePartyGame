@@ -141,6 +141,7 @@ function Initialize(_racers, _board)
     cards[client.localPlayer] = {}
     cards[racers:GetOpponentPlayer(client.localPlayer)] = {}
     selectedCard = -1
+    playedCard = nil
     UpdateView()
 end
 
