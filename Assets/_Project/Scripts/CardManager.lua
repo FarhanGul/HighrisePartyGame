@@ -92,7 +92,7 @@ end
 
 function OnCardCountUpdated()
     if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
-    playerHudGameObject:GetComponent("RacerUIView").UpdateView()
+    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     UpdateView()
 end
 

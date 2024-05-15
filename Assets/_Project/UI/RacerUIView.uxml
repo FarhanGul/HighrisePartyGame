@@ -8,19 +8,28 @@
 >
   <hr:UILuaView name="root" class="racer-u-i-view" picking-mode="Ignore" >
 
-    <VisualElement name="game_view_group" picking-mode="Ignore">
-
-      <VisualElement name="scene_heading_group" class="center" picking-mode="Ignore">
-        <hr:UILabel name="scene_title" class="title_text" picking-mode="Ignore"/>
+    <VisualElement name="waiting_for_match_group" class="popup" picking-mode="Ignore">
+      <VisualElement name="waiting_heading_group" class="center" picking-mode="Ignore">
+        <hr:UILabel name="waiting_title" class="title_text" picking-mode="Ignore"/>
       </VisualElement>
+      <VisualElement name="waiting_help_group" class="center" picking-mode="Ignore">
+        <VisualElement name="waiting_help_background" class="help_background"  picking-mode="Ignore">
+          <hr:UILabel name="waiting_help" class="subtitle_text" picking-mode="Ignore"/>
+        </VisualElement>
+      </VisualElement>
+    </VisualElement>
 
-      <VisualElement name="scene_help_group" class="center" picking-mode="Ignore">
-        <VisualElement name="scene_help_background"  picking-mode="Ignore">
-          <hr:UILabel name="scene_help" class="subtitle_text" picking-mode="Ignore"/>
+    <VisualElement name="game_view_group" class="popup" picking-mode="Ignore">
+      <VisualElement name="game_heading_group" class="center" picking-mode="Ignore">
+        <hr:UILabel name="game_title" class="title_text" picking-mode="Ignore"/>
+      </VisualElement>
+      <VisualElement name="game_help_group" class="center" picking-mode="Ignore">
+        <VisualElement name="game_help_background" class="help_background" picking-mode="Ignore">
+          <hr:UILabel name="game_help" class="subtitle_text" picking-mode="Ignore"/>
         </VisualElement>
       </VisualElement>
 
-      <VisualElement name="username_group" class="center hide" picking-mode="Ignore" >
+      <VisualElement name="username_group" class="center" picking-mode="Ignore" >
         <VisualElement name="user_1" class="center" picking-mode="Ignore">
           <hr:UILabel name="username_1" class="username_text" picking-mode="Ignore"/>
           <VisualElement class="race_stat">
@@ -36,7 +45,6 @@
             <hr:UILabel name="card_count_1" class="normal_text" picking-mode="Ignore"/>
           </VisualElement>
         </VisualElement>
-        <!-- <hr:UILabel name="vs_label" class="username_text" picking-mode="Ignore"/> -->
         <VisualElement name="user_2" class="center" picking-mode="Ignore">
           <hr:UILabel name="username_2" class="username_text" picking-mode="Ignore"/>
           <VisualElement class="race_stat">
@@ -54,7 +62,7 @@
         </VisualElement>
       </VisualElement>
 
-        <VisualElement name="action_group" class="hide" picking-mode="Ignore">
+        <VisualElement name="action_group" picking-mode="Ignore">
           <VisualElement name="action_image" picking-mode="Ignore"/>
           <VisualElement name="action_text_background" picking-mode="Ignore">
             <hr:UILabel name="action_player" class="subtitle_text" picking-mode="Ignore"/>
@@ -64,7 +72,7 @@
       
     </VisualElement>
 
-    <VisualElement name="welcome_group" class="popup">
+    <VisualElement name="welcome_group" class="popup" picking-mode="Ignore">
       <hr:UILabel name="welcome_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
@@ -72,14 +80,14 @@
       <hr:UILabel name="welcome_guide" class="normal_text" picking-mode="Ignore"/>
     </VisualElement>
 
-    <VisualElement name="result_group" class="popup">
+    <VisualElement name="result_group" class="popup" picking-mode="Ignore">
       <hr:UILabel name="result_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="result_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
-      <VisualElement name="result_win_image"  picking-mode="Ignore"/>
-      <VisualElement name="result_lose_image"  picking-mode="Ignore"/>
+      <VisualElement name="result_win_image" class="hide"  picking-mode="Ignore"/>
+      <VisualElement name="result_lose_image" class="hide"  picking-mode="Ignore"/>
     </VisualElement>
 
-    <VisualElement name="opponent_left_group" class="popup">
+    <VisualElement name="opponent_left_group" class="popup" picking-mode="Ignore">
       <hr:UILabel name="opponent_left_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="opponent_left_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <VisualElement name="opponent_left_image"  picking-mode="Ignore"/>

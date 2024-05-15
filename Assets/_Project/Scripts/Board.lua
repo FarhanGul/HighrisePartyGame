@@ -57,7 +57,7 @@ function self:ClientAwake()
     end
     e_sendOverclockToClient:Connect(function(id,_overclock)
         overclock[id] = _overclock
-        playerHudGameObject:GetComponent("RacerUIView").UpdateView()
+        playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     end)
     e_sendLocationToClient:Connect(function(id,_location)
         location[id] = _location
@@ -145,13 +145,13 @@ function Move(id,roll,_onMoveFinished)
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
     modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
-    -- if(Input.isAltPressed) then modifiedRoll = 3 end
+    if(Input.isAltPressed) then modifiedRoll = 100 end
     _DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
 
 function TurnEnd()
-    playerHudGameObject:GetComponent("RacerUIView").UpdateView()
+    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     cardManager.TurnEnd()
 end
 

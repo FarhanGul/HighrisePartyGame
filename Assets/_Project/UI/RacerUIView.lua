@@ -25,6 +25,7 @@ local OnResultScreenClosed
 local OnOpponentLeftScreenClosed
 local uiDebugCycleIndex = 0
 local isAltReleased
+local action
 
 --Enums
 function Location ()
@@ -37,9 +38,9 @@ function self:ClientAwake()
         if(root:Q("welcome_group").visible) then
             CloseWelcomeScreen()
         elseif(root:Q("result_group").visible) then
-            CloseResult(true)
+            CloseResult()
         elseif(root:Q("opponent_left_group").visible) then
-            CloseOpponentLeft(true)
+            CloseOpponentLeft()
         end
         playTapHandler.gameObject:SetActive(false)
         audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
@@ -63,21 +64,17 @@ function SetRacers(_racers)
 end
 
 function UpdateAction(_action)
-    if(_action ~= nil) then 
-        root:Q("action_group"):EnableInClassList("hide",false)
-        root:Q("action_player"):SetPrelocalizedText(_action.player, false)
-        root:Q("action_text"):SetPrelocalizedText(_action.text, false)
-    else
-        root:Q("action_group"):EnableInClassList("hide",true)
-    end
+    action = _action
+    UpdateGameView()
 end
 
-function UpdateView()
-    ShowSceneView()
-    if (location == Location().Lobby) then SetSceneHeading(strings.title,"WAITING AREA") else SetSceneHeading(strings.title,"GAME") end
-    if (location == Location().Lobby) then SetSceneHelp("PLEASE WAIT FOR MATCH") else
-        if(racers.IsLocalRacerTurn()) then SetSceneHelp("IT IS YOUR TURN") else SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN") end
+function UpdateGameView()
+    if(racers.IsLocalRacerTurn()) then 
+        root:Q("game_help"):SetPrelocalizedText("IT IS YOUR TURN", false)
+    else 
+        root:Q("game_help"):SetPrelocalizedText("PLEASE WAIT FOR YOUR OPPONENET'S TURN", false)
     end
+
     for i=1,2 do
         if(location == Location().Lobby) then
             SetPlayer(i,nil)
@@ -87,6 +84,14 @@ function UpdateView()
             data.cardCount = board.GetCardManager().GetCardCount(racers:GetFromId(i).player)
             SetPlayer(i,data)
         end
+    end
+
+    if(action ~= nil) then 
+        root:Q("action_player"):SetPrelocalizedText(action.player, false)
+        root:Q("action_text"):SetPrelocalizedText(action.text, false)
+    else
+        root:Q("action_player"):SetPrelocalizedText("Match started", false)
+        root:Q("action_text"):SetPrelocalizedText("May the odds be in your favor", false)
     end
 end
 
@@ -109,31 +114,20 @@ function Initialize()
     root:Q("overclock_label_2"):SetPrelocalizedText("Overclock", false)
     root:Q("card_count_label_1"):SetPrelocalizedText("Cards", false)
     root:Q("card_count_label_2"):SetPrelocalizedText("Cards", false)
-
-    -- root:Q("vs_label"):SetPrelocalizedText("vs", false)
+    
+    root:Q("waiting_title"):SetPrelocalizedText(strings.title, false)
+    root:Q("waiting_help"):SetPrelocalizedText("PLEASE WAIT FOR MATCH", false)
+    root:Q("game_title"):SetPrelocalizedText(strings.title, false)
+    
 
     -- Set Intial State
-    CloseResult(false)
-    CloseOpponentLeft(false)
-    CloseSceneView()
-end
-
-function ShowSceneView()
-    root:Q("scene_heading_group").visible = true
-    root:Q("scene_help_group").visible = true
-    root:Q("username_group"):EnableInClassList("hide",false)
-    -- root:Q("action_group"):EnableInClassList("hide",false)
-end
-
-function CloseSceneView()
-    root:Q("scene_heading_group").visible = false
-    root:Q("scene_help_group").visible = false
-    root:Q("username_group"):EnableInClassList("hide",true)
-    -- root:Q("action_group"):EnableInClassList("hide",true)
+    root:Q("waiting_for_match_group").visible = false
+    root:Q("game_view_group").visible = false
+    root:Q("result_group").visible = false
+    root:Q("opponent_left_group").visible = false
 end
 
 function ShowWelcomeScreen(onClose)
-    CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
     OnWelcomeScreenClosed = onClose
     root:Q("welcome_group").visible = true
@@ -142,52 +136,65 @@ end
 function CloseWelcomeScreen()
     root:Q("welcome_group").visible = false
     OnWelcomeScreenClosed()
+    ShowWaitingForMatch()
+end
+
+function ShowWaitingForMatch()
+    root:Q("waiting_for_match_group").visible = true
+end
+
+function CloseWaitingForMatch()
+    root:Q("waiting_for_match_group").visible = false
+end
+
+function ShowGameView()
+    UpdateAction(nil)
+    CloseWaitingForMatch()
+    root:Q("game_view_group").visible = true
+end
+
+function CloseGameView()
+    root:Q("game_view_group").visible = false
 end
 
 function ShowResult(didWin,onClose)
-    CloseSceneView()
-    UpdateAction(nil)
+    CloseGameView()
     playTapHandler.gameObject:SetActive(true)
     OnResultScreenClosed = onClose
     root:Q("result_group").visible = true
-    if(didWin) then
-        root:Q("result_win_image"):RemoveFromClassList("hide")
-        root:Q("result_lose_image"):AddToClassList("hide")
-    else
-        root:Q("result_win_image"):AddToClassList("hide")
-        root:Q("result_lose_image"):RemoveFromClassList("hide")
-    end
+    root:Q("result_win_image"):EnableInClassList("hide", not didWin)
+    root:Q("result_lose_image"):EnableInClassList("hide",didWin)
+
 end
 
-function CloseResult(invokeCallback)
-    if(invokeCallback) then OnResultScreenClosed() end
+function CloseResult()
+    OnResultScreenClosed()
+    ShowWaitingForMatch()
     root:Q("result_group").visible = false
-    root:Q("result_win_image"):AddToClassList("hide")
-    root:Q("result_lose_image"):AddToClassList("hide")
+    root:Q("result_win_image"):EnableInClassList("hide",true)
+    root:Q("result_lose_image"):EnableInClassList("hide",true)
 end
 
 function ShowOpponentLeft(onClose)
-    UpdateAction(nil)
+    CloseGameView()
     audioManagerGameObject:GetComponent("AudioManager"):PlayDisconnect()
-    CloseSceneView()
     playTapHandler.gameObject:SetActive(true)
     OnOpponentLeftScreenClosed = onClose
     root:Q("opponent_left_group").visible = true
 end
 
-function CloseOpponentLeft(invokeCallback)
-    if(invokeCallback) then OnOpponentLeftScreenClosed() end
+function CloseOpponentLeft()
+    ShowWaitingForMatch()
+    OnOpponentLeftScreenClosed()
     root:Q("opponent_left_group").visible = false
 end
 
 function SetPlayer(id,data)
     if (data == nil) then
-        root:Q("user_"..id).visible = false
-        -- root:Q("vs_label").visible = false
+        -- root:Q("user_"..id).visible = false
         return
     end
-    root:Q("user_"..id).visible = true
-    -- root:Q("vs_label").visible = true
+    -- root:Q("user_"..id).visible = true
     root:Q("username_"..id):SetPrelocalizedText(data.player.name, false)
     root:Q("lap_"..id):SetPrelocalizedText(data.lap.." / "..strings.totalLaps, false)
     root:Q("overclock_"..id):SetPrelocalizedText(data.overclock, false)
@@ -195,40 +202,23 @@ function SetPlayer(id,data)
 
 end
 
-function SetSceneHeading(title,subtitle)
-    if (title == nil or subtitle == nil) then
-        root:Q("scene_heading_group").visible = false
-        return
-    end
-    root:Q("scene_heading_group").visible = true
-    root:Q("scene_title"):SetPrelocalizedText(title, false)
-end
-
-function SetSceneHelp(help)
-    if (help == nil) then
-        root:Q("scene_help_group").visible = false
-        return
-    end
-    root:Q("scene_help_group").visible = true
-    root:Q("scene_help"):SetPrelocalizedText(help, false)
-end
-
 function HandleUiDebug()
-    if(not isAltReleased and not Input.isAltPressed) then
-        isAltReleased = true
-    end
+    if(not isAltReleased and not Input.isAltPressed) then isAltReleased = true end
     if(isAltReleased and Input.isAltPressed) then
         isAltReleased = false
+        if(true) then
+            print("Debug UI disabled, needs to be updated")
+            return
+        end
         if(uiDebugCycleIndex == 0) then
-            CloseResult(false)
+            CloseResult()
             ShowWelcomeScreen(function()end)
         elseif(uiDebugCycleIndex == 1) then
             CloseWelcomeScreen()
             SetLocation(Location().Lobby)
-            UpdateView()
+            ShowWaitingForMatch()
         elseif(uiDebugCycleIndex == 2) then
-            SetSceneHeading(strings.title,"GAME")
-            SetSceneHelp("PLEASE WAIT FOR YOUR OPPONENET'S TURN")
+            ShowGameView()
             local debugData = {}
             debugData.lap = 1
             debugData.isTurn = true
@@ -244,7 +234,7 @@ function HandleUiDebug()
         elseif(uiDebugCycleIndex == 3) then
             ShowOpponentLeft(function()end)
         elseif(uiDebugCycleIndex == 4) then
-            CloseOpponentLeft(false)
+            CloseOpponentLeft()
             ShowResult(function()end, nil)
         end
         uiDebugCycleIndex += 1

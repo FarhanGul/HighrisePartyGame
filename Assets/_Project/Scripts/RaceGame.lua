@@ -83,7 +83,6 @@ function self:ClientAwake()
                 racers:GetFromId(id).isTurn = false
                 racers:GetFromId(racers.GetOtherId(id)).isTurn = true
                 diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
-                playerHud.UpdateView()
             end
             isRollRequestInProgress = false
             boardGameObject:GetComponent("Board").TurnEnd()

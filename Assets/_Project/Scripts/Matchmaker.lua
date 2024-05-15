@@ -179,14 +179,13 @@ function self:ClientAwake()
             cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
             playerHud.SetLocation( playerHud.Location().Game )
-            playerHud.UpdateView()
+            playerHud.ShowGameView()
         end
     end)
     e_sendMoveToWaitingAreaToClient:Connect(function(player)
         player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
-            playerHud.UpdateView()
             playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
