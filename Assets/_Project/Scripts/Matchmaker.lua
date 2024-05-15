@@ -128,15 +128,19 @@ function GameInstances()
             for k,v in pairs(self._table) do
                 if (v.p1 == nil and v.p2 == nil ) then 
                     v.p1 = player
-                    v.p1.character.transform.position = gamesInfo.waitingAreaPosition
-                    e_sendMoveToWaitingAreaToClient:FireAllClients(v.p1)
+                    if(not IsPlayerInWaitingArea(v.p1)) then
+                        v.p1.character.transform.position = gamesInfo.waitingAreaPosition
+                        e_sendMoveToWaitingAreaToClient:FireAllClients(v.p1)
+                    end
                     return
                 end
             end
             -- We are out of game instances
             -- add player to waiting queue and send player to waiting area
-            player.character.transform.position = gamesInfo.waitingAreaPosition
-            e_sendMoveToWaitingAreaToClient:FireAllClients(player)
+            if(not IsPlayerInWaitingArea(player)) then
+                player.character.transform.position = gamesInfo.waitingAreaPosition
+                e_sendMoveToWaitingAreaToClient:FireAllClients(player)
+            end
             table.insert(self.playersInWaitingQueue,player)
         end
     }
@@ -160,7 +164,7 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 0))
+    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 10))
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
 
@@ -206,4 +210,12 @@ function GameFinished(_gameIndex)
     if(client.localPlayer ~= playerWhoWon) then 
         e_sendMatchFinishedToServer:FireServer(_gameIndex)
     end
+end
+
+function IsPlayerInWaitingArea(player)
+    return ServerVectorDistance(player.character.transform.position, gamesInfo.waitingAreaPosition) < 50
+end
+
+function ServerVectorDistance(a,b)
+    return math.sqrt( ( (b.x - a.x) *  (b.x - a.x) ) + ( (b.y - a.y) *  (b.y - a.y) ) + ( (b.z - a.z) *  (b.z - a.z) ) )
 end
