@@ -39,7 +39,6 @@
 }
 
 #user_1 , #user_2{
-    /* background-color: green; */
     width: 100%;
     margin-top: 30px;
 }
@@ -48,21 +47,7 @@
     margin-top: 15px;
     margin-bottom: 15px;
     width: 100%;
-    /* background-color: red; */
-    /* display: flex;
-    flex-direction: row; */
 }
-
-#vs_label{
-    /* width: 10%;
-    margin-left: 10px;
-    margin-right: 10px; */
-}
-
-/* .username-block{
-    display: flex;
-    flex-direction: row;
-} */
 
 .title_text{
     color : #07A5C7;
@@ -88,13 +73,8 @@
 }
 
 .username_text{
-    /* -unity-text-align: middle-center; */
     font-size: 400%;
     -unity-font-definition: var(--heading-font);
-    /* white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; */
-    /* width: 35%; */
 }
 
 .button_text{
@@ -116,9 +96,6 @@
 #game_view_group{
     position: absolute;
     width: 100%;
-    /* height: 100%; */
-    /* align-items : center;
-    padding: 10%; */
 }
 
 .race_stat{
@@ -131,14 +108,12 @@
 }
 
 .popup{
-    /* background-color: var(--color-03); */
     background-color: rgba(0, 0, 0, 0);
     position: absolute;
     width: 100%;
     height: 100%;
     align-items : center;
     justify-content: center;
-    /* padding: 5%; */
 }
 
 .hide{

@@ -145,7 +145,10 @@ function Move(id,roll,_onMoveFinished)
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
     modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
-    if(Input.isAltPressed) then modifiedRoll = 100 end
+    -- if(Input.isAltPressed) then
+    --     print("Debug Role Activated")
+    --      modifiedRoll = 100 
+    -- end
     _DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end

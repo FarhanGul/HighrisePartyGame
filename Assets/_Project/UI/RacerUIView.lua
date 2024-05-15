@@ -191,10 +191,8 @@ end
 
 function SetPlayer(id,data)
     if (data == nil) then
-        -- root:Q("user_"..id).visible = false
         return
     end
-    -- root:Q("user_"..id).visible = true
     root:Q("username_"..id):SetPrelocalizedText(data.player.name, false)
     root:Q("lap_"..id):SetPrelocalizedText(data.lap.." / "..strings.totalLaps, false)
     root:Q("overclock_"..id):SetPrelocalizedText(data.overclock, false)
