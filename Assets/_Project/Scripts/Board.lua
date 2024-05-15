@@ -145,11 +145,11 @@ function Move(id,roll,_onMoveFinished)
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
     modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
-    -- if(Input.isAltPressed) then
-    --     print("Debug Role Activated")
-    --      modifiedRoll = 100 
-    -- end
-    _DiceAnimation(roll)
+    if(Input.isAltPressed) then
+        print("Debug Role Activated")
+         modifiedRoll = 3 
+    end
+    cardManager._DiceAnimation(roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
 
@@ -212,43 +212,6 @@ function _MovePiece(id, amount)
     audioManagerGameObject:GetComponent("AudioManager"):PlayMove()
     amount -= 1
     local newTimer = Timer.new(0.25,function() _MovePiece(id, amount) end,false)
-end
-
-function _DiceAnimation(randomFace)
-    local rotation = Vector3.new(0,0,0)
-    local x, y, z = 0, 0, 0
-
-    if (randomFace == 1) then
-        x = 180
-        y = 0
-        z = 0
-    elseif (randomFace == 2) then
-        x = -90
-        y = 0
-        z = 0
-    elseif (randomFace == 3) then
-        x = 0
-        y = 0
-        z = -90
-    elseif (randomFace == 4) then
-        x = 0
-        y = 0
-        z = 90
-    elseif (randomFace == 5) then
-        x = 90
-        y = 0
-        z = 0
-    elseif (randomFace == 6) then
-        x = 0
-        y = 0
-        z = 0
-    end
-
-    -- Apply rotation to the cube
-    rotation = Vector3.new(x,y,z)
-    dice.transform.localEulerAngles = rotation
-    dice.transform.GetChild(dice.transform,0).gameObject:GetComponent(Animator):SetTrigger("Flip")
-    audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
 end
 
 function GetOverclock()

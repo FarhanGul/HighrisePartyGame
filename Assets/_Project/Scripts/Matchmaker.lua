@@ -11,7 +11,9 @@ local gamesInfo = {
     waitingAreaPosition = Vector3.new(0,0,0),
     worldSpaceUiWaitingAreaPosition = Vector3.new(0,3.61,-8.06),
     worldSpaceUiRelativeGamePosition = Vector3.new(0,3.61,-8.06),
-    cardManagerRelativePosition = Vector3.new(0.4,5,-1.28)
+    cardManagerRelativePosition = Vector3.new(0.4,5,1.16),
+    player1SpawnRelativePosition = Vector3.new(5.5,0.5,0),
+    player2SpawnRelativePosition = Vector3.new(-5.5,0.5,0)
 }
 
 --Public Variables
@@ -117,8 +119,8 @@ function GameInstances()
                 if (v.p1 ~= nil and v.p2 == nil  ) then
                     v.p2 = player
                     v.firstTurn = math.random(1,2)
-                    v.p1.character.transform.position = gamesInfo.playerGamePositions[v.gameIndex]
-                    v.p2.character.transform.position = gamesInfo.playerGamePositions[v.gameIndex]
+                    v.p1.character.transform.position = ServerVectorAdd(gamesInfo.playerGamePositions[v.gameIndex] , gamesInfo.player1SpawnRelativePosition )
+                    v.p2.character.transform.position = ServerVectorAdd(gamesInfo.playerGamePositions[v.gameIndex] , gamesInfo.player2SpawnRelativePosition )
                     e_sendStartMatchToClient:FireAllClients(v.gameIndex,v.p1,v.p2,v.firstTurn)
                     return
                 end
@@ -164,7 +166,7 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 10))
+    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 5))
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
 
@@ -173,8 +175,8 @@ function self:ClientAwake()
     end)
     e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn)
         local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
-        p1.character:Teleport(raceGame.transform.position,function() end)
-        p2.character:Teleport(raceGame.transform.position,function() end)
+        p1.character:Teleport(raceGame.transform.position + gamesInfo.player1SpawnRelativePosition,function() end)
+        p2.character:Teleport(raceGame.transform.position + gamesInfo.player2SpawnRelativePosition,function() end)
         if(p1 == client.localPlayer or p2 == client.localPlayer) then    
             playerHudGameObject.transform.parent:SetParent(raceGame.transform)
             playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
@@ -218,4 +220,8 @@ end
 
 function ServerVectorDistance(a,b)
     return math.sqrt( ( (b.x - a.x) *  (b.x - a.x) ) + ( (b.y - a.y) *  (b.y - a.y) ) + ( (b.z - a.z) *  (b.z - a.z) ) )
+end
+
+function ServerVectorAdd(a,b)
+    return Vector3.new(a.x+b.x, a.y+b.y, a.z+b.z)
 end

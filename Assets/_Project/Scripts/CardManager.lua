@@ -1,5 +1,9 @@
 -- Public
 --!SerializeField
+local diceTapHandler : TapHandler = nil
+--!SerializeField
+local cardSkipTapHandler : TapHandler = nil
+--!SerializeField
 local playCardTapHandler : TapHandler = nil
 --!SerializeField
 local cardSlot_01 : TapHandler = nil
@@ -19,6 +23,7 @@ local racers
 local playedCard = nil
 local board = nil
 local isPlayCardRequestInProgress
+local isRollRequestInProgress
 
 -- Events
 local e_sendHandDiscardedToServer = Event.new("sendHandDiscardedToServer")
@@ -27,6 +32,8 @@ local e_sendDrawCardToServer = Event.new("sendDrawCardToServer")
 local e_sendDrawCardToClient = Event.new("sendDrawCardToClient")
 local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
 local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
+local e_sendRollToServer = Event.new("sendRollToServer")
+local e_sendRollToClients = Event.new("sendRollToClients")
 
 function self:ServerAwake()
     e_sendHandDiscardedToServer:Connect(function(player,opponentPlayer)
@@ -44,8 +51,13 @@ function self:ServerAwake()
     e_sendPlayCardToServer:Connect(function(player,opponentPlayer,_playedCard)
         e_sendPlayCardToClient:FireClient(player,player,_playedCard)
         e_sendPlayCardToClient:FireClient(opponentPlayer,player,_playedCard)
-    end
-    )
+    end)
+
+    e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
+        print("Server recieved roll "..roll)
+        e_sendRollToClients:FireClient(player,id,roll)
+        e_sendRollToClients:FireClient(opponentPlayer,id,roll)
+    end)
 end
 
 function self:ClientAwake()
@@ -53,6 +65,21 @@ function self:ClientAwake()
     cardSlot_01.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(1) end)
     cardSlot_02.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(2) end)
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
+
+    e_sendRollToClients:Connect(function(id, roll)
+        print("client recieved roll "..roll)
+        board.Move(id,roll,function() 
+            local skipOpponentTurn = false
+            if(GetPlayedCard() == "Zap") then skipOpponentTurn = true end
+            if(not skipOpponentTurn) then
+                racers:GetFromId(id).isTurn = false
+                racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+            end
+            isRollRequestInProgress = false
+            board.TurnEnd()
+            SetInteractableState()
+        end)
+    end)
 
     e_sendPlayCardToClient:Connect(function(_player,_playedCard)
         table.remove(cards[_player],table.find(cards[_player], _playedCard))
@@ -88,7 +115,35 @@ function self:ClientAwake()
         end
         OnCardCountUpdated()
     end)
+
+    diceTapHandler.Tapped:Connect(function()
+        if(racers.IsLocalRacerTurn() and not isRollRequestInProgress and not GetIsPlayCardRequestInProgress()) then
+            isRollRequestInProgress = true
+            e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetPlayerWhoseTurnItIs().id ,math.random(1,6)) 
+        end
+    end)
+
+    cardSkipTapHandler.Tapped:Connect(function()
+        if(racers.IsLocalRacerTurn()) then
+            self.transform:Find("View").gameObject:SetActive(false)
+            print(tostring(racers == nil))
+            diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
+            audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+        end
+    end)
 end
+
+function SetInteractableState()
+    local canPlayCard = self.gameObject:GetComponent("CardManager").CanPlaycard()
+    if(not racers.IsLocalRacerTurn()) then
+        self.transform:Find("View").gameObject:SetActive(false)
+        diceTapHandler.gameObject:SetActive(false)
+    else
+        self.transform:Find("View").gameObject:SetActive( canPlayCard )
+        diceTapHandler.gameObject:SetActive( not canPlayCard )
+    end
+end
+
 
 function OnCardCountUpdated()
     if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
@@ -143,6 +198,7 @@ function Initialize(_racers, _board)
     selectedCard = -1
     playedCard = nil
     UpdateView()
+    SetInteractableState()
 end
 
 function TurnEnd()
@@ -155,6 +211,7 @@ function PlaySelectedCard()
     isPlayCardRequestInProgress = true
     e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard)
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+    SetInteractableState()
     UpdateView()
 end
 
@@ -173,7 +230,6 @@ end
 function UpdateView()
     local c = cards[client.localPlayer]
     local canPlayCard = CanPlaycard()
-    playCardTapHandler.gameObject:SetActive(canPlayCard)
     cardSlot_01.gameObject:SetActive(#c > 0)
     cardSlot_02.gameObject:SetActive(#c > 1)
     cardSlot_03.gameObject:SetActive(#c > 2)
@@ -207,4 +263,41 @@ end
 
 function GetIsPlayCardRequestInProgress()
     return isPlayCardRequestInProgress
+end
+
+function _DiceAnimation(randomFace)
+    local rotation = Vector3.new(0,0,0)
+    local x, y, z = 0, 0, 0
+
+    if (randomFace == 1) then
+        x = 90
+        y = 0
+        z = 0
+    elseif (randomFace == 2) then
+        x = 180
+        y = 0
+        z = 0
+    elseif (randomFace == 3) then
+        x = 0
+        y = -90
+        z = 0
+    elseif (randomFace == 4) then
+        x = 0
+        y = 90
+        z = 0
+    elseif (randomFace == 5) then
+        x = 0
+        y = 0
+        z = 0
+    elseif (randomFace == 6) then
+        x = -90
+        y = 0
+        z = 0
+    end
+
+    -- Apply rotation to the cube
+    rotation = Vector3.new(x,y,z)
+    diceTapHandler.transform.parent.localEulerAngles = rotation
+    diceTapHandler.gameObject:GetComponent(Animator):SetTrigger("Flip")
+    audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
 end

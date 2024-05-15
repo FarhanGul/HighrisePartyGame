@@ -1,22 +1,17 @@
 --Public Fields
 --!SerializeField
-local diceTapHandler : TapHandler = nil
---!SerializeField
 local boardGameObject : GameObject = nil
 --!SerializeField
 local playerHudGameObject : GameObject = nil
 --!SerializeField
 local cardManagerGameObject : GameObject = nil
-
---Events
-local e_sendRollToServer = Event.new("sendRollToServer")
-local e_sendRollToClients = Event.new("sendRollToClients")
+--!SerializeField
+local audioManagerGameObject : GameObject = nil
 
 --Private Variables
 local racers
 local localRacer
 local playerHud
-local isRollRequestInProgress
 
 --Classes
 local function Racer(_id,_player,_isTurn)
@@ -75,32 +70,6 @@ end
 --Functions
 function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
-    e_sendRollToClients:Connect(function(id, roll)
-        boardGameObject:GetComponent("Board").Move(id,roll,function() 
-            local skipOpponentTurn = false
-            if(cardManagerGameObject:GetComponent("CardManager").GetPlayedCard() == "Zap") then skipOpponentTurn = true end
-            if(not skipOpponentTurn) then
-                racers:GetFromId(id).isTurn = false
-                racers:GetFromId(racers.GetOtherId(id)).isTurn = true
-                diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
-            end
-            isRollRequestInProgress = false
-            boardGameObject:GetComponent("Board").TurnEnd()
-        end)
-    end)
-    diceTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        if(localRacer.isTurn and not isRollRequestInProgress and not cardManagerGameObject:GetComponent("CardManager").GetIsPlayCardRequestInProgress()) then
-            isRollRequestInProgress = true
-            e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),localRacer.id ,math.random(1,6)) 
-        end
-    end)
-end
-
-function self:ServerAwake()
-    e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
-        e_sendRollToClients:FireClient(player,id,roll)
-        e_sendRollToClients:FireClient(opponentPlayer,id,roll)
-    end)
 end
 
 function StartMatch(gameIndex, p1,p2,firstTurn)
@@ -112,7 +81,6 @@ function StartMatch(gameIndex, p1,p2,firstTurn)
     playerHud.SetBoard( boardGameObject:GetComponent("Board") )
     localRacer = racers:GetFromPlayer(client.localPlayer)
     boardGameObject:GetComponent("Board").Initialize(gameIndex,racers,p1,p2)
-    diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
 end
 
 function GetRacers()
