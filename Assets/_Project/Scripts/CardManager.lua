@@ -54,7 +54,6 @@ function self:ServerAwake()
     end)
 
     e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
-        print("Server recieved roll "..roll)
         e_sendRollToClients:FireClient(player,id,roll)
         e_sendRollToClients:FireClient(opponentPlayer,id,roll)
     end)
@@ -67,7 +66,6 @@ function self:ClientAwake()
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
 
     e_sendRollToClients:Connect(function(id, roll)
-        print("client recieved roll "..roll)
         board.Move(id,roll,function() 
             local skipOpponentTurn = false
             if(GetPlayedCard() == "Zap") then skipOpponentTurn = true end
@@ -76,8 +74,7 @@ function self:ClientAwake()
                 racers:GetFromId(racers.GetOtherId(id)).isTurn = true
             end
             isRollRequestInProgress = false
-            board.TurnEnd()
-            SetInteractableState()
+            TurnEnd()
         end)
     end)
 
@@ -126,7 +123,6 @@ function self:ClientAwake()
     cardSkipTapHandler.Tapped:Connect(function()
         if(racers.IsLocalRacerTurn()) then
             self.transform:Find("View").gameObject:SetActive(false)
-            print(tostring(racers == nil))
             diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
             audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
         end
@@ -134,7 +130,7 @@ function self:ClientAwake()
 end
 
 function SetInteractableState()
-    local canPlayCard = self.gameObject:GetComponent("CardManager").CanPlaycard()
+    local canPlayCard = CanPlaycard()
     if(not racers.IsLocalRacerTurn()) then
         self.transform:Find("View").gameObject:SetActive(false)
         diceTapHandler.gameObject:SetActive(false)
@@ -163,13 +159,14 @@ end
 
 function GetRandomCard()
     local deck = {
-        {card="Nos",probablity=1},
+        -- {card="Nos",probablity=1},
         {card="Zap",probablity=0.85},
-        {card="Honk",probablity=0.3},
-        {card="WarpDrive",probablity=0.4},
-        {card="WormHole",probablity=0.5}
+        -- {card="Honk",probablity=0.3},
+        -- {card="WarpDrive",probablity=0.4},
+        -- {card="WormHole",probablity=0.5}
     }
     local rand = math.random()
+    rand = 0
     local filterdCards = {}
     for k , v in pairs(deck) do
         if v.probablity >= rand then
@@ -198,11 +195,11 @@ function Initialize(_racers, _board)
     selectedCard = -1
     playedCard = nil
     UpdateView()
-    SetInteractableState()
 end
 
 function TurnEnd()
     playedCard = nil
+    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     UpdateView()
 end
 
@@ -211,7 +208,6 @@ function PlaySelectedCard()
     isPlayCardRequestInProgress = true
     e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard)
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-    SetInteractableState()
     UpdateView()
 end
 
@@ -228,6 +224,7 @@ function CanPlaycard()
 end
 
 function UpdateView()
+    SetInteractableState()
     local c = cards[client.localPlayer]
     local canPlayCard = CanPlaycard()
     cardSlot_01.gameObject:SetActive(#c > 0)

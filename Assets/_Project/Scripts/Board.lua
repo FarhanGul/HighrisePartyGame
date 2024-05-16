@@ -153,11 +153,6 @@ function Move(id,roll,_onMoveFinished)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
 
-function TurnEnd()
-    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
-    cardManager.TurnEnd()
-end
-
 function LandedOnTile(id)
     local tileType = tiles[location[id]]:GetComponent("BoardTile").GetType()
     if(tileType == "Draw") then
