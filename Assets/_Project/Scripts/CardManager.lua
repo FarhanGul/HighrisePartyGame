@@ -1,10 +1,16 @@
 -- Public
 --!SerializeField
-local diceTapHandler : TapHandler = nil
+local diceAnimator : Animator = nil
 --!SerializeField
-local cardSkipTapHandler : TapHandler = nil
+local diceMesh : Transform = nil
 --!SerializeField
 local playCardTapHandler : TapHandler = nil
+--!SerializeField
+local rollTapHandler : TapHandler = nil
+--!SerializeField
+local rollPressed : GameObject = nil
+--!SerializeField
+local playCardPressed : GameObject = nil
 --!SerializeField
 local cardSlot_01 : TapHandler = nil
 --!SerializeField
@@ -24,6 +30,7 @@ local playedCard = nil
 local board = nil
 local isPlayCardRequestInProgress
 local isRollRequestInProgress
+local didRoll
 
 -- Events
 local e_sendHandDiscardedToServer = Event.new("sendHandDiscardedToServer")
@@ -113,31 +120,39 @@ function self:ClientAwake()
         OnCardCountUpdated()
     end)
 
-    diceTapHandler.Tapped:Connect(function()
+    rollTapHandler.Tapped:Connect(function()
         if(racers.IsLocalRacerTurn() and not isRollRequestInProgress and not GetIsPlayCardRequestInProgress()) then
             isRollRequestInProgress = true
+            didRoll = true
+            SetInteractableState()
             e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetPlayerWhoseTurnItIs().id ,math.random(1,6)) 
         end
     end)
 
-    cardSkipTapHandler.Tapped:Connect(function()
-        if(racers.IsLocalRacerTurn()) then
-            self.transform:Find("View").gameObject:SetActive(false)
-            diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
-            audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-        end
-    end)
+    -- cardSkipTapHandler.Tapped:Connect(function()
+    --     if(racers.IsLocalRacerTurn()) then
+    --         self.transform:Find("View").gameObject:SetActive(false)
+    --         diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
+    --         audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+    --     end
+    -- end)
 end
 
 function SetInteractableState()
-    local canPlayCard = CanPlaycard()
-    if(not racers.IsLocalRacerTurn()) then
-        self.transform:Find("View").gameObject:SetActive(false)
-        diceTapHandler.gameObject:SetActive(false)
-    else
-        self.transform:Find("View").gameObject:SetActive( canPlayCard )
-        diceTapHandler.gameObject:SetActive( not canPlayCard )
-    end
+    local isLocalTurn = racers.IsLocalRacerTurn()
+    rollPressed:SetActive(not isLocalTurn or (isLocalTurn and isRollRequestInProgress))
+    playCardPressed:SetActive(not isLocalTurn or not CanPlaycard() or didRoll)
+    rollTapHandler.gameObject:SetActive(isLocalTurn and not isRollRequestInProgress)
+    playCardTapHandler.gameObject:SetActive(isLocalTurn and CanPlaycard() and not didRoll)
+
+    -- local canPlayCard = CanPlaycard()
+    -- if(not racers.IsLocalRacerTurn()) then
+    --     self.transform:Find("View").gameObject:SetActive(false)
+    --     diceTapHandler.gameObject:SetActive(false)
+    -- else
+    --     self.transform:Find("View").gameObject:SetActive( canPlayCard )
+    --     diceTapHandler.gameObject:SetActive( not canPlayCard )
+    -- end
 end
 
 
@@ -159,11 +174,11 @@ end
 
 function GetRandomCard()
     local deck = {
-        -- {card="Nos",probablity=1},
+        {card="Nos",probablity=1},
         {card="Zap",probablity=0.85},
-        -- {card="Honk",probablity=0.3},
-        -- {card="WarpDrive",probablity=0.4},
-        -- {card="WormHole",probablity=0.5}
+        {card="Honk",probablity=0.3},
+        {card="WarpDrive",probablity=0.4},
+        {card="WormHole",probablity=0.3}
     }
     local rand = math.random()
     rand = 0
@@ -194,10 +209,12 @@ function Initialize(_racers, _board)
     cards[racers:GetOpponentPlayer(client.localPlayer)] = {}
     selectedCard = -1
     playedCard = nil
+    didRoll = false
     UpdateView()
 end
 
 function TurnEnd()
+    didRoll = false
     playedCard = nil
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     UpdateView()
@@ -262,31 +279,34 @@ function GetIsPlayCardRequestInProgress()
     return isPlayCardRequestInProgress
 end
 
-function _DiceAnimation(randomFace)
+function _DiceAnimation(id, roll)
+    if(racers:GetFromId(id).player ~= client.localPlayer) then
+        return
+    end
     local rotation = Vector3.new(0,0,0)
     local x, y, z = 0, 0, 0
 
-    if (randomFace == 1) then
+    if (roll == 1) then
         x = 90
         y = 0
         z = 0
-    elseif (randomFace == 2) then
+    elseif (roll == 2) then
         x = 180
         y = 0
         z = 0
-    elseif (randomFace == 3) then
+    elseif (roll == 3) then
         x = 0
         y = -90
         z = 0
-    elseif (randomFace == 4) then
+    elseif (roll == 4) then
         x = 0
         y = 90
         z = 0
-    elseif (randomFace == 5) then
+    elseif (roll == 5) then
         x = 0
         y = 0
         z = 0
-    elseif (randomFace == 6) then
+    elseif (roll == 6) then
         x = -90
         y = 0
         z = 0
@@ -294,7 +314,7 @@ function _DiceAnimation(randomFace)
 
     -- Apply rotation to the cube
     rotation = Vector3.new(x,y,z)
-    diceTapHandler.transform.parent.localEulerAngles = rotation
-    diceTapHandler.gameObject:GetComponent(Animator):SetTrigger("Flip")
+    diceMesh.localEulerAngles = rotation
+    diceAnimator:SetTrigger("Flip")
     audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
 end

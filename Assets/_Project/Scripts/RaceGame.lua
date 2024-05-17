@@ -63,6 +63,9 @@ local function Racers()
                 end
             end
             return nil
+        end,
+        Print = function()
+            
         end
     }
 end
@@ -80,6 +83,7 @@ function StartMatch(gameIndex, p1,p2,firstTurn)
     playerHud.SetRacers( racers )
     playerHud.SetBoard( boardGameObject:GetComponent("Board") )
     localRacer = racers:GetFromPlayer(client.localPlayer)
+    -- print("Race game calls board Initialize")
     boardGameObject:GetComponent("Board").Initialize(gameIndex,racers,p1,p2)
 end
 

@@ -26,6 +26,8 @@ PluginImporter:
       type: 3}
     Highrise.Lua.Generated.GeneralChat: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
       type: 3}
+    Highrise.Lua.Generated.GenericText: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
+      type: 3}
     Highrise.Lua.Generated.HighriseCameraController: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
       type: 3}
     Highrise.Lua.Generated.Matchmaker: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
@@ -51,6 +53,8 @@ PluginImporter:
     Highrise.Lua.Generated.Server: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
       type: 3}
     Highrise.Lua.Generated.ServerTest: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
+      type: 3}
+    Highrise.Lua.Generated.StandingPlatformUI: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
       type: 3}
   executionOrder: {}
   defineConstraints: []

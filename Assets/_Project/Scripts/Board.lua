@@ -107,10 +107,12 @@ function SwapPieces()
 end
 
 function Initialize(_gameIndex,_racers,p1,p2)
+    -- print("Board Initialized :"..tostring(_racers == nil))
     laps = {1,1}
     location = {0,0}
     overclock = {0,0}
     racers = _racers
+    print(client.localPlayer.name.."@".."Board Racer count : "..racers:GetCount())
     gameIndex = _gameIndex
     SetPiecePosition(1)
     SetPiecePosition(2)
@@ -136,6 +138,8 @@ function GetTileRotation(_location)
 end
 
 function Move(id,roll,_onMoveFinished)
+    -- print("Move "..tostring(racers == nil))
+    -- print("Move "..tostring(racers:GetFromId(id) == nil))
     playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
         player = racers:GetFromId(id).player.name,
         text  = "Rolled "..tostring(roll)
@@ -149,7 +153,7 @@ function Move(id,roll,_onMoveFinished)
         print("Debug Role Activated")
          modifiedRoll = 3 
     end
-    cardManager._DiceAnimation(roll)
+    cardManager._DiceAnimation(id,roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
 

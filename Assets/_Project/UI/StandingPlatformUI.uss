@@ -1,0 +1,11 @@
+.standing-platform-u-i {
+    background-color : red;
+}
+
+#test{
+    color : yellow;
+    font-size: 600%;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    -unity-font-definition: url("project://database/Assets/_Project/Fonts/impactSDF.asset");
+}
