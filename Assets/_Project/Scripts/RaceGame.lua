@@ -50,6 +50,9 @@ local function Racers()
         GetOpponentPlayer = function(self,player)
             return self:GetFromId(self.GetOtherId(self:GetFromPlayer(player).id)).player
         end,
+        GetOtherPlayer = function(self,id)
+            return self:GetFromId(self.GetOtherId(id)).player
+        end,
         GetOtherId = function(id)
             if id == 1 then return 2 else return 1 end
         end,

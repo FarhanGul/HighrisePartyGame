@@ -25,6 +25,8 @@ local cameraRoot : GameObject = nil
 local playerHudGameObject : GameObject = nil
 --!SerializeField
 local cardManagerGameObject : GameObject = nil
+--!SerializeField
+local audioManagerGameObject : GameObject = nil
 
 --Private Variables
 -- local maxMatches = 1
@@ -203,9 +205,9 @@ function self:ClientAwake()
     end)
 end
 
-function GameFinished(_gameIndex)
+function GameFinished(_gameIndex,playerWhoWon)
+    audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
     local raceGame = raceGames.transform:GetChild(_gameIndex-1).gameObject:GetComponent("RaceGame")
-    local playerWhoWon = raceGame.GetRacers():GetPlayerWhoseTurnItIs()
     playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)

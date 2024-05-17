@@ -15,9 +15,9 @@ local playerHudGameObject : GameObject = nil
 local audioManagerGameObject : GameObject = nil
 
 local tiles = {}
-local location = {0,0}
-local overclock = {0,0}
-local laps = {1,1}
+local location
+local health
+local laps
 local matchmaker
 local cardManager
 local gameIndex
@@ -26,17 +26,17 @@ local teleportTileLocations
 local onMoveFinished
 
 -- Events
-local e_sendOverclockToServer = Event.new("sendOverclockToServer")
-local e_sendOverclockToClient = Event.new("sendOverclockToClient")
+local e_sendHealthToServer = Event.new("sendHealthToServer")
+local e_sendHealthToClient = Event.new("sendHealthToClient")
 local e_sendLocationToServer = Event.new("sendLocationToServer")
 local e_sendLocationToClient = Event.new("sendLocationToClient")
 local e_sendLandedOnSpecialTileToServer = Event.new("sendLandedOnSpecialTileToServer")
 local e_sendLandedOnSpecialTileToClient = Event.new("sendLandedOnSpecialTileToClient")
 
 function self:ServerAwake()
-    e_sendOverclockToServer:Connect(function(player,opponentPlayer,id,_overclock)
-        e_sendOverclockToClient:FireClient(player,id,_overclock)
-        e_sendOverclockToClient:FireClient(opponentPlayer,id,_overclock)
+    e_sendHealthToServer:Connect(function(player,opponentPlayer,id,_health)
+        e_sendHealthToClient:FireClient(player,id,_health)
+        e_sendHealthToClient:FireClient(opponentPlayer,id,_health)
     end)
     e_sendLocationToServer:Connect(function(player,opponentPlayer,id,_location)
         e_sendLocationToClient:FireClient(player,id,_location)
@@ -55,8 +55,11 @@ function self:ClientAwake()
     do 
         tiles[i] = self.transform.GetChild(self.transform,i).gameObject;
     end
-    e_sendOverclockToClient:Connect(function(id,_overclock)
-        overclock[id] = _overclock
+    e_sendHealthToClient:Connect(function(id,_health)
+        health[id] = _health
+        if(health[id]  <= 0) then
+            matchmaker.GameFinished(gameIndex,racers:GetOtherPlayer())
+        end
         playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     end)
     e_sendLocationToClient:Connect(function(id,_location)
@@ -67,8 +70,8 @@ function self:ClientAwake()
         if(tileType == "Teleport") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
         end
-        if(tileType == "Overclock") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayUpgrade()
+        if(tileType == "Mine") then
+            audioManagerGameObject:GetComponent("AudioManager"):PlayDamage()
         end
         if(tileType == "Anomaly") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayAnomaly()
@@ -110,9 +113,9 @@ function Initialize(_gameIndex,_racers,p1,p2)
     -- print("Board Initialized :"..tostring(_racers == nil))
     laps = {1,1}
     location = {0,0}
-    overclock = {0,0}
+    health = {4,4}
     racers = _racers
-    print(client.localPlayer.name.."@".."Board Racer count : "..racers:GetCount())
+    -- print(client.localPlayer.name.."@".."Board Racer count : "..racers:GetCount())
     gameIndex = _gameIndex
     SetPiecePosition(1)
     SetPiecePosition(2)
@@ -147,11 +150,10 @@ function Move(id,roll,_onMoveFinished)
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
-    modifiedRoll += overclock[id]
     onMoveFinished = _onMoveFinished
     if(Input.isAltPressed) then
         print("Debug Role Activated")
-         modifiedRoll = 3 
+         modifiedRoll = 10 
     end
     cardManager._DiceAnimation(id,roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
@@ -171,19 +173,12 @@ function LandedOnTile(id)
             destination = teleportTileLocations[1]
         end
         e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,destination)
-    elseif(tileType == "Overclock") then
-        e_sendOverclockToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,GetNextOverclockValue(overclock[id]))
+    elseif(tileType == "Mine") then
+        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,health[id]-1)
     elseif(tileType == "Anomaly") then
-        e_sendOverclockToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
-        cardManager.SendHandDiscardedToServer(client.localPlayer)
         e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
     end
     e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer.name,tileType)
-end
-
-function GetNextOverclockValue(current)
-    if(current == 0 ) then return 1
-    else return current*2 end
 end
 
 function _MovePiece(id, amount)
@@ -198,8 +193,7 @@ function _MovePiece(id, amount)
     location[id] += 1
     if( location[id] == #tiles + 1) then
         if(laps[id] == TotalLaps ) then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
-            matchmaker.GameFinished(gameIndex)
+            matchmaker.GameFinished(gameIndex,racers:GetPlayerWhoseTurnItIs())
             return
         end
         audioManagerGameObject:GetComponent("AudioManager"):PlayCheckpoint()
@@ -213,8 +207,8 @@ function _MovePiece(id, amount)
     local newTimer = Timer.new(0.25,function() _MovePiece(id, amount) end,false)
 end
 
-function GetOverclock()
-    return overclock
+function GetHealth()
+    return health
 end
 
 function GetCardManager()

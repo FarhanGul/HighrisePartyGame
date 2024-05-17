@@ -80,7 +80,7 @@ function UpdateGameView()
             SetPlayer(i,nil)
         else
             local data = racers:GetFromId(i)
-            data.overclock = board.GetOverclock()[i]
+            data.health = board.GetHealth()[i]
             data.cardCount = board.GetCardManager().GetCardCount(racers:GetFromId(i).player)
             SetPlayer(i,data)
         end
@@ -99,8 +99,8 @@ function Initialize()
     -- Set Text
     root:Q("welcome_title"):SetPrelocalizedText(strings.title, false)
     root:Q("welcome_subtitle"):SetPrelocalizedText("WELCOME", false)
-    root:Q("welcome_description"):SetPrelocalizedText("A tabletop race where you'll roll dice and play cards. Get to the finish spot before your opponent to win. Best of luck!", false)
-    root:Q("welcome_guide"):SetPrelocalizedText("When it is your turn , tap the dice to roll. You can play only one card before your dice roll so choose wisely, tap the card to select it. Overclock increases your dice roll and anomaly discards your hand, resets your overclock and returns you back to the checkpoint.", false)
+    root:Q("welcome_description"):SetPrelocalizedText("A tabletop race where you'll roll dice and play cards. Get to the finish spot before your opponent or destroy the opponent alien to win. Best of luck!", false)
+    root:Q("welcome_guide"):SetPrelocalizedText("Roll the dice to move your piece. If you have cards, tap the card to select it and play it before your dice roll, tap the card to select it", false)
 
     root:Q("result_title"):SetPrelocalizedText(strings.title, false)
     root:Q("result_subtitle"):SetPrelocalizedText("GAME FINISHED", false)
@@ -110,8 +110,8 @@ function Initialize()
 
     root:Q("lap_label_1"):SetPrelocalizedText("Lap", false)
     root:Q("lap_label_2"):SetPrelocalizedText("Lap", false)
-    root:Q("overclock_label_1"):SetPrelocalizedText("Overclock", false)
-    root:Q("overclock_label_2"):SetPrelocalizedText("Overclock", false)
+    root:Q("overclock_label_1"):SetPrelocalizedText("Health", false)
+    root:Q("overclock_label_2"):SetPrelocalizedText("Health", false)
     root:Q("card_count_label_1"):SetPrelocalizedText("Cards", false)
     root:Q("card_count_label_2"):SetPrelocalizedText("Cards", false)
     
@@ -195,7 +195,7 @@ function SetPlayer(id,data)
     end
     root:Q("username_"..id):SetPrelocalizedText(data.player.name, false)
     root:Q("lap_"..id):SetPrelocalizedText(data.lap.." / "..strings.totalLaps, false)
-    root:Q("overclock_"..id):SetPrelocalizedText(data.overclock, false)
+    root:Q("overclock_"..id):SetPrelocalizedText(data.health, false)
     root:Q("card_count_"..id):SetPrelocalizedText(data.cardCount.." / 3", false)
 
 end
@@ -222,7 +222,7 @@ function HandleUiDebug()
             debugData.isTurn = true
             debugData.player = {}
             debugData.player.name = "Debug Racer big name 01"
-            debugData.overclock = 2
+            debugData.health = 2
             debugData.cardCount = 1
             SetPlayer(1,debugData)
             debugData.isTurn = false

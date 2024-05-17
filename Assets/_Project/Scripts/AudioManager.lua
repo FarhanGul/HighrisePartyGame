@@ -27,7 +27,7 @@ local anomaly : AudioSource = nil
 --!SerializeField
 local teleport : AudioSource = nil
 --!SerializeField
-local upgrade : AudioSource = nil
+local damage : AudioSource = nil
 --!SerializeField
 local checkpoint : AudioSource = nil
 
@@ -83,8 +83,8 @@ function PlayTeleport()
     teleport:Play()
 end
 
-function PlayUpgrade()
-    upgrade:Play()
+function PlayDamage()
+    damage:Play()
 end
 
 function PlayCheckpoint()
