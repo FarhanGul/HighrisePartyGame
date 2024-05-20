@@ -16,6 +16,14 @@ local audioManagerGameObject : GameObject = nil
 local player01Hud : GameObject = nil
 --!SerializeField
 local player02Hud : GameObject = nil
+--!SerializeField
+local turnGenericTextGameObject : GameObject = nil
+--!SerializeField
+local actionOwnerGenericTextGameObject : GameObject = nil
+--!SerializeField
+local actionMessageGenericTextGameObject : GameObject = nil
+--!SerializeField
+local actionHelpGenericTextGameObject : GameObject = nil
 
 --!Bind
 local root: VisualElement = nil
@@ -74,9 +82,9 @@ end
 
 function UpdateGameView()
     if(racers.IsLocalRacerTurn()) then 
-        root:Q("game_help"):SetPrelocalizedText("IT IS YOUR TURN", false)
+        root:Q("game_help"):SetPrelocalizedText("IT'S YOUR TURN", false)
     else 
-        root:Q("game_help"):SetPrelocalizedText("PLEASE WAIT FOR YOUR OPPONENET'S TURN", false)
+        root:Q("game_help"):SetPrelocalizedText("IT'S YOUR OPPONENET'S TURN", false)
     end
 
     for i=1,2 do
@@ -97,6 +105,8 @@ function UpdateGameView()
         root:Q("action_player"):SetPrelocalizedText("Match started", false)
         root:Q("action_text"):SetPrelocalizedText("May the odds be in your favor", false)
     end
+
+    SetActionAndTurn(action,racers.IsLocalRacerTurn())
 end
 
 function Initialize()
@@ -215,6 +225,22 @@ function SetPlayer(id,data)
         cardRoot:GetChild(i).gameObject:SetActive(data.cardCount > i)
     end
 
+end
+
+function SetActionAndTurn(action,isTurn)
+    if(action ~= nil) then 
+        actionOwnerGenericTextGameObject:GetComponent("GenericText").SetText(action.player)
+        actionMessageGenericTextGameObject:GetComponent("GenericText").SetText(action.text)
+    else
+        actionOwnerGenericTextGameObject:GetComponent("GenericText").SetText("Match started")
+        actionMessageGenericTextGameObject:GetComponent("GenericText").SetText("May the odds be in your favor")
+    end
+
+    if(isTurn) then 
+        turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR TURN")
+    else 
+        turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR OPPONENET'S TURN")
+    end
 end
 
 function HandleUiDebug()

@@ -169,9 +169,9 @@ end
 
 function self:ClientAwake()
     -- cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 5))
-    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 10))
+    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 15))
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
-    playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
+    -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
 
     playerHud.ShowWelcomeScreen(function()
         e_sendReadyForMatchmakingToServer:FireServer()
@@ -181,8 +181,8 @@ function self:ClientAwake()
         p1.character:Teleport(raceGame.transform.position + gamesInfo.player1SpawnRelativePosition,function() end)
         p2.character:Teleport(raceGame.transform.position + gamesInfo.player2SpawnRelativePosition,function() end)
         if(p1 == client.localPlayer or p2 == client.localPlayer) then    
-            playerHudGameObject.transform.parent:SetParent(raceGame.transform)
-            playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
+            -- playerHudGameObject.transform.parent:SetParent(raceGame.transform)
+            -- playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
             cardManagerGameObject.transform:SetParent(raceGame.transform)
             cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
@@ -195,7 +195,7 @@ function self:ClientAwake()
         player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
-            playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
+            -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
             cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
     end)

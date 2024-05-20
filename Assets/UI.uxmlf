@@ -2,3 +2,4 @@
 @import url("/Assets/_Project/UI/RacerUIView.uxml");
 @import url("/Assets/_Project/UI/StandingPlatformUI.uxml");
 @import url("/Assets/_Project/UI/GenericText.uxml");
+@import url("/Assets/_Project/UI/ActionUI.uxml");
