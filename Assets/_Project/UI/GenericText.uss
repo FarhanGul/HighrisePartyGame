@@ -1,2 +1,27 @@
-.generic-text {
+:root {
+    --heading-font: url("project://database/Assets/_Project/Fonts/impactSDF.asset");
+    --normal-font: url("project://database/Assets/_Project/Fonts/bahnschriftSDF.asset");
+}
+
+.view{
+    height:100%;
+    width:100%;
+}
+
+#generic_text{
+    height:100%;
+    width:100%;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color : white;
+}
+
+.normal_text {
+    font-size: 32px;
+    -unity-font-definition: var(--normal-font);
+}
+
+.heading_text{
+    font-size: 48px;
+    -unity-font-definition: var(--heading-font);
 }

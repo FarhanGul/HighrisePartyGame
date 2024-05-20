@@ -7,7 +7,8 @@
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
 
-  <hr:UILuaView class="generic-text">
+  <hr:UILuaView class="view">
+    <hr:UILabel name="generic_text" class="normal_text" picking-mode="Ignore"/>
   </hr:UILuaView>
 
 </UXML>

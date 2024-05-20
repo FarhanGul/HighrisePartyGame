@@ -181,7 +181,6 @@ function GetRandomCard()
         {card="WormHole",probablity=0.3}
     }
     local rand = math.random()
-    rand = 0
     local filterdCards = {}
     for k , v in pairs(deck) do
         if v.probablity >= rand then

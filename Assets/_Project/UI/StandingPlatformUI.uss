@@ -4,7 +4,7 @@
 
 #test{
     color : yellow;
-    font-size: 600%;
+    font-size: 32px
     margin-bottom: 15px;
     margin-top: 15px;
     -unity-font-definition: url("project://database/Assets/_Project/Fonts/impactSDF.asset");

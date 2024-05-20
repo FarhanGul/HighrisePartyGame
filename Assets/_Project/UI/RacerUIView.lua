@@ -12,6 +12,10 @@ local uiDebugMode : boolean = false
 local playTapHandler : TapHandler = nil
 --!SerializeField
 local audioManagerGameObject : GameObject = nil
+--!SerializeField
+local player01Hud : GameObject = nil
+--!SerializeField
+local player02Hud : GameObject = nil
 
 --!Bind
 local root: VisualElement = nil
@@ -197,6 +201,19 @@ function SetPlayer(id,data)
     root:Q("lap_"..id):SetPrelocalizedText(data.lap.." / "..strings.totalLaps, false)
     root:Q("overclock_"..id):SetPrelocalizedText(data.health, false)
     root:Q("card_count_"..id):SetPrelocalizedText(data.cardCount.." / 3", false)
+
+    -- New UI
+    local hud = id == 1 and player01Hud or player02Hud
+    hud.transform:Find("Name").gameObject:GetComponent("GenericText").SetText(data.player.name)
+    hud.transform:Find("Lap").gameObject:GetComponent("GenericText").SetText(data.lap.." / "..strings.totalLaps)
+    local healthRoot = hud.transform:Find("Health")
+    for i = 0 , healthRoot.childCount -1 do
+        healthRoot:GetChild(i).gameObject:SetActive(data.health > i)
+    end
+    local cardRoot = hud.transform:Find("CardCount")
+    for i = 0 , cardRoot.childCount -1 do
+        cardRoot:GetChild(i).gameObject:SetActive(data.cardCount > i)
+    end
 
 end
 
