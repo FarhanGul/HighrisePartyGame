@@ -142,7 +142,8 @@ function MovePieceToLocation(_id,_newLocation)
     SetPiecePosition(_id)
 end
 
-function Initialize(_gameIndex,_racers,p1,p2)
+function Initialize(_gameIndex,_racers,p1,p2,randomBoard)
+    SetupBoard(randomBoard)
     laps = {1,1}
     location = {0,0}
     health = {4,4}
@@ -153,6 +154,12 @@ function Initialize(_gameIndex,_racers,p1,p2)
     SetTeleportTileLocations()
     cardManager.Initialize(racers,self)
     audioManagerGameObject:GetComponent("AudioManager"):PlayRaceStart()
+end
+
+function SetupBoard(randomBoard)
+    for i = 1, #randomBoard do
+        tiles[i-1]:GetComponent("BoardTile").SetType( randomBoard[i] )
+    end
 end
 
 function SetPiecePosition(id)

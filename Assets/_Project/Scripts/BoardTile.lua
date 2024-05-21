@@ -9,6 +9,14 @@ function GetType()
     return type
 end
 
+function SetType(_newType)
+    type = _newType
+    for i=0, self.transform.childCount - 1 do
+        local child = self.transform:GetChild(i).gameObject
+        child:SetActive(type == child.name)
+    end
+end
+
 function GetRotatePiece()
     return rotatePiece
 end

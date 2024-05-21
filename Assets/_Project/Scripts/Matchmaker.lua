@@ -127,7 +127,7 @@ function GameInstances()
                     v.firstTurn = math.random(1,2)
                     v.p1.character.transform.position = ServerVectorAdd(gamesInfo.playerGamePositions[v.gameIndex] , gamesInfo.player1SpawnRelativePosition )
                     v.p2.character.transform.position = ServerVectorAdd(gamesInfo.playerGamePositions[v.gameIndex] , gamesInfo.player2SpawnRelativePosition )
-                    e_sendStartMatchToClient:FireAllClients(v.gameIndex,v.p1,v.p2,v.firstTurn)
+                    e_sendStartMatchToClient:FireAllClients(v.gameIndex,v.p1,v.p2,v.firstTurn,GenerateRandomBoard())
                     return
                 end
             end
@@ -171,6 +171,13 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
+    -- for i = 1 , 10 do
+    --     print("--------")
+    --     local randBoard = GenerateRandomBoard()
+    --     for i = 1 , #randBoard do
+    --         print(randBoard[i])
+    --     end
+    -- end
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
     -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
@@ -178,7 +185,7 @@ function self:ClientAwake()
     playerHud.ShowWelcomeScreen(function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
-    e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn)
+    e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn,randomBoard)
         local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
         p1.character:Teleport(raceGame.transform.position + gamesInfo.player1SpawnRelativePosition,function() end)
         p2.character:Teleport(raceGame.transform.position + gamesInfo.player2SpawnRelativePosition,function() end)
@@ -189,7 +196,7 @@ function self:ClientAwake()
             cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraGameRotation)
             cameraRoot:GetComponent("CustomRTSCamera").CenterOn(raceGame.transform.position)
-            raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
+            raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn,randomBoard)
             playerHud.SetLocation( playerHud.Location().Game )
             playerHud.ShowGameView()
         end
@@ -231,4 +238,52 @@ end
 
 function ServerVectorAdd(a,b)
     return Vector3.new(a.x+b.x, a.y+b.y, a.z+b.z)
+end
+
+function GenerateRandomBoard()
+    -- Total tiles = 32
+    local _deckWeights = {
+        Default = 17,
+        Draw = 8,
+        Mine = 2,
+        Draw3 = 1,
+    }
+    local _deck = {}
+    for k , v in pairs(_deckWeights) do
+        for i = 1, v do 
+            table.insert(_deck,k)
+        end
+    end
+    ShuffleArray(_deck)
+    local teleportIndex1 = math.random(1,31)
+    local teleportIndex2 = GetRandomExcluding(1, 31, {teleportIndex1})
+    local anomalyIndex = GetRandomExcluding(16, 31, {teleportIndex1,teleportIndex2})
+    local _tiles = {}
+    for i = 1 , 31 do
+        if ( i == teleportIndex1 or i == teleportIndex2) then
+            _tiles[i] = "Teleport"
+        elseif ( i == anomalyIndex) then
+            _tiles[i] = "Anomaly"
+        else
+            _tiles[i] = _deck[1]
+            table.remove(_deck,1)
+        end
+    end
+    return _tiles
+end
+
+function ShuffleArray(arr)
+    local n = #arr
+    for i = n, 2, -1 do
+        local j = math.random(i) -- Generate a random index
+        arr[i], arr[j] = arr[j], arr[i] -- Swap elements
+    end
+end
+
+function GetRandomExcluding(from, to, exclude)
+    local rand = math.random(from , to)
+    while( exclude[rand] ~= nil) do
+        rand = math.random(from , to)
+    end
+    return rand
 end

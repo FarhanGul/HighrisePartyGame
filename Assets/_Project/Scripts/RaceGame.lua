@@ -93,7 +93,7 @@ function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
 end
 
-function StartMatch(gameIndex, p1,p2,firstTurn)
+function StartMatch(gameIndex, p1,p2,firstTurn,randomBoard)
     isRollRequestInProgress = false
     racers = Racers()
     racers:Add(Racer(1,p1,firstTurn == 1))
@@ -101,7 +101,7 @@ function StartMatch(gameIndex, p1,p2,firstTurn)
     playerHud.SetRacers( racers )
     playerHud.SetBoard( boardGameObject:GetComponent("Board") )
     localRacer = racers:GetFromPlayer(client.localPlayer)
-    boardGameObject:GetComponent("Board").Initialize(gameIndex,racers,p1,p2)
+    boardGameObject:GetComponent("Board").Initialize(gameIndex,racers,p1,p2,randomBoard)
 end
 
 function GetRacers()
