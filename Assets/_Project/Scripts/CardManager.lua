@@ -89,7 +89,8 @@ function self:ClientAwake()
         table.remove(cards[_player],table.find(cards[_player], _playedCard))
         playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
             player = _player.name,
-            text  = "Played ".._playedCard
+            text  = "Played ".._playedCard,
+            help = GetCardHelp(_playedCard)
         })
         if(_playedCard == "Zap") then
             audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
@@ -128,14 +129,6 @@ function self:ClientAwake()
             e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetPlayerWhoseTurnItIs().id ,math.random(1,6)) 
         end
     end)
-
-    -- cardSkipTapHandler.Tapped:Connect(function()
-    --     if(racers.IsLocalRacerTurn()) then
-    --         self.transform:Find("View").gameObject:SetActive(false)
-    --         diceTapHandler.gameObject:SetActive(racers.IsLocalRacerTurn())
-    --         audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-    --     end
-    -- end)
 end
 
 function SetInteractableState()
@@ -144,15 +137,6 @@ function SetInteractableState()
     playCardPressed:SetActive(not isLocalTurn or not CanPlaycard() or didRoll)
     rollTapHandler.gameObject:SetActive(isLocalTurn and not isRollRequestInProgress)
     playCardTapHandler.gameObject:SetActive(isLocalTurn and CanPlaycard() and not didRoll)
-
-    -- local canPlayCard = CanPlaycard()
-    -- if(not racers.IsLocalRacerTurn()) then
-    --     self.transform:Find("View").gameObject:SetActive(false)
-    --     diceTapHandler.gameObject:SetActive(false)
-    -- else
-    --     self.transform:Find("View").gameObject:SetActive( canPlayCard )
-    --     diceTapHandler.gameObject:SetActive( not canPlayCard )
-    -- end
 end
 
 
@@ -170,6 +154,20 @@ end
 
 function GetPlayedCard()
     return playedCard
+end
+
+function GetCardHelp(_card)
+    if(_card == "Zap") then
+        return "Opponent misses their next turn"
+    elseif(_card == "Nos") then
+        return "Next roll is doubled"
+    elseif(_card == "Honk") then
+        return "This card does nothing"
+    elseif(_card == "WarpDrive") then
+        return "Next roll is tripled"
+    elseif(_card == "WormHole") then
+        return "Swap places with the opponent. Laps remain unchanged"
+    end
 end
 
 function GetRandomCard()

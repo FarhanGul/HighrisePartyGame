@@ -231,9 +231,11 @@ function SetActionAndTurn(action,isTurn)
     if(action ~= nil) then 
         actionOwnerGenericTextGameObject:GetComponent("GenericText").SetText(action.player)
         actionMessageGenericTextGameObject:GetComponent("GenericText").SetText(action.text)
+        actionHelpGenericTextGameObject:GetComponent("GenericText").SetText(action.help)
     else
         actionOwnerGenericTextGameObject:GetComponent("GenericText").SetText("Match started")
         actionMessageGenericTextGameObject:GetComponent("GenericText").SetText("May the odds be in your favor")
+        actionHelpGenericTextGameObject:GetComponent("GenericText").SetText("")
     end
 
     if(isTurn) then 

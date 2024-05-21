@@ -81,11 +81,31 @@ function self:ClientAwake()
             if(label == "Draw3") then label = "Draw 3x" end
             playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
                 player = playerName,
-                text  = "Landed on  "..label
+                text  = "Landed on  "..label,
+                help = GetTileHelp(tileType)
             })
         end
     end)
 end
+
+function GetTileHelp(tileType)
+    if(tileType == "Teleport") then
+        return "Moves the player to the other teleport tile"
+    end
+    if(tileType == "Mine") then
+        return "Deals 1 damage to the player"
+    end
+    if(tileType == "Anomaly") then
+        return "Returns the player back to the checkpoint"
+    end
+    if(tileType == "Draw") then
+        return "Player draws a card"
+    end
+    if(tileType == "Draw3") then
+        return "Player draw 3 cards"
+    end
+end
+    
 
 function GetPiece(id)
     return piecesGameObject.transform:GetChild(id-1).gameObject
@@ -143,10 +163,6 @@ end
 function Move(id,roll,_onMoveFinished)
     -- print("Move "..tostring(racers == nil))
     -- print("Move "..tostring(racers:GetFromId(id) == nil))
-    playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-        player = racers:GetFromId(id).player.name,
-        text  = "Rolled "..tostring(roll)
-    })
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
@@ -155,6 +171,11 @@ function Move(id,roll,_onMoveFinished)
         print("Debug Role Activated")
          modifiedRoll = 10 
     end
+    playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+        player = racers:GetFromId(id).player.name,
+        text  = "Rolled "..tostring(roll),
+        help = "Moved "..tostring(modifiedRoll).." Tiles"
+    })
     cardManager._DiceAnimation(id,roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
