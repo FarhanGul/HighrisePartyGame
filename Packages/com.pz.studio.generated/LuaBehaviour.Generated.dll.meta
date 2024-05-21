@@ -20,6 +20,8 @@ PluginImporter:
       type: 3}
     Highrise.Lua.Generated.Common: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
       type: 3}
+    Highrise.Lua.Generated.CustomRTSCamera: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
+      type: 3}
     Highrise.Lua.Generated.DeathTriggerScript: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,
       type: 3}
     Highrise.Lua.Generated.DiceController: {fileID: 2800000, guid: 7b17fa3987cfb1748a297e97f9214051,

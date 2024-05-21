@@ -27,6 +27,10 @@ local playerHudGameObject : GameObject = nil
 local cardManagerGameObject : GameObject = nil
 --!SerializeField
 local audioManagerGameObject : GameObject = nil
+--!SerializeField
+local cameraWaitingAreaRotation : Vector3 = nil
+--!SerializeField
+local cameraGameRotation : Vector3 = nil
 
 --Private Variables
 -- local maxMatches = 1
@@ -167,9 +171,8 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    -- cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 5))
-    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 20))
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
+    cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
     -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
 
     playerHud.ShowWelcomeScreen(function()
@@ -184,7 +187,8 @@ function self:ClientAwake()
             -- playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
             cardManagerGameObject.transform:SetParent(raceGame.transform)
             cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
-            cameraRoot:GetComponent("RTSCamera").CenterOn(raceGame.transform.position)
+            cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraGameRotation)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(raceGame.transform.position)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn)
             playerHud.SetLocation( playerHud.Location().Game )
             playerHud.ShowGameView()
@@ -195,7 +199,8 @@ function self:ClientAwake()
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
             -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
-            cameraRoot:GetComponent("RTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
+            cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
     end)
     e_sendMatchCancelledToClient:Connect(function()
