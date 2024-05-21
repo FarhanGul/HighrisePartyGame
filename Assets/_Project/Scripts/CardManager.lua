@@ -33,6 +33,8 @@ local isRollRequestInProgress
 local didRoll
 
 -- Events
+local e_sendCardsToServer = Event.new("sendCardsToServer")
+local e_sendCardsToClient = Event.new("sendCardsToClient")
 local e_sendHandDiscardedToServer = Event.new("sendHandDiscardedToServer")
 local e_sendHandDiscardedToClient = Event.new("sendHandDiscardedToClient")
 local e_sendDrawCardToServer = Event.new("sendDrawCardToServer")
@@ -43,6 +45,9 @@ local e_sendRollToServer = Event.new("sendRollToServer")
 local e_sendRollToClients = Event.new("sendRollToClients")
 
 function self:ServerAwake()
+    e_sendCardsToServer:Connect(function(player,opponentPlayer,_cards)
+        e_sendCardsToClient:FireClient(opponentPlayer,_cards)
+    end)
     e_sendHandDiscardedToServer:Connect(function(player,opponentPlayer)
         e_sendHandDiscardedToClient:FireClient(player,player)
         e_sendHandDiscardedToClient:FireClient(opponentPlayer,player)
@@ -59,7 +64,6 @@ function self:ServerAwake()
         e_sendPlayCardToClient:FireClient(player,player,_playedCard)
         e_sendPlayCardToClient:FireClient(opponentPlayer,player,_playedCard)
     end)
-
     e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
         e_sendRollToClients:FireClient(player,id,roll)
         e_sendRollToClients:FireClient(opponentPlayer,id,roll)
@@ -103,9 +107,29 @@ function self:ClientAwake()
         elseif(_playedCard == "WormHole") then
             board.SwapPieces()
             audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
+        elseif(_playedCard == "ElectronBlaster") then
+            board.MovePieceToLocation(racers:GetOpponentRacer(_player).id,0)
+        elseif(_playedCard == "MeatHook") then
+            StealCards(_player, racers:GetOpponentPlayer(_player))
+        elseif(_playedCard == "AntimatterCannon") then
+            board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
+        elseif(_playedCard == "FlameThrower") then
+            local _opponent = racers:GetOpponentPlayer(_player)
+            if(client.localPlayer == _player and #cards[_opponent] > 0) then
+                cards[_opponent] = {}
+                e_sendCardsToServer:FireServer(_opponent,cards)
+                OnCardCountUpdated()
+            end
+        elseif(_playedCard == "Regenerate") then
+            board.ChangeHealth(racers:GetFromPlayer(_player).id,1)
         end
         playedCard = _playedCard
         isPlayCardRequestInProgress = false
+        OnCardCountUpdated()
+    end)
+
+    e_sendCardsToClient:Connect(function(_cards)
+        cards = _cards
         OnCardCountUpdated()
     end)
 
@@ -152,6 +176,16 @@ function SendHandDiscardedToServer(player)
     end
 end
 
+function StealCards(thief,victim)
+    if(client.localPlayer == thief and #cards[victim] > 0) then
+        local randomIndex = math.random(1,#cards[victim])
+        table.insert(cards[thief],cards[victim][randomIndex])
+        table.remove(cards[victim],randomIndex)
+        e_sendCardsToServer:FireServer(victim,cards)
+        OnCardCountUpdated()
+    end
+end
+
 function GetPlayedCard()
     return playedCard
 end
@@ -167,6 +201,16 @@ function GetCardHelp(_card)
         return "Next roll is tripled"
     elseif(_card == "WormHole") then
         return "Swap places with the opponent. Laps remain unchanged"
+    elseif(_card == "ElectronBlaster") then
+        return "Opponent is sent back to the checkpoint"
+    elseif(_card == "MeatHook") then
+        return "Steal card from opponent"
+    elseif(_card == "AntimatterCannon") then
+            return "Deal 1 damage to opponent"
+    elseif(_card == "FlameThrower") then
+        return "Discard all opponent cards"
+    elseif(_card == "Regenerate") then
+            return "Increase Health by 1"
     end
 end
 
@@ -175,8 +219,13 @@ function GetRandomCard()
         {card="Nos",probablity=1},
         {card="Zap",probablity=0.85},
         {card="Honk",probablity=0.3},
-        {card="WarpDrive",probablity=0.4},
-        {card="WormHole",probablity=0.3}
+        {card="WarpDrive",probablity=0.3},
+        {card="WormHole",probablity=0.4},
+        {card="ElectronBlaster",probablity=0.4},
+        {card="MeatHook",probablity=0.85},
+        {card="AntimatterCannon",probablity=0.7},
+        {card="FlameThrower",probablity=0.5},
+        {card="Regenerate",probablity=0.7},
     }
     local rand = math.random()
     local filterdCards = {}

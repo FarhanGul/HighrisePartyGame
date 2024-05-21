@@ -55,12 +55,8 @@ function self:ClientAwake()
     do 
         tiles[i] = self.transform.GetChild(self.transform,i).gameObject;
     end
-    e_sendHealthToClient:Connect(function(id,_health)
-        health[id] = _health
-        if(health[id]  <= 0) then
-            matchmaker.GameFinished(gameIndex,racers:GetOtherPlayer())
-        end
-        playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
+    e_sendHealthToClient:Connect(function(_id,_health)
+        SetHealth(_id,_health)
     end)
     e_sendLocationToClient:Connect(function(id,_location)
         location[id] = _location
@@ -86,6 +82,18 @@ function self:ClientAwake()
             })
         end
     end)
+end
+
+function ChangeHealth(_id,_change)
+    SetHealth(_id, health[_id]+_change)
+end
+
+function SetHealth(_id,_health)
+    health[_id] = math.min(4,_health)
+    if(health[_id]  <= 0) then
+        matchmaker.GameFinished(gameIndex,racers:GetOtherPlayer())
+    end
+    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
 end
 
 function GetTileHelp(tileType)
@@ -129,13 +137,16 @@ function SwapPieces()
     SetPiecePosition(2)
 end
 
+function MovePieceToLocation(_id,_newLocation)
+    location[_id] = _newLocation
+    SetPiecePosition(_id)
+end
+
 function Initialize(_gameIndex,_racers,p1,p2)
-    -- print("Board Initialized :"..tostring(_racers == nil))
     laps = {1,1}
     location = {0,0}
     health = {4,4}
     racers = _racers
-    -- print(client.localPlayer.name.."@".."Board Racer count : "..racers:GetCount())
     gameIndex = _gameIndex
     SetPiecePosition(1)
     SetPiecePosition(2)
@@ -161,8 +172,6 @@ function GetTileRotation(_location)
 end
 
 function Move(id,roll,_onMoveFinished)
-    -- print("Move "..tostring(racers == nil))
-    -- print("Move "..tostring(racers:GetFromId(id) == nil))
     local modifiedRoll = roll
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end

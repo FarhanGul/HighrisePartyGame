@@ -169,7 +169,7 @@ end
 
 function self:ClientAwake()
     -- cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 5))
-    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 15))
+    cameraRoot:GetComponent("RTSCamera").Rotate(Vector2.new(135, 20))
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
 

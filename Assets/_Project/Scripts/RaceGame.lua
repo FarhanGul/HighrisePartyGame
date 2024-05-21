@@ -47,6 +47,9 @@ local function Racers()
             end
             return c
         end,
+        GetOpponentRacer = function(self,player)
+            return self:GetFromId(self.GetOtherId(self:GetFromPlayer(player).id))
+        end,
         GetOpponentPlayer = function(self,player)
             return self:GetFromId(self.GetOtherId(self:GetFromPlayer(player).id)).player
         end,
