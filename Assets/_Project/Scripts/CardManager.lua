@@ -150,7 +150,7 @@ function self:ClientAwake()
             isRollRequestInProgress = true
             didRoll = true
             SetInteractableState()
-            e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetPlayerWhoseTurnItIs().id ,math.random(1,6)) 
+            e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetRacerWhoseTurnItIs().id ,math.random(1,6)) 
         end
     end)
 end

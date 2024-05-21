@@ -62,6 +62,14 @@ local function Racers()
         IsLocalRacerTurn = function()
             return localRacer.isTurn
         end,
+        GetRacerWhoseTurnItIs = function(self)
+            for k,v in pairs(self.list) do
+                if(v.isTurn) then
+                    return v
+                end
+            end
+            return nil
+        end,
         GetPlayerWhoseTurnItIs = function(self)
             for k,v in pairs(self.list) do
                 if(v.isTurn) then
@@ -70,8 +78,12 @@ local function Racers()
             end
             return nil
         end,
-        Print = function()
-            
+        Print = function(self)
+            for k,v in pairs(self.list) do
+                print(client.localPlayer.name.."@ Player name : "..v.player.name)
+                print(client.localPlayer.name.."@ Player id : "..v.id)
+                print(client.localPlayer.name.."@ Is valid : ".. tostring(v.player.name == k.name))
+            end
         end
     }
 end
@@ -89,7 +101,6 @@ function StartMatch(gameIndex, p1,p2,firstTurn)
     playerHud.SetRacers( racers )
     playerHud.SetBoard( boardGameObject:GetComponent("Board") )
     localRacer = racers:GetFromPlayer(client.localPlayer)
-    -- print("Race game calls board Initialize")
     boardGameObject:GetComponent("Board").Initialize(gameIndex,racers,p1,p2)
 end
 
