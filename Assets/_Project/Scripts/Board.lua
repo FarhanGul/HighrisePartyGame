@@ -158,7 +158,7 @@ end
 
 function SetupBoard(randomBoard)
     for i = 1, #randomBoard do
-        tiles[i-1]:GetComponent("BoardTile").SetType( randomBoard[i] )
+        tiles[i]:GetComponent("BoardTile").SetType( randomBoard[i] )
     end
 end
 

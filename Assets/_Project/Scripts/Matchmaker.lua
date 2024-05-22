@@ -269,6 +269,11 @@ function GenerateRandomBoard()
             table.remove(_deck,1)
         end
     end
+    -- print("--------")
+    -- for i = 1 , #_tiles do
+    --     print(_tiles[i])
+    -- end
+    -- print("--------")
     return _tiles
 end
 

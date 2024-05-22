@@ -11,8 +11,9 @@ end
 
 function SetType(_newType)
     type = _newType
-    for i=0, self.transform.childCount - 1 do
-        local child = self.transform:GetChild(i).gameObject
+    local tilesRoot = self.gameObject.transform:Find("Tiles")
+    for i=0, tilesRoot.childCount - 1 do
+        local child = tilesRoot:GetChild(i).gameObject
         child:SetActive(type == child.name)
     end
 end
