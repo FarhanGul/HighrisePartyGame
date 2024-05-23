@@ -7,7 +7,7 @@ local isHeading: boolean = false
 local generic_text: UILabel = nil
 
 function self:ClientAwake()
-    -- SetText("IT'S YOUR OPPONENT'S TURN")
+    SetText("Farhan Gul Dev played antimatter cannon but it was blocked")
 end
 
 function SetText(text)

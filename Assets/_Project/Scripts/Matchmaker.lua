@@ -171,13 +171,7 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    -- for i = 1 , 10 do
-    --     print("--------")
-    --     local randBoard = GenerateRandomBoard()
-    --     for i = 1 , #randBoard do
-    --         print(randBoard[i])
-    --     end
-    -- end
+    GenerateRandomBoard()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
     -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
@@ -243,10 +237,15 @@ end
 function GenerateRandomBoard()
     -- Total tiles = 32
     local _deckWeights = {
-        Default = 17,
+        Default = 6,
         Draw = 8,
         Mine = 2,
         Draw3 = 1,
+        Burn = 2,
+        Snare = 1,
+        Recharge = 2,
+        Draw2 = 2,
+        Dome = 4
     }
     local _deck = {}
     for k , v in pairs(_deckWeights) do
@@ -271,7 +270,7 @@ function GenerateRandomBoard()
     end
     -- print("--------")
     -- for i = 1 , #_tiles do
-    --     print(_tiles[i])
+    --     print(i.._tiles[i])
     -- end
     -- print("--------")
     return _tiles

@@ -63,18 +63,11 @@ function self:ClientAwake()
         SetPiecePosition(id)
     end)
     e_sendLandedOnSpecialTileToClient:Connect(function(playerName,tileType)
-        if(tileType == "Teleport") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
-        end
-        if(tileType == "Mine") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayDamage()
-        end
-        if(tileType == "Anomaly") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayAnomaly()
-        end
+        HandleTileAudio(tileType)
         if(tileType ~= "Default")then
             local label = tileType
             if(label == "Draw3") then label = "Draw 3x" end
+            if(label == "Draw2") then label = "Draw 2x" end
             playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
                 player = playerName,
                 text  = "Landed on  "..label,
@@ -82,6 +75,10 @@ function self:ClientAwake()
             })
         end
     end)
+end
+
+function IsOnSafeTile(_id)
+    return tiles[location[_id]]:GetComponent("BoardTile").GetType() == "Dome"
 end
 
 function ChangeHealth(_id,_change)
@@ -96,12 +93,25 @@ function SetHealth(_id,_health)
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
 end
 
+function HandleTileAudio(tileType)
+    if(tileType == "Teleport") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
+    elseif(tileType == "Mine") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayDamage()
+    elseif(tileType == "Anomaly") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayAnomaly()
+    end
+end
+
 function GetTileHelp(tileType)
     if(tileType == "Teleport") then
         return "Moves the player to the other teleport tile"
     end
     if(tileType == "Mine") then
         return "Deals 1 damage to the player"
+    end
+    if(tileType == "Snare") then
+        return "Deals 2 damage to the player"
     end
     if(tileType == "Anomaly") then
         return "Returns the player back to the checkpoint"
@@ -110,7 +120,16 @@ function GetTileHelp(tileType)
         return "Player draws a card"
     end
     if(tileType == "Draw3") then
-        return "Player draw 3 cards"
+        return "Player draws 3 cards"
+    end
+    if(tileType == "Burn") then
+        return "Player discards 1 random card from hand"
+    end
+    if(tileType == "Recharge") then
+        return "Increase health by 1"
+    end
+    if(tileType == "Dome") then
+        return "Player is immune to any opponent attack while on this tile"
     end
 end
     
@@ -183,9 +202,9 @@ function Move(id,roll,_onMoveFinished)
     if(cardManager.GetPlayedCard() == "Nos") then modifiedRoll = roll*2 end
     if(cardManager.GetPlayedCard() == "WarpDrive") then modifiedRoll = roll*3 end
     onMoveFinished = _onMoveFinished
-    if(Input.isAltPressed) then
-        print("Debug Role Activated")
-         modifiedRoll = 10 
+    if(cardManager.GetDebugRoll() ~= nil) then
+         modifiedRoll = cardManager.GetDebugRoll()
+         cardManager.SetDebugRoll(nil)
     end
     playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
         player = racers:GetFromId(id).player.name,
@@ -198,8 +217,11 @@ end
 
 function LandedOnTile(id)
     local tileType = tiles[location[id]]:GetComponent("BoardTile").GetType()
+    local playerWhoseTurnItIs = client.localPlayer
     if(tileType == "Draw") then
         cardManager.LandedOnDrawCardTile(1)
+    elseif(tileType == "Draw2") then
+            cardManager.LandedOnDrawCardTile(2)
     elseif(tileType == "Draw3") then
             cardManager.LandedOnDrawCardTile(3)
     elseif(tileType == "Teleport") then
@@ -209,11 +231,17 @@ function LandedOnTile(id)
         else 
             destination = teleportTileLocations[1]
         end
-        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,destination)
+        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,destination)
     elseif(tileType == "Mine") then
-        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,health[id]-1)
+        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,health[id]-1)
+    elseif(tileType == "Snare") then
+        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,health[id]-2)
+    elseif(tileType == "Recharge") then
+        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,health[id]+1)
     elseif(tileType == "Anomaly") then
-        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),id,0)
+        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,0)
+    elseif(tileType == "Burn") then
+        cardManager.DiscardOpponentCards(racers:GetOpponentPlayer(playerWhoseTurnItIs),1)
     end
     e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer.name,tileType)
 end

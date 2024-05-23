@@ -31,6 +31,7 @@ local board = nil
 local isPlayCardRequestInProgress
 local isRollRequestInProgress
 local didRoll
+local debugRoll = nil
 
 -- Events
 local e_sendCardsToServer = Event.new("sendCardsToServer")
@@ -71,6 +72,11 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
+    print("Debug Role Activated")
+    Chat.TextMessageReceivedHandler:Connect(function(channel,from,message)
+        debugRoll = tonumber(message)
+        Chat:DisplayTextMessage(channel, from, message)
+    end)
     playCardTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(PlaySelectedCard)
     cardSlot_01.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(1) end)
     cardSlot_02.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(2) end)
@@ -91,38 +97,31 @@ function self:ClientAwake()
 
     e_sendPlayCardToClient:Connect(function(_player,_playedCard)
         table.remove(cards[_player],table.find(cards[_player], _playedCard))
-        playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-            player = _player.name,
-            text  = "Played ".._playedCard,
-            help = GetCardHelp(_playedCard)
-        })
-        if(_playedCard == "Zap") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
-        elseif(_playedCard == "Nos") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
-        elseif(_playedCard == "Honk") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayHonk()
-        elseif(_playedCard == "WarpDrive") then
-            audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
-        elseif(_playedCard == "WormHole") then
-            board.SwapPieces()
-            audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
-        elseif(_playedCard == "ElectronBlaster") then
-            board.MovePieceToLocation(racers:GetOpponentRacer(_player).id,0)
-        elseif(_playedCard == "MeatHook") then
-            StealCards(_player, racers:GetOpponentPlayer(_player))
-        elseif(_playedCard == "AntimatterCannon") then
-            board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
-        elseif(_playedCard == "FlameThrower") then
-            local _opponent = racers:GetOpponentPlayer(_player)
-            if(client.localPlayer == _player and #cards[_opponent] > 0) then
-                cards[_opponent] = {}
-                e_sendCardsToServer:FireServer(_opponent,cards)
-                OnCardCountUpdated()
+        HandleCardAudio(_playedCard)
+        local isOpponentOnSafeTile = board.IsOnSafeTile(racers:GetOpponentRacer(_player).id)
+        if ( not isOpponentOnSafeTile ) then
+            if(_playedCard == "WormHole") then
+                board.SwapPieces()
+            elseif(_playedCard == "ElectronBlaster") then
+                board.MovePieceToLocation(racers:GetOpponentRacer(_player).id,0)
+            elseif(_playedCard == "MeatHook") then
+                StealCards(_player, racers:GetOpponentPlayer(_player))
+            elseif(_playedCard == "AntimatterCannon") then
+                board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
+            elseif(_playedCard == "FlameThrower") then
+                if(_player == client.localPlayer) then
+                    DiscardOpponentCards(_player, 3)
+                end
             end
-        elseif(_playedCard == "Regenerate") then
+        end
+        if(_playedCard == "Regenerate") then
             board.ChangeHealth(racers:GetFromPlayer(_player).id,1)
         end
+        playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+            player = _player.name,
+            text  = "Played ".._playedCard..(isOpponentOnSafeTile and " but was blocked" or ""),
+            help = GetCardHelp(_playedCard)
+        })
         playedCard = _playedCard
         isPlayCardRequestInProgress = false
         OnCardCountUpdated()
@@ -153,6 +152,33 @@ function self:ClientAwake()
             e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetRacerWhoseTurnItIs().id ,math.random(1,6)) 
         end
     end)
+end
+
+function HandleCardAudio(_card)
+    if(_card == "Zap") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
+    elseif(_card == "Nos") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
+    elseif(_card == "Honk") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayHonk()
+    elseif(_card == "WarpDrive") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
+    elseif(_card == "WormHole") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
+    end
+end
+
+function DiscardOpponentCards(_otherPlayer,count)
+    local _opponent = racers:GetOpponentPlayer(_otherPlayer)
+    if(#cards[_opponent] > 0) then
+        local cardsToDiscard = math.min(count,#cards[_opponent])
+        for i = 1 , count do
+            local randIndex = math.random(1, #cards[_opponent])
+            table.remove(cards[_opponent],randIndex)
+        end
+        e_sendCardsToServer:FireServer(_opponent,cards)
+        OnCardCountUpdated()
+    end
 end
 
 function SetInteractableState()
@@ -280,6 +306,14 @@ function CardSlotClick(cardSlotIndex)
     end
     selectedCard = cardSlotIndex
     UpdateView()
+end
+
+function GetDebugRoll()
+    return debugRoll
+end
+
+function SetDebugRoll(newRoll)
+    debugRoll = newRoll
 end
 
 function CanPlaycard()
