@@ -19,8 +19,6 @@ local player02Hud : GameObject = nil
 --!SerializeField
 local turnGenericTextGameObject : GameObject = nil
 --!SerializeField
-local actionOwnerGenericTextGameObject : GameObject = nil
---!SerializeField
 local actionMessageGenericTextGameObject : GameObject = nil
 --!SerializeField
 local actionHelpGenericTextGameObject : GameObject = nil
@@ -229,13 +227,11 @@ end
 
 function SetActionAndTurn(action,isTurn)
     if(action ~= nil) then 
-        actionOwnerGenericTextGameObject:GetComponent("GenericText").SetText(action.player)
-        actionMessageGenericTextGameObject:GetComponent("GenericText").SetText(action.text)
+        actionMessageGenericTextGameObject:GetComponent("GenericText").SetText(action.player.." "..action.text)
         actionHelpGenericTextGameObject:GetComponent("GenericText").SetText(action.help)
     else
-        actionOwnerGenericTextGameObject:GetComponent("GenericText").SetText("Match started")
-        actionMessageGenericTextGameObject:GetComponent("GenericText").SetText("May the odds be in your favor")
-        actionHelpGenericTextGameObject:GetComponent("GenericText").SetText("")
+        actionMessageGenericTextGameObject:GetComponent("GenericText").SetText("Match started")
+        actionHelpGenericTextGameObject:GetComponent("GenericText").SetText("May the odds be in your favor")
     end
 
     if(isTurn) then 
