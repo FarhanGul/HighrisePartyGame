@@ -16,6 +16,55 @@ local gamesInfo = {
     player2SpawnRelativePosition = Vector3.new(-5.5,0.5,0)
 }
 
+-- Total Tiles 31
+local tileConfigurations = {
+    {
+        -- 1 - A bit of everything
+        Default = 10,
+        Draw = 4,
+        Mine = 2,
+        Draw3 = 1,
+        Burn = 2,
+        Snare = 1,
+        Recharge = 2,
+        Draw2 = 2,
+        Dome = 4,
+        Teleport = 2,
+        Anomaly = 1
+    },
+    {
+        -- 2 - Lots of cards and lot of burns
+        Default = 10,
+        Draw = 6,
+        Burn = 6,
+        Draw2 = 2,
+        Draw3 = 1,
+        Teleport = 2,
+        Dome = 4,
+    },
+    {
+        -- 3 - Lots of mines and recharges
+        Default = 6,
+        Draw = 6,
+        Mine = 6,
+        Snare = 2,
+        Recharge = 6,
+        Draw2 = 2,
+        Dome = 1,
+        Teleport = 2
+    },
+    {
+        -- 4 - Super Safe
+        Default = 12,
+        Draw = 8,
+        Draw3 = 1,
+        Draw2 = 2,
+        Dome = 5,
+        Teleport = 2,
+        Anomaly = 1
+    }
+}
+
 --Public Variables
 --!SerializeField
 local raceGames : GameObject = nil
@@ -33,8 +82,6 @@ local cameraWaitingAreaRotation : Vector3 = nil
 local cameraGameRotation : Vector3 = nil
 
 --Private Variables
--- local maxMatches = 1
--- local waitingQueue={}
 local matchTable
 local gameInstances
 local playerHud
@@ -171,11 +218,8 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    GenerateRandomBoard()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
-    -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
-
     playerHud.ShowWelcomeScreen(function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
@@ -234,46 +278,64 @@ function ServerVectorAdd(a,b)
     return Vector3.new(a.x+b.x, a.y+b.y, a.z+b.z)
 end
 
+function ValidateTileConfigurations()
+end
+
 function GenerateRandomBoard()
-    -- Total tiles = 32
-    local _deckWeights = {
-        Default = 6,
-        Draw = 8,
-        Mine = 2,
-        Draw3 = 1,
-        Burn = 2,
-        Snare = 1,
-        Recharge = 2,
-        Draw2 = 2,
-        Dome = 4
-    }
-    local _deck = {}
-    for k , v in pairs(_deckWeights) do
+    local printOutput = false
+    local randomConfigIndex = math.random(1,#tileConfigurations)
+    -- randomConfigIndex = 2
+    local randomConfig = tileConfigurations[randomConfigIndex]
+    if(printOutput) then
+        print("<Config Start>")
+        print("ConfigIndex : "..randomConfigIndex)
+        -- for k,v in pairs(randomConfig) do
+        --     print(k.." : "..v)
+        -- end
+        print("<Config End>")
+    end
+    local teleportIndex1,teleportIndex2,anomalyIndex
+    local usedIndices = {}
+    if(randomConfig["Anomaly"] ~= nil) then
+        anomalyIndex = GetRandomExcluding(16, 31, usedIndices)
+        table.insert(usedIndices,anomalyIndex)
+    end
+    if(randomConfig["Teleport"] ~= nil) then
+        teleportIndex1 = GetRandomExcluding(1, 16,usedIndices)
+        table.insert(usedIndices,teleportIndex1)
+        teleportIndex2 = GetRandomExcluding(1, 16,usedIndices)
+        table.insert(usedIndices,teleportIndex2)
+    end
+    local remaingTiles = {}
+    for k , v in pairs(randomConfig) do
         for i = 1, v do 
-            table.insert(_deck,k)
+            if ( k ~= "Anomaly" and k ~= "Teleport") then
+                table.insert(remaingTiles,k)
+            end
         end
     end
-    ShuffleArray(_deck)
-    local teleportIndex1 = math.random(1,31)
-    local teleportIndex2 = GetRandomExcluding(1, 31, {teleportIndex1})
-    local anomalyIndex = GetRandomExcluding(16, 31, {teleportIndex1,teleportIndex2})
-    local _tiles = {}
+    for i = 1 , 5 do ShuffleArray(remaingTiles) end
+
+    local finalBoard = {}
     for i = 1 , 31 do
         if ( i == teleportIndex1 or i == teleportIndex2) then
-            _tiles[i] = "Teleport"
+            finalBoard[i] = "Teleport"
         elseif ( i == anomalyIndex) then
-            _tiles[i] = "Anomaly"
+            finalBoard[i] = "Anomaly"
         else
-            _tiles[i] = _deck[1]
-            table.remove(_deck,1)
+            finalBoard[i] = remaingTiles[1]
+            table.remove(remaingTiles,1)
         end
     end
-    -- print("--------")
-    -- for i = 1 , #_tiles do
-    --     print(i.._tiles[i])
-    -- end
-    -- print("--------")
-    return _tiles
+    if(printOutput) then
+        print("<Board Start>")
+        print("Is Valid : "..tostring(#finalBoard == 31))
+        -- for i = 1 , #finalBoard do
+        --     print(i..finalBoard[i])
+        -- end
+        print("<Board End>")
+    end
+    return finalBoard
 end
 
 function ShuffleArray(arr)
