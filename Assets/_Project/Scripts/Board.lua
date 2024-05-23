@@ -2,8 +2,6 @@
 local TotalLaps = 3
 
 --!SerializeField
-local dice : GameObject = nil
---!SerializeField
 local piecesGameObject : GameObject = nil
 --!SerializeField
 local matchmakerGameObject : GameObject = nil

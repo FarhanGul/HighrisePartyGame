@@ -1,19 +1,8 @@
 local gamesInfo = {
-    count = 2,
-    playerGamePositions = {
-        Vector3.new(500,0,0),
-        Vector3.new(-500,0,0),
-        Vector3.new(1000,0,0),
-        Vector3.new(-1000,0,0),
-        Vector3.new(1500,0,0),
-        Vector3.new(-1500,0,0),
-    },
+    totalGameInstances = 256,
     waitingAreaPosition = Vector3.new(0,0,0),
-    worldSpaceUiWaitingAreaPosition = Vector3.new(0,3.61,-8.06),
-    worldSpaceUiRelativeGamePosition = Vector3.new(0,3.61,-8.06),
-    cardManagerRelativePosition = Vector3.new(0.4,5,1.16),
-    player1SpawnRelativePosition = Vector3.new(5.5,0.5,0),
-    player2SpawnRelativePosition = Vector3.new(-5.5,0.5,0)
+    player1SpawnRelativePosition = Vector3.new(5.3,0.96,0),
+    player2SpawnRelativePosition = Vector3.new(-5.3,0.96,0)
 }
 
 -- Total Tiles 31
@@ -67,7 +56,7 @@ local tileConfigurations = {
 
 --Public Variables
 --!SerializeField
-local raceGames : GameObject = nil
+local raceGame : GameObject = nil
 --!SerializeField
 local cameraRoot : GameObject = nil
 --!SerializeField
@@ -110,7 +99,7 @@ function GameInstances()
         _table = {},
         playersInWaitingQueue = {},
         Initialize = function(self)
-            for i=1, gamesInfo.count do
+            for i=1, gamesInfo.totalGameInstances do
                 table.insert(self._table,GameInstance(i,nil,nil,nil))
             end
         end,
@@ -172,8 +161,8 @@ function GameInstances()
                 if (v.p1 ~= nil and v.p2 == nil  ) then
                     v.p2 = player
                     v.firstTurn = math.random(1,2)
-                    v.p1.character.transform.position = ServerVectorAdd(gamesInfo.playerGamePositions[v.gameIndex] , gamesInfo.player1SpawnRelativePosition )
-                    v.p2.character.transform.position = ServerVectorAdd(gamesInfo.playerGamePositions[v.gameIndex] , gamesInfo.player2SpawnRelativePosition )
+                    v.p1.character.transform.position = ServerVectorAdd(GetGameInstancePosition(v.gameIndex) , gamesInfo.player1SpawnRelativePosition )
+                    v.p2.character.transform.position = ServerVectorAdd(GetGameInstancePosition(v.gameIndex) , gamesInfo.player2SpawnRelativePosition )
                     e_sendStartMatchToClient:FireAllClients(v.gameIndex,v.p1,v.p2,v.firstTurn,GenerateRandomBoard())
                     return
                 end
@@ -224,16 +213,14 @@ function self:ClientAwake()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
     e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn,randomBoard)
-        local raceGame = raceGames.transform:GetChild(gameIndex-1).gameObject:GetComponent("RaceGame")
-        p1.character:Teleport(raceGame.transform.position + gamesInfo.player1SpawnRelativePosition,function() end)
-        p2.character:Teleport(raceGame.transform.position + gamesInfo.player2SpawnRelativePosition,function() end)
+        local raceGame = raceGame:GetComponent("RaceGame")
+        local instancePosition = GetGameInstancePosition(gameIndex) 
+        p1.character:Teleport(instancePosition + gamesInfo.player1SpawnRelativePosition,function() end)
+        p2.character:Teleport(instancePosition + gamesInfo.player2SpawnRelativePosition,function() end)
         if(p1 == client.localPlayer or p2 == client.localPlayer) then    
-            -- playerHudGameObject.transform.parent:SetParent(raceGame.transform)
-            -- playerHudGameObject.transform.parent.localPosition = gamesInfo.worldSpaceUiRelativeGamePosition
-            cardManagerGameObject.transform:SetParent(raceGame.transform)
-            cardManagerGameObject.transform.localPosition = gamesInfo.cardManagerRelativePosition
+            raceGame.transform.position = instancePosition
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraGameRotation)
-            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(raceGame.transform.position)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(instancePosition)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn,randomBoard)
             playerHud.SetLocation( playerHud.Location().Game )
             playerHud.ShowGameView()
@@ -243,7 +230,6 @@ function self:ClientAwake()
         player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
-            -- playerHudGameObject.transform.parent.position = gamesInfo.worldSpaceUiWaitingAreaPosition
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
             cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
         end
@@ -257,7 +243,7 @@ end
 
 function GameFinished(_gameIndex,playerWhoWon)
     audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
-    local raceGame = raceGames.transform:GetChild(_gameIndex-1).gameObject:GetComponent("RaceGame")
+    local raceGame = raceGame:GetComponent("RaceGame")
     playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
@@ -344,6 +330,10 @@ function ShuffleArray(arr)
         local j = math.random(i) -- Generate a random index
         arr[i], arr[j] = arr[j], arr[i] -- Swap elements
     end
+end
+
+function GetGameInstancePosition(_gameIndex)
+    return Vector3.new(_gameIndex * 500, 0, 0)
 end
 
 function GetRandomExcluding(from, to, exclude)
