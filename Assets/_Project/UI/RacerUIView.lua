@@ -11,6 +11,8 @@ local uiDebugMode : boolean = false
 --!SerializeField
 local playTapHandler : TapHandler = nil
 --!SerializeField
+local playPressedGameObject : GameObject = nil
+--!SerializeField
 local audioManagerGameObject : GameObject = nil
 --!SerializeField
 local player01Hud : GameObject = nil
@@ -52,7 +54,7 @@ function self:ClientAwake()
         elseif(root:Q("opponent_left_group").visible) then
             CloseOpponentLeft()
         end
-        playTapHandler.gameObject:SetActive(false)
+        SetPlayMatchButton(false)
         audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
     end)
 end
@@ -139,8 +141,13 @@ function Initialize()
     root:Q("opponent_left_group").visible = false
 end
 
+function SetPlayMatchButton(isActive)
+    playTapHandler.gameObject:SetActive(isActive)
+    playPressedGameObject:SetActive(not isActive)
+end
+
 function ShowWelcomeScreen(onClose)
-    playTapHandler.gameObject:SetActive(true)
+    SetPlayMatchButton(true)
     OnWelcomeScreenClosed = onClose
     root:Q("welcome_group").visible = true
 end
@@ -171,7 +178,7 @@ end
 
 function ShowResult(didWin,onClose)
     CloseGameView()
-    playTapHandler.gameObject:SetActive(true)
+    SetPlayMatchButton(true)
     OnResultScreenClosed = onClose
     root:Q("result_group").visible = true
     root:Q("result_win_image"):EnableInClassList("hide", not didWin)
@@ -190,7 +197,7 @@ end
 function ShowOpponentLeft(onClose)
     CloseGameView()
     audioManagerGameObject:GetComponent("AudioManager"):PlayDisconnect()
-    playTapHandler.gameObject:SetActive(true)
+    SetPlayMatchButton(true)
     OnOpponentLeftScreenClosed = onClose
     root:Q("opponent_left_group").visible = true
 end
