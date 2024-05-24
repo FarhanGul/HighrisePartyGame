@@ -23,32 +23,39 @@ local tileConfigurations = {
     },
     {
         -- 2 - Lots of cards and lot of burns
-        Default = 10,
-        Draw = 6,
-        Burn = 6,
-        Draw2 = 2,
+        Default = 8,
+        Draw = 8,
+        Mine = 2,
         Draw3 = 1,
+        Burn = 4,
+        Snare = 1,
+        Recharge = 1,
+        Draw2 = 2,
+        Dome = 1,
         Teleport = 2,
-        Dome = 4,
+        Anomaly = 1
     },
     {
         -- 3 - Lots of mines and recharges
-        Default = 6,
-        Draw = 6,
-        Mine = 6,
+        Default = 8,
+        Draw = 4,
+        Mine = 5,
+        Draw3 = 1,
         Snare = 2,
-        Recharge = 6,
+        Recharge = 4,
         Draw2 = 2,
-        Dome = 1,
-        Teleport = 2
+        Dome = 2,
+        Teleport = 2,
+        Anomaly = 1
     },
     {
-        -- 4 - Super Safe
-        Default = 12,
+        -- 4 - Safe
+        Default = 10,
         Draw = 8,
-        Draw3 = 1,
+        Recharge = 2,
+        Mine = 2,
         Draw2 = 2,
-        Dome = 5,
+        Dome = 4,
         Teleport = 2,
         Anomaly = 1
     }
@@ -191,6 +198,7 @@ function GameInstances()
 end
 
 function self:ServerAwake()
+    ValidateTileConfigurations()
     gameInstances = GameInstances()
     gameInstances:Initialize()
     server.PlayerConnected:Connect(function(player)
@@ -265,6 +273,15 @@ function ServerVectorAdd(a,b)
 end
 
 function ValidateTileConfigurations()
+    for i =1 , #tileConfigurations do 
+        local _count = 0
+        for k , v in pairs(tileConfigurations[i]) do
+            _count += v
+        end
+        if(_count ~= 31) then
+            print("Tile Validation for "..i.." Failed with count ".._count)
+        end
+    end
 end
 
 function GenerateRandomBoard()

@@ -102,7 +102,7 @@ function PlayCheckpoint()
 end
 
 function PlayUpgrade()
-    checkpoint:Play()
+    upgrade:Play()
 end
 
 function PlayFlame()

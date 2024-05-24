@@ -265,11 +265,11 @@ function GetRandomCard()
         {card="Honk",probablity=0.3},
         {card="WarpDrive",probablity=0.3},
         {card="WormHole",probablity=0.4},
-        {card="ElectronBlaster",probablity=0.4},
+        {card="ElectronBlaster",probablity=0.5},
         {card="MeatHook",probablity=0.85},
         {card="AntimatterCannon",probablity=0.7},
-        {card="FlameThrower",probablity=0.5},
-        {card="Regenerate",probablity=0.7},
+        {card="FlameThrower",probablity=0.6},
+        {card="Regenerate",probablity=1}
     }
     local rand = math.random()
     local filterdCards = {}
