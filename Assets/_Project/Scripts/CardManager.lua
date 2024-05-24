@@ -23,6 +23,8 @@ local cardSlot_03 : TapHandler = nil
 local audioManagerGameObject : GameObject = nil
 --!SerializeField
 local playerHudGameObject : GameObject = nil
+--!SerializeField
+local emptyHandGenericTextGameObject : GameObject = nil
 
 -- Private
 local cards = {}
@@ -210,6 +212,7 @@ end
 function OnCardCountUpdated()
     if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
+    emptyHandGenericTextGameObject:SetActive(#cards[client.localPlayer] == 0)
     UpdateView()
 end
 

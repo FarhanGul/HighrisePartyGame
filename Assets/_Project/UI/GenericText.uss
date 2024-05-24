@@ -14,9 +14,7 @@
     -unity-text-align: middle-center;
     overflow:hidden;
     white-space: normal;
-    /* white-space:nowrap; */
     text-overflow:ellipsis;
-    /* color : white; */
 }
 
 .tiny_text {
