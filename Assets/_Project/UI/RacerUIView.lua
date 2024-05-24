@@ -212,8 +212,8 @@ function SetPlayer(id,data)
 
     -- New UI
     local hud = id == 1 and player01Hud or player02Hud
-    hud.transform:Find("Name").gameObject:GetComponent("GenericText").SetText(data.player.name)
-    hud.transform:Find("Lap").gameObject:GetComponent("GenericText").SetText(data.lap.." / "..strings.totalLaps)
+    hud.transform:Find("NameGenericText").gameObject:GetComponent("GenericText").SetText(data.player.name)
+    hud.transform:Find("LapGenericText").gameObject:GetComponent("GenericText").SetText(data.lap.." / "..strings.totalLaps)
     local healthRoot = hud.transform:Find("Health")
     for i = 0 , healthRoot.childCount -1 do
         healthRoot:GetChild(i).gameObject:SetActive(data.health > i)

@@ -899,7 +899,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 0
+  m_isSmall: 1
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -908,7 +909,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 226050759}
-        Size: {x: 288, y: 51}
+        Size: {x: 576, y: 102}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457317418106902
@@ -1424,7 +1425,7 @@ GameObject:
   - component: {fileID: 281750082}
   - component: {fileID: 281750081}
   m_Layer: 0
-  m_Name: Lap
+  m_Name: LapGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1470,6 +1471,7 @@ MonoBehaviour:
   _upconverted: 0
   m_isHeading: 1
   m_isSmall: 0
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -1478,7 +1480,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 281750082}
-        Size: {x: 41, y: 35}
+        Size: {x: 82, y: 70}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254414
@@ -1864,6 +1866,7 @@ MonoBehaviour:
   _upconverted: 0
   m_isHeading: 0
   m_isSmall: 0
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -1872,7 +1875,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 401045054}
-        Size: {x: 288, y: 51}
+        Size: {x: 576, y: 102}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457317418106902
@@ -4470,7 +4473,7 @@ GameObject:
   - component: {fileID: 729248152}
   - component: {fileID: 729248151}
   m_Layer: 0
-  m_Name: LabelCardCount
+  m_Name: LabelCardCountGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4485,7 +4488,7 @@ Transform:
   m_GameObject: {fileID: 729248149}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.652, y: 0.048, z: 0}
+  m_LocalPosition: {x: -0.652, y: 0.02700009, z: -0.0000000018626451}
   m_LocalScale: {x: 0.3608578, y: 0.11477662, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4515,7 +4518,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
+  m_isTiny: 1
   m_label: CARDS
   references:
     version: 2
@@ -4524,7 +4528,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 729248152}
-        Size: {x: 36, y: 11}
+        Size: {x: 72, y: 22}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -4735,7 +4739,7 @@ GameObject:
   - component: {fileID: 794179311}
   - component: {fileID: 794179310}
   m_Layer: 0
-  m_Name: Name
+  m_Name: NameGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4781,6 +4785,7 @@ MonoBehaviour:
   _upconverted: 0
   m_isHeading: 0
   m_isSmall: 0
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -4789,7 +4794,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 794179311}
-        Size: {x: 136, y: 23}
+        Size: {x: 272, y: 46}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -7238,7 +7243,7 @@ GameObject:
   - component: {fileID: 1306220544}
   - component: {fileID: 1306220543}
   m_Layer: 0
-  m_Name: Lap
+  m_Name: LapGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7284,6 +7289,7 @@ MonoBehaviour:
   _upconverted: 0
   m_isHeading: 1
   m_isSmall: 0
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -7292,7 +7298,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 1306220544}
-        Size: {x: 41, y: 35}
+        Size: {x: 82, y: 70}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254382
@@ -7976,7 +7982,7 @@ GameObject:
   - component: {fileID: 1347907316}
   - component: {fileID: 1347907315}
   m_Layer: 0
-  m_Name: LabelHealth
+  m_Name: LabelHealthGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7991,7 +7997,7 @@ Transform:
   m_GameObject: {fileID: 1347907313}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.147, y: 0.195, z: 0}
+  m_LocalPosition: {x: 0.147, y: 0.20399994, z: 9.313226e-10}
   m_LocalScale: {x: 0.4316181, y: 0.11477662, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8021,7 +8027,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
+  m_isTiny: 1
   m_label: HEALTH
   references:
     version: 2
@@ -8030,7 +8037,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 1347907316}
-        Size: {x: 43, y: 11}
+        Size: {x: 86, y: 22}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -8293,6 +8300,7 @@ MonoBehaviour:
   _upconverted: 0
   m_isHeading: 0
   m_isSmall: 0
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -8301,7 +8309,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 1403004762}
-        Size: {x: 220, y: 22}
+        Size: {x: 440, y: 44}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254348
@@ -10245,7 +10253,7 @@ GameObject:
   - component: {fileID: 1755779743}
   - component: {fileID: 1755779742}
   m_Layer: 0
-  m_Name: LabelLap
+  m_Name: LabelLapGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10290,7 +10298,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
+  m_isTiny: 1
   m_label: LAPS
   references:
     version: 2
@@ -10299,7 +10308,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 1755779743}
-        Size: {x: 23, y: 11}
+        Size: {x: 46, y: 22}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -10496,7 +10505,7 @@ GameObject:
   - component: {fileID: 1843644058}
   - component: {fileID: 1843644057}
   m_Layer: 0
-  m_Name: LabelLap
+  m_Name: LabelLapGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10541,7 +10550,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
+  m_isTiny: 1
   m_label: LAPS
   references:
     version: 2
@@ -10550,7 +10560,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 1843644058}
-        Size: {x: 23, y: 11}
+        Size: {x: 46, y: 22}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -10981,7 +10991,7 @@ GameObject:
   - component: {fileID: 1928783777}
   - component: {fileID: 1928783776}
   m_Layer: 0
-  m_Name: LabelCardCount
+  m_Name: LabelCardCountGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10996,7 +11006,7 @@ Transform:
   m_GameObject: {fileID: 1928783774}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.654, y: 0.048, z: 0}
+  m_LocalPosition: {x: 0.654, y: 0.027, z: -0}
   m_LocalScale: {x: 0.3608578, y: 0.11477662, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11026,7 +11036,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
+  m_isTiny: 1
   m_label: CARDS
   references:
     version: 2
@@ -11035,7 +11046,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 1928783777}
-        Size: {x: 36, y: 11}
+        Size: {x: 72, y: 22}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -11338,7 +11349,7 @@ GameObject:
   - component: {fileID: 2004452879}
   - component: {fileID: 2004452878}
   m_Layer: 0
-  m_Name: LabelHealth
+  m_Name: LabelHealthGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11353,7 +11364,7 @@ Transform:
   m_GameObject: {fileID: 2004452876}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.126, y: 0.195, z: 0}
+  m_LocalPosition: {x: -0.126, y: 0.204, z: 0}
   m_LocalScale: {x: 0.4316181, y: 0.11477662, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11383,7 +11394,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
+  m_isTiny: 1
   m_label: HEALTH
   references:
     version: 2
@@ -11392,7 +11404,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 2004452879}
-        Size: {x: 43, y: 11}
+        Size: {x: 86, y: 22}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254299
@@ -11601,7 +11613,7 @@ GameObject:
   - component: {fileID: 2019142253}
   - component: {fileID: 2019142252}
   m_Layer: 0
-  m_Name: Name
+  m_Name: NameGenericText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11647,6 +11659,7 @@ MonoBehaviour:
   _upconverted: 0
   m_isHeading: 0
   m_isSmall: 0
+  m_isTiny: 0
   m_label: 
   references:
     version: 2
@@ -11655,7 +11668,7 @@ MonoBehaviour:
       type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
       data:
         Renderer: {fileID: 2019142253}
-        Size: {x: 136, y: 23}
+        Size: {x: 272, y: 46}
         ClearColor: 1
         ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
     - rid: 8113457316822254295
