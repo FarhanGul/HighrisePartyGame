@@ -899,9 +899,11 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
-  m_isSmall: 1
+  m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 1
+  m_customColor: {r: 0.690566, g: 0.690566, b: 0.690566, a: 1}
   references:
     version: 2
     RefIds:
@@ -1473,6 +1475,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -1868,6 +1872,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -4521,6 +4527,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 1
   m_label: CARDS
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -4787,6 +4795,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -7291,6 +7301,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -8030,6 +8042,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 1
   m_label: HEALTH
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -8302,6 +8316,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -10301,6 +10317,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 1
   m_label: LAPS
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -10553,6 +10571,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 1
   m_label: LAPS
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -11039,6 +11059,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 1
   m_label: CARDS
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -11397,6 +11419,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 1
   m_label: HEALTH
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:
@@ -11661,6 +11685,8 @@ MonoBehaviour:
   m_isSmall: 0
   m_isTiny: 0
   m_label: 
+  m_applyCustomColor: 0
+  m_customColor: {r: 0, g: 0, b: 0, a: 0}
   references:
     version: 2
     RefIds:

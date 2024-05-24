@@ -16,7 +16,7 @@
     white-space: normal;
     /* white-space:nowrap; */
     text-overflow:ellipsis;
-    color : white;
+    /* color : white; */
 }
 
 .tiny_text {
