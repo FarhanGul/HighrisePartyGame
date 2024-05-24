@@ -40,9 +40,9 @@ function self:ServerAwake()
         e_sendLocationToClient:FireClient(player,id,_location)
         e_sendLocationToClient:FireClient(opponentPlayer,id,_location)
     end)
-    e_sendLandedOnSpecialTileToServer:Connect(function(player,opponentPlayer,playerName,tileType)
-        e_sendLandedOnSpecialTileToClient:FireClient(player,playerName,tileType)
-        e_sendLandedOnSpecialTileToClient:FireClient(opponentPlayer,playerName,tileType)
+    e_sendLandedOnSpecialTileToServer:Connect(function(player,opponentPlayer,landedPlayer,tileType)
+        e_sendLandedOnSpecialTileToClient:FireClient(player,landedPlayer,tileType)
+        e_sendLandedOnSpecialTileToClient:FireClient(opponentPlayer,landedPlayer,tileType)
     end)
 end
 
@@ -60,14 +60,14 @@ function self:ClientAwake()
         location[id] = _location
         SetPiecePosition(id)
     end)
-    e_sendLandedOnSpecialTileToClient:Connect(function(playerName,tileType)
-        HandleTileAudio(tileType)
+    e_sendLandedOnSpecialTileToClient:Connect(function(landedPlayer,tileType)
+        HandleTileAudio(landedPlayer,tileType)
         if(tileType ~= "Default")then
             local label = tileType
             if(label == "Draw3") then label = "Draw 3x" end
             if(label == "Draw2") then label = "Draw 2x" end
             playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-                player = playerName,
+                player = landedPlayer.name,
                 text  = "Landed on  "..label,
                 help = GetTileHelp(tileType)
             })
@@ -85,19 +85,39 @@ end
 
 function SetHealth(_id,_health)
     health[_id] = math.min(4,_health)
+    if(_health < health[_id]) then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayDamage()
+    end
     if(health[_id]  <= 0) then
         matchmaker.GameFinished(gameIndex,racers:GetOtherPlayer())
     end
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
 end
 
-function HandleTileAudio(tileType)
+function HandleTileAudio(landedPlayer, tileType)
     if(tileType == "Teleport") then
         audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
-    elseif(tileType == "Mine") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayDamage()
-    elseif(tileType == "Anomaly") then
+    end
+    if(tileType == "Mine") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayLaser()
+    end
+    if(tileType == "Snare") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayLaser()
+    end
+    if(tileType == "Anomaly") then
         audioManagerGameObject:GetComponent("AudioManager"):PlayAnomaly()
+    end
+    if(tileType == "Draw" or tileType == "Draw2" or tileType == "Draw3") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
+    end
+    if(tileType == "Burn") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayFlame()
+    end
+    if(tileType == "Recharge") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayUpgrade()
+    end
+    if(tileType == "Dome") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayShield()
     end
 end
 
@@ -247,7 +267,7 @@ function LandedOnTile(id)
     elseif(tileType == "Burn") then
         cardManager.DiscardCards(playerWhoseTurnItIs,playerWhoseTurnItIs,1)
     end
-    e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer.name,tileType)
+    e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer,tileType)
 end
 
 function _MovePiece(id, amount)

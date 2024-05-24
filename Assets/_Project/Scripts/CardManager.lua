@@ -173,6 +173,17 @@ function HandleCardAudio(_card)
         audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
     elseif(_card == "WormHole") then
         audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
+    elseif(_card == "ElectronBlaster") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
+        audioManagerGameObject:GetComponent("AudioManager"):PlayLaser()
+    elseif(_card == "MeatHook") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayHook()
+    elseif(_card == "AntimatterCannon") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayLaser()
+    elseif(_card == "FlameThrower") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayFlame()
+    elseif(_card == "Regenerate") then
+        audioManagerGameObject:GetComponent("AudioManager"):PlayUpgrade()
     end
 end
 
@@ -271,9 +282,6 @@ function GetRandomCard()
 end
 
 function LandedOnDrawCardTile(count)
-    if(#cards[racers:GetPlayerWhoseTurnItIs()] ~= 3) then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayCardDraw()
-    end
     local cardsToDraw = math.min(count,3 - #cards[racers:GetPlayerWhoseTurnItIs()])
     if(cardsToDraw > 0) then
         e_sendDrawCardToServer:FireServer(racers:GetPlayerWhoseTurnItIs(),racers:GetOpponentPlayer(racers:GetPlayerWhoseTurnItIs()),cardsToDraw)

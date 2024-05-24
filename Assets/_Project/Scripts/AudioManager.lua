@@ -30,6 +30,16 @@ local teleport : AudioSource = nil
 local damage : AudioSource = nil
 --!SerializeField
 local checkpoint : AudioSource = nil
+--!SerializeField
+local upgrade : AudioSource = nil
+--!SerializeField
+local flame : AudioSource = nil
+--!SerializeField
+local shield : AudioSource = nil
+--!SerializeField
+local hook : AudioSource = nil
+--!SerializeField
+local laser : AudioSource = nil
 
 function PlayMove()
     move:Play()
@@ -89,4 +99,24 @@ end
 
 function PlayCheckpoint()
     checkpoint:Play()
+end
+
+function PlayUpgrade()
+    checkpoint:Play()
+end
+
+function PlayFlame()
+    flame:Play()
+end
+
+function PlayShield()
+    shield:Play()
+end
+
+function PlayHook()
+    hook:Play()
+end
+
+function PlayLaser()
+    laser:Play()
 end
