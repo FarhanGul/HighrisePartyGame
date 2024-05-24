@@ -1,5 +1,7 @@
 -- Public
 --!SerializeField
+local debug : boolean = false
+--!SerializeField
 local diceAnimator : Animator = nil
 --!SerializeField
 local diceMesh : Transform = nil
@@ -32,6 +34,7 @@ local isPlayCardRequestInProgress
 local isRollRequestInProgress
 local didRoll
 local debugRoll = nil
+local debugPlayedCard = nil
 
 -- Events
 local e_sendCardsToServer = Event.new("sendCardsToServer")
@@ -72,11 +75,20 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
-    -- print("Debug Role Activated")
-    -- Chat.TextMessageReceivedHandler:Connect(function(channel,from,message)
-    --     debugRoll = tonumber(message)
-    --     Chat:DisplayTextMessage(channel, from, message)
-    -- end)
+    if(debug) then
+        print("Debug mode activated")
+        Chat.TextMessageReceivedHandler:Connect(function(channel,from,message)
+            local command = string.sub(message,1,1)
+            local param = string.sub(message,3,-1)
+            if(command == "d") then
+                debugRoll = tonumber(param)
+
+            elseif(command == "c") then
+                debugPlayedCard = param
+            end
+            Chat:DisplayTextMessage(channel, from, message)
+        end)
+    end
     playCardTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(PlaySelectedCard)
     cardSlot_01.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(1) end)
     cardSlot_02.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(2) end)
@@ -108,10 +120,6 @@ function self:ClientAwake()
                 StealCards(_player, racers:GetOpponentPlayer(_player))
             elseif(_playedCard == "AntimatterCannon") then
                 board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
-            elseif(_playedCard == "FlameThrower") then
-                if(_player == client.localPlayer) then
-                    DiscardOpponentCards(_player, 3)
-                end
             end
         end
         if(_playedCard == "Regenerate") then
@@ -168,15 +176,14 @@ function HandleCardAudio(_card)
     end
 end
 
-function DiscardOpponentCards(_otherPlayer,count)
-    local _opponent = racers:GetOpponentPlayer(_otherPlayer)
-    if(#cards[_opponent] > 0) then
-        local cardsToDiscard = math.min(count,#cards[_opponent])
-        for i = 1 , count do
-            local randIndex = math.random(1, #cards[_opponent])
-            table.remove(cards[_opponent],randIndex)
+function DiscardCards(_instigator,_victim,count)
+    if(#cards[_victim] > 0) then
+        local cardsToDiscard = math.min(count,#cards[_victim])
+        for i = 1 , cardsToDiscard do
+            local randIndex = math.random(1, #cards[_victim])
+            table.remove(cards[_victim],randIndex)
         end
-        e_sendCardsToServer:FireServer(_opponent,cards)
+        e_sendCardsToServer:FireServer(racers:GetOpponentPlayer(_instigator),cards)
         OnCardCountUpdated()
     end
 end
@@ -288,13 +295,18 @@ end
 function TurnEnd()
     didRoll = false
     playedCard = nil
+    debugPlayedCard = nil
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     UpdateView()
 end
 
 function PlaySelectedCard()
     playedCard = cards[client.localPlayer][selectedCard]
+    if(debugPlayedCard ~= nil ) then playedCard = debugPlayedCard end
     isPlayCardRequestInProgress = true
+    if(playedCard == "FlameThrower") then
+        DiscardCards(client.localPlayer,racers:GetOpponentPlayer(client.localPlayer), 3)
+    end
     e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard)
     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
     UpdateView()

@@ -3840,7 +3840,7 @@ GameObject:
   m_Component:
   - component: {fileID: 668658015}
   m_Layer: 0
-  m_Name: PlayerHud
+  m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14233,7 +14233,7 @@ PrefabInstance:
     - target: {fileID: 1867388420241799096, guid: d361ce7706b76594994940bfa0627562,
         type: 3}
       propertyPath: m_targetRotation.y
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2197352190419539048, guid: d361ce7706b76594994940bfa0627562,
         type: 3}
@@ -19515,6 +19515,7 @@ MonoBehaviour:
   _uiOutputSettings:
     rid: -2
   _upconverted: 0
+  m_debug: 1
   m_diceAnimator: {fileID: 575454015}
   m_diceMesh: {fileID: 1805776329}
   m_playCardTapHandler: {fileID: 234094354}

@@ -146,6 +146,10 @@ function SetTeleportTileLocations()
     end
 end
 
+function SetIndicator(id, isActive)
+    GetPiece(id).transform:Find("Alien_01/Indicator").gameObject:SetActive(isActive) 
+end
+
 function SwapPieces()
     local temp = location[1]
     location[1] = location[2]
@@ -168,6 +172,8 @@ function Initialize(_gameIndex,_racers,p1,p2,randomBoard)
     gameIndex = _gameIndex
     SetPiecePosition(1)
     SetPiecePosition(2)
+    SetIndicator(1, p1 == client.localPlayer)
+    SetIndicator(2, p2 == client.localPlayer)
     SetTeleportTileLocations()
     cardManager.Initialize(racers,self)
     audioManagerGameObject:GetComponent("AudioManager"):PlayRaceStart()
@@ -239,7 +245,7 @@ function LandedOnTile(id)
     elseif(tileType == "Anomaly") then
         e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,0)
     elseif(tileType == "Burn") then
-        cardManager.DiscardOpponentCards(racers:GetOpponentPlayer(playerWhoseTurnItIs),1)
+        cardManager.DiscardCards(playerWhoseTurnItIs,playerWhoseTurnItIs,1)
     end
     e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer.name,tileType)
 end
