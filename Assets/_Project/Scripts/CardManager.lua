@@ -299,7 +299,7 @@ function Initialize(_racers, _board)
     selectedCard = -1
     playedCard = nil
     didRoll = false
-    UpdateView()
+    OnCardCountUpdated()
 end
 
 function TurnEnd()
