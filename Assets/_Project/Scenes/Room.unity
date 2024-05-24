@@ -899,6 +899,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
@@ -1438,7 +1440,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1.239, y: 0.056, z: 0}
-  m_LocalScale: {x: 0.41285232, y: 0.3567164, z: 1.1687052}
+  m_LocalScale: {x: 0.31944034, y: 0.27600574, z: 0.904274}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1331304307}
@@ -1467,6 +1469,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 1
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
@@ -1859,6 +1863,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
@@ -4451,6 +4457,130 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1174949725}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &729248149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 729248150}
+  - component: {fileID: 729248153}
+  - component: {fileID: 729248152}
+  - component: {fileID: 729248151}
+  m_Layer: 0
+  m_Name: LabelCardCount
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &729248150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729248149}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.652, y: 0.048, z: 0}
+  m_LocalScale: {x: 0.3608578, y: 0.11477662, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 850379263}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &729248151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729248149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 744711163, guid: 991a4badf00d28384a32b2c089782f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkId: 0
+  _script: {fileID: -974389366465450183, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8, type: 3}
+  _properties:
+  - Property: {fileID: -78859143864150698, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8,
+      type: 3}
+    Value:
+      rid: 8113457316822254299
+  _uiOutput: 1
+  _uiOutputSettings:
+    rid: 8113457228610535507
+  _upconverted: 0
+  m_isHeading: 0
+  m_isSmall: 1
+  m_label: CARDS
+  references:
+    version: 2
+    RefIds:
+    - rid: 8113457228610535507
+      type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
+      data:
+        Renderer: {fileID: 729248152}
+        Size: {x: 36, y: 11}
+        ClearColor: 1
+        ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
+    - rid: 8113457316822254299
+      type: {class: BooleanLuaPropertyValue, ns: Highrise.Lua, asm: com.pz.highrise.lua}
+      data:
+        _value: 0
+--- !u!23 &729248152
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729248149}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4712b79b4b1d2a945bb7a2797e17cd5f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &729248153
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729248149}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &762685398 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6056413803968883092, guid: d361ce7706b76594994940bfa0627562,
@@ -4650,6 +4780,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
@@ -4779,6 +4911,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 794179309}
+  - {fileID: 729248150}
+  - {fileID: 1843644056}
+  - {fileID: 1347907314}
   - {fileID: 1306220542}
   - {fileID: 874924715}
   - {fileID: 1883762295}
@@ -7119,7 +7254,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.23, y: 0.056, z: 0}
-  m_LocalScale: {x: 0.41285232, y: 0.3567164, z: 1.1687052}
+  m_LocalScale: {x: 0.31944034, y: 0.27600574, z: 0.904274}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 850379263}
@@ -7148,6 +7283,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 1
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
@@ -7251,6 +7388,9 @@ Transform:
   - {fileID: 281750080}
   - {fileID: 838513078}
   - {fileID: 314879510}
+  - {fileID: 1928783775}
+  - {fileID: 1755779741}
+  - {fileID: 2004452877}
   m_Father: {fileID: 987674558}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1332807716
@@ -7823,6 +7963,130 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1342033336}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1347907313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1347907314}
+  - component: {fileID: 1347907317}
+  - component: {fileID: 1347907316}
+  - component: {fileID: 1347907315}
+  m_Layer: 0
+  m_Name: LabelHealth
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1347907314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347907313}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.147, y: 0.195, z: 0}
+  m_LocalScale: {x: 0.4316181, y: 0.11477662, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 850379263}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1347907315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347907313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 744711163, guid: 991a4badf00d28384a32b2c089782f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkId: 0
+  _script: {fileID: -974389366465450183, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8, type: 3}
+  _properties:
+  - Property: {fileID: -78859143864150698, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8,
+      type: 3}
+    Value:
+      rid: 8113457316822254299
+  _uiOutput: 1
+  _uiOutputSettings:
+    rid: 8113457228610535507
+  _upconverted: 0
+  m_isHeading: 0
+  m_isSmall: 1
+  m_label: HEALTH
+  references:
+    version: 2
+    RefIds:
+    - rid: 8113457228610535507
+      type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
+      data:
+        Renderer: {fileID: 1347907316}
+        Size: {x: 43, y: 11}
+        ClearColor: 1
+        ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
+    - rid: 8113457316822254299
+      type: {class: BooleanLuaPropertyValue, ns: Highrise.Lua, asm: com.pz.highrise.lua}
+      data:
+        _value: 0
+--- !u!23 &1347907316
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347907313}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4712b79b4b1d2a945bb7a2797e17cd5f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1347907317
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347907313}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1355605848
 GameObject:
   m_ObjectHideFlags: 0
@@ -8028,6 +8292,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
@@ -9966,6 +10232,130 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 291872383088670329}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1755779740
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1755779741}
+  - component: {fileID: 1755779744}
+  - component: {fileID: 1755779743}
+  - component: {fileID: 1755779742}
+  m_Layer: 0
+  m_Name: LabelLap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1755779741
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755779740}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.24, y: -0.111999944, z: 0.0000000037252903}
+  m_LocalScale: {x: 0.23050514, y: 0.11477662, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1331304307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1755779742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755779740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 744711163, guid: 991a4badf00d28384a32b2c089782f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkId: 0
+  _script: {fileID: -974389366465450183, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8, type: 3}
+  _properties:
+  - Property: {fileID: -78859143864150698, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8,
+      type: 3}
+    Value:
+      rid: 8113457316822254299
+  _uiOutput: 1
+  _uiOutputSettings:
+    rid: 8113457228610535507
+  _upconverted: 0
+  m_isHeading: 0
+  m_isSmall: 1
+  m_label: LAPS
+  references:
+    version: 2
+    RefIds:
+    - rid: 8113457228610535507
+      type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
+      data:
+        Renderer: {fileID: 1755779743}
+        Size: {x: 23, y: 11}
+        ClearColor: 1
+        ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
+    - rid: 8113457316822254299
+      type: {class: BooleanLuaPropertyValue, ns: Highrise.Lua, asm: com.pz.highrise.lua}
+      data:
+        _value: 0
+--- !u!23 &1755779743
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755779740}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4712b79b4b1d2a945bb7a2797e17cd5f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1755779744
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755779740}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &1789836661 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 275fa770bef8bcf4fbfbb6331225a83c,
@@ -10093,6 +10483,130 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1805776328}
   m_Mesh: {fileID: -5495902117074765545, guid: 3e7aae0538d178e44b6245ab63fdda31, type: 3}
+--- !u!1 &1843644055
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1843644056}
+  - component: {fileID: 1843644059}
+  - component: {fileID: 1843644058}
+  - component: {fileID: 1843644057}
+  m_Layer: 0
+  m_Name: LabelLap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1843644056
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843644055}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.233, y: -0.112, z: 0}
+  m_LocalScale: {x: 0.23050514, y: 0.11477662, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 850379263}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1843644057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843644055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 744711163, guid: 991a4badf00d28384a32b2c089782f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkId: 0
+  _script: {fileID: -974389366465450183, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8, type: 3}
+  _properties:
+  - Property: {fileID: -78859143864150698, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8,
+      type: 3}
+    Value:
+      rid: 8113457316822254299
+  _uiOutput: 1
+  _uiOutputSettings:
+    rid: 8113457228610535507
+  _upconverted: 0
+  m_isHeading: 0
+  m_isSmall: 1
+  m_label: LAPS
+  references:
+    version: 2
+    RefIds:
+    - rid: 8113457228610535507
+      type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
+      data:
+        Renderer: {fileID: 1843644058}
+        Size: {x: 23, y: 11}
+        ClearColor: 1
+        ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
+    - rid: 8113457316822254299
+      type: {class: BooleanLuaPropertyValue, ns: Highrise.Lua, asm: com.pz.highrise.lua}
+      data:
+        _value: 0
+--- !u!23 &1843644058
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843644055}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4712b79b4b1d2a945bb7a2797e17cd5f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1843644059
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843644055}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1883762294
 GameObject:
   m_ObjectHideFlags: 0
@@ -10454,6 +10968,130 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1926039197}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1928783774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1928783775}
+  - component: {fileID: 1928783778}
+  - component: {fileID: 1928783777}
+  - component: {fileID: 1928783776}
+  m_Layer: 0
+  m_Name: LabelCardCount
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1928783775
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928783774}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.654, y: 0.048, z: 0}
+  m_LocalScale: {x: 0.3608578, y: 0.11477662, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1331304307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1928783776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928783774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 744711163, guid: 991a4badf00d28384a32b2c089782f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkId: 0
+  _script: {fileID: -974389366465450183, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8, type: 3}
+  _properties:
+  - Property: {fileID: -78859143864150698, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8,
+      type: 3}
+    Value:
+      rid: 8113457316822254299
+  _uiOutput: 1
+  _uiOutputSettings:
+    rid: 8113457228610535507
+  _upconverted: 0
+  m_isHeading: 0
+  m_isSmall: 1
+  m_label: CARDS
+  references:
+    version: 2
+    RefIds:
+    - rid: 8113457228610535507
+      type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
+      data:
+        Renderer: {fileID: 1928783777}
+        Size: {x: 36, y: 11}
+        ClearColor: 1
+        ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
+    - rid: 8113457316822254299
+      type: {class: BooleanLuaPropertyValue, ns: Highrise.Lua, asm: com.pz.highrise.lua}
+      data:
+        _value: 0
+--- !u!23 &1928783777
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928783774}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4712b79b4b1d2a945bb7a2797e17cd5f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1928783778
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928783774}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1932589728
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10687,6 +11325,130 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8152848418900424493}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2004452876
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2004452877}
+  - component: {fileID: 2004452880}
+  - component: {fileID: 2004452879}
+  - component: {fileID: 2004452878}
+  m_Layer: 0
+  m_Name: LabelHealth
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2004452877
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004452876}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.126, y: 0.195, z: 0}
+  m_LocalScale: {x: 0.4316181, y: 0.11477662, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1331304307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2004452878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004452876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 744711163, guid: 991a4badf00d28384a32b2c089782f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _networkId: 0
+  _script: {fileID: -974389366465450183, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8, type: 3}
+  _properties:
+  - Property: {fileID: -78859143864150698, guid: 4cf7a9c3f01d9fa4bbe400b2a1afcfe8,
+      type: 3}
+    Value:
+      rid: 8113457316822254299
+  _uiOutput: 1
+  _uiOutputSettings:
+    rid: 8113457228610535507
+  _upconverted: 0
+  m_isHeading: 0
+  m_isSmall: 1
+  m_label: HEALTH
+  references:
+    version: 2
+    RefIds:
+    - rid: 8113457228610535507
+      type: {class: UIWorldOutputSettings, ns: Highrise.Client, asm: com.pz.highrise.game.client}
+      data:
+        Renderer: {fileID: 2004452879}
+        Size: {x: 43, y: 11}
+        ClearColor: 1
+        ClearColorValue: {r: 1, g: 1, b: 1, a: 0}
+    - rid: 8113457316822254299
+      type: {class: BooleanLuaPropertyValue, ns: Highrise.Lua, asm: com.pz.highrise.lua}
+      data:
+        _value: 0
+--- !u!23 &2004452879
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004452876}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4712b79b4b1d2a945bb7a2797e17cd5f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &2004452880
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004452876}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &2005828133
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10884,6 +11646,8 @@ MonoBehaviour:
     rid: 8113457228610535507
   _upconverted: 0
   m_isHeading: 0
+  m_isSmall: 0
+  m_label: 
   references:
     version: 2
     RefIds:
