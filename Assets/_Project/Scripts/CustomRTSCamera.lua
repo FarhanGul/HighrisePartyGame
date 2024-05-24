@@ -41,6 +41,8 @@ local lastDirection : Vector2 = Vector2.zero     -- the direction of the last fr
 local target = Vector3.zero                      -- the point the camera is looking at
 local offset = Vector3.zero                      -- the offset from the Target
 
+local outOfBounds = false
+
 local localCharacterInstantiatedEvent = nil
 if centerOnCharacterWhenSpawned then
     localCharacterInstantiatedEvent = client.localPlayer.CharacterChanged:Connect(function(player, character)
@@ -65,8 +67,9 @@ Input.MouseWheel:Connect(function(evt)
     if evt.delta.y < 0.0 then
         ZoomIn()
     else
-        ZoomOut()
+        if(not outOfBounds) then ZoomOut() end
     end
+    HandleProximityConstraint()
 end)
 
 function IsActive()
@@ -126,8 +129,13 @@ function PanCamera(evt)
     local endPoint = ScreenPositionToWorldPoint(camera, evt.position)
     local dragAdjustment = -(endPoint - startPoint)
     dragAdjustment.y = 0
-
+    local oldDistance = Vector3.Distance( target,client.localPlayer.character.transform.position)
     target = target + dragAdjustment
+    local newDistance = Vector3.Distance( target,client.localPlayer.character.transform.position)
+    if( outOfBounds and newDistance > oldDistance) then
+        target = target - dragAdjustment
+    end
+    HandleProximityConstraint()
 end
 
 function RotateCamera(evt)
@@ -287,4 +295,9 @@ function self:Update()
 
     UpdateInertia()
     UpdatePosition()
+end
+
+function HandleProximityConstraint()
+    local distance = Vector3.Distance( self.transform.position,client.localPlayer.character.transform.position)
+    outOfBounds = distance > 45
 end
