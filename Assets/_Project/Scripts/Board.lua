@@ -62,7 +62,7 @@ function self:ClientAwake()
     end)
     e_sendLandedOnSpecialTileToClient:Connect(function(landedPlayer,tileType)
         HandleTileAudio(landedPlayer,tileType)
-        if(tileType ~= "Default")then
+        if(tileType ~= "Default" and tileType ~= "Start")then
             local label = tileType
             if(label == "Draw3") then label = "Draw 3x" end
             if(label == "Draw2") then label = "Draw 2x" end

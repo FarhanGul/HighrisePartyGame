@@ -82,7 +82,6 @@ function self:ClientAwake()
             local param = string.sub(message,3,-1)
             if(command == "d") then
                 debugRoll = tonumber(param)
-
             elseif(command == "c") then
                 debugPlayedCard = param
             end
@@ -267,7 +266,7 @@ function GetRandomCard()
         {card="WormHole",probablity=0.4},
         {card="ElectronBlaster",probablity=0.5},
         {card="MeatHook",probablity=0.85},
-        {card="AntimatterCannon",probablity=0.7},
+        {card="AntimatterCannon",probablity=0.9},
         {card="FlameThrower",probablity=0.6},
         {card="Regenerate",probablity=1}
     }

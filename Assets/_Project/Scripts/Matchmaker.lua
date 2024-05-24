@@ -304,9 +304,12 @@ function GenerateRandomBoard()
         table.insert(usedIndices,anomalyIndex)
     end
     if(randomConfig["Teleport"] ~= nil) then
-        teleportIndex1 = GetRandomExcluding(1, 16,usedIndices)
+        -- generate index in middle
+        local middleIndex = GetRandomExcluding(8, 22,usedIndices)
+        -- Then generate teleport index 
+        teleportIndex1 = GetRandomExcluding(middleIndex - 6, middleIndex - 2,usedIndices)
         table.insert(usedIndices,teleportIndex1)
-        teleportIndex2 = GetRandomExcluding(1, 16,usedIndices)
+        teleportIndex2 = GetRandomExcluding(middleIndex + 2, middleIndex + 6,usedIndices)
         table.insert(usedIndices,teleportIndex2)
     end
     local remaingTiles = {}

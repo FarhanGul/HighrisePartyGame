@@ -20170,7 +20170,7 @@ MonoBehaviour:
   _uiOutputSettings:
     rid: -2
   _upconverted: 0
-  m_debug: 0
+  m_debug: 1
   m_diceAnimator: {fileID: 575454015}
   m_diceMesh: {fileID: 1805776329}
   m_playCardTapHandler: {fileID: 234094354}
