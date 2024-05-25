@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.70915395, g: 0.8659702, b: 0.8622527, a: 1}
+  m_IndirectSpecularColor: {r: 0.1411131, g: 0.21557781, b: 0.39990222, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5513,6 +5513,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 570458746982006239, guid: 5d10938ecd31eea4688eb0a6db8c3902,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5d10938ecd31eea4688eb0a6db8c3902,
         type: 3}
       propertyPath: m_Name
@@ -5557,6 +5562,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3893119678213526593, guid: 5d10938ecd31eea4688eb0a6db8c3902,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3985363735776731139, guid: 5d10938ecd31eea4688eb0a6db8c3902,
         type: 3}
@@ -21693,7 +21703,7 @@ MonoBehaviour:
   _uiOutputSettings:
     rid: -2
   _upconverted: 0
-  m_debug: 1
+  m_debug: 0
   m_diceAnimator: {fileID: 575454015}
   m_diceMesh: {fileID: 1805776329}
   m_playCardTapHandler: {fileID: 234094354}
