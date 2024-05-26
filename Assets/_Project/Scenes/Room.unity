@@ -5445,11 +5445,12 @@ MonoBehaviour:
   _upconverted: 0
   m_zoom: 22
   m_zoomMin: 8
-  m_zoomMax: 50
+  m_zoomMax: 35
   m_fov: 40
   m_pitch: 30
   m_yaw: 45
   m_centerOnCharacterWhenSpawned: 1
+  m_maxPanning: 14
   references:
     version: 2
     RefIds:
