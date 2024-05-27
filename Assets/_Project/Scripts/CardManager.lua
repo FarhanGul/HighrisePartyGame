@@ -86,6 +86,11 @@ function self:ClientAwake()
                 debugRoll = tonumber(param)
             elseif(command == "c") then
                 debugPlayedCard = param
+            elseif(command == "f") then
+                board.SetLaps({3,3})
+                racers:GetFromId(1).lap = 3
+                racers:GetFromId(2).lap = 3
+                playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
             end
             Chat:DisplayTextMessage(channel, from, message)
         end)
@@ -299,6 +304,10 @@ function Initialize(_racers, _board)
     selectedCard = -1
     playedCard = nil
     didRoll = false
+    isPlayCardRequestInProgress = false
+    isRollRequestInProgress = false
+    debugRoll = nil
+    debugPlayedCard = nil
     OnCardCountUpdated()
 end
 

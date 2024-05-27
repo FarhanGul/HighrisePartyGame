@@ -137,6 +137,9 @@ function GetTileHelp(tileType)
     if(tileType == "Draw") then
         return "Player draws a card"
     end
+    if(tileType == "Draw2") then
+        return "Player draws 2 cards"
+    end
     if(tileType == "Draw3") then
         return "Player draws 3 cards"
     end
@@ -235,6 +238,7 @@ function Move(id,roll,_onMoveFinished)
         text  = "Rolled "..tostring(roll),
         help = "Moved "..tostring(modifiedRoll).." Tiles"
     })
+    audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
     cardManager._DiceAnimation(id,roll)
     Timer.new(1.5,function() _MovePiece(id,modifiedRoll) end,false)
 end
@@ -302,4 +306,8 @@ end
 
 function GetCardManager()
     return cardManager
+end
+
+function SetLaps(_newLaps)
+    laps = _newLaps
 end
