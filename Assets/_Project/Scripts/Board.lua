@@ -22,6 +22,7 @@ local gameIndex
 local racers
 local teleportTileLocations
 local onMoveFinished
+local isInitialized = false
 
 -- Events
 local e_sendHealthToServer = Event.new("sendHealthToServer")
@@ -61,17 +62,20 @@ function self:ClientAwake()
         SetPiecePosition(id)
     end)
     e_sendLandedOnSpecialTileToClient:Connect(function(landedPlayer,tileType)
-        HandleTileAudio(landedPlayer,tileType)
-        if(tileType ~= "Default" and tileType ~= "Start")then
-            local label = tileType
-            if(label == "Draw3") then label = "Draw 3x" end
-            if(label == "Draw2") then label = "Draw 2x" end
-            playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-                player = landedPlayer.name,
-                text  = "Landed on  "..label,
-                help = GetTileHelp(tileType)
-            })
+        if(landedPlayer ~= nil) then
+            HandleTileAudio(landedPlayer,tileType)
+            if(tileType ~= "Default" and tileType ~= "Start")then
+                local label = tileType
+                if(label == "Draw3") then label = "Draw 3x" end
+                if(label == "Draw2") then label = "Draw 2x" end
+                playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+                    player = landedPlayer.name,
+                    text  = "Landed on  "..label,
+                    help = GetTileHelp(tileType)
+                })
+            end
         end
+
     end)
 end
 
@@ -187,6 +191,7 @@ function MovePieceToLocation(_id,_newLocation)
 end
 
 function Initialize(_gameIndex,_racers,p1,p2,randomBoard)
+    isInitialized = true
     SetupBoard(randomBoard)
     laps = {1,1}
     location = {0,0}
@@ -200,6 +205,10 @@ function Initialize(_gameIndex,_racers,p1,p2,randomBoard)
     SetTeleportTileLocations()
     cardManager.Initialize(racers,self)
     audioManagerGameObject:GetComponent("AudioManager"):PlayRaceStart()
+end
+
+function Uninitialize()
+    isInitialized = false
 end
 
 function SetupBoard(randomBoard)
@@ -244,6 +253,7 @@ function Move(id,roll,_onMoveFinished)
 end
 
 function LandedOnTile(id)
+    if(not isInitialized)then return end
     local tileType = tiles[location[id]]:GetComponent("BoardTile").GetType()
     local playerWhoseTurnItIs = client.localPlayer
     if(tileType == "Draw") then
@@ -275,6 +285,7 @@ function LandedOnTile(id)
 end
 
 function _MovePiece(id, amount)
+    if(not isInitialized) then return end
     if( amount == 0 ) then
         -- This is the final tile
         if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then

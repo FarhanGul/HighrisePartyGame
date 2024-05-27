@@ -114,6 +114,7 @@ function self:ClientAwake()
     end)
 
     e_sendPlayCardToClient:Connect(function(_player,_playedCard)
+        audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
         table.remove(cards[_player],table.find(cards[_player], _playedCard))
         HandleCardAudio(_playedCard)
         local isOpponentOnSafeTile = board.IsOnSafeTile(racers:GetOpponentRacer(_player).id)
@@ -211,13 +212,13 @@ function SetInteractableState()
     playCardPressed:SetActive(not isLocalTurn or not CanPlaycard() or didRoll)
     rollTapHandler.gameObject:SetActive(isLocalTurn and not isRollRequestInProgress)
     playCardTapHandler.gameObject:SetActive(isLocalTurn and CanPlaycard() and not didRoll)
+    emptyHandGenericTextGameObject:GetComponent(MeshRenderer).enabled = #cards[client.localPlayer] == 0
 end
 
 
 function OnCardCountUpdated()
     if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
-    emptyHandGenericTextGameObject:SetActive(#cards[client.localPlayer] == 0)
     UpdateView()
 end
 
@@ -327,8 +328,6 @@ function PlaySelectedCard()
         DiscardCards(client.localPlayer,racers:GetOpponentPlayer(client.localPlayer), 3)
     end
     e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard)
-    audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-    UpdateView()
 end
 
 function CardSlotClick(cardSlotIndex)

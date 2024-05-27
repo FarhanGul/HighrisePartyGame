@@ -7,8 +7,6 @@ local strings={
 }
 
 --!SerializeField
-local uiDebugMode : boolean = false
---!SerializeField
 local playTapHandler : TapHandler = nil
 --!SerializeField
 local playPressedGameObject : GameObject = nil
@@ -57,10 +55,6 @@ function self:ClientAwake()
         SetPlayMatchButton(false)
         audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
     end)
-end
-
-function self:ClientUpdate()
-    if(uiDebugMode) then HandleUiDebug() end
 end
 
 function SetBoard(_board)
@@ -194,6 +188,10 @@ function CloseResult()
     root:Q("result_lose_image"):EnableInClassList("hide",true)
 end
 
+function IsResultShowing()
+    return root:Q("result_group").visible
+end
+
 function ShowOpponentLeft(onClose)
     CloseGameView()
     audioManagerGameObject:GetComponent("AudioManager"):PlayDisconnect()
@@ -245,45 +243,5 @@ function SetActionAndTurn(action,isTurn)
         turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR TURN")
     else 
         turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR OPPONENET'S TURN")
-    end
-end
-
-function HandleUiDebug()
-    if(not isAltReleased and not Input.isAltPressed) then isAltReleased = true end
-    if(isAltReleased and Input.isAltPressed) then
-        isAltReleased = false
-        if(true) then
-            print("Debug UI disabled, needs to be updated")
-            return
-        end
-        if(uiDebugCycleIndex == 0) then
-            CloseResult()
-            ShowWelcomeScreen(function()end)
-        elseif(uiDebugCycleIndex == 1) then
-            CloseWelcomeScreen()
-            SetLocation(Location().Lobby)
-            ShowWaitingForMatch()
-        elseif(uiDebugCycleIndex == 2) then
-            ShowGameView()
-            local debugData = {}
-            debugData.lap = 1
-            debugData.isTurn = true
-            debugData.player = {}
-            debugData.player.name = "Debug Racer big name 01"
-            debugData.health = 2
-            debugData.cardCount = 1
-            SetPlayer(1,debugData)
-            debugData.isTurn = false
-            debugData.player.name = "sn"
-            SetPlayer(2,debugData)
-            UpdateAction({player = "Debug Racer big name 01",text = " played zap"})
-        elseif(uiDebugCycleIndex == 3) then
-            ShowOpponentLeft(function()end)
-        elseif(uiDebugCycleIndex == 4) then
-            CloseOpponentLeft()
-            ShowResult(function()end, nil)
-        end
-        uiDebugCycleIndex += 1
-        if(uiDebugCycleIndex == 5) then uiDebugCycleIndex = 0 end
     end
 end

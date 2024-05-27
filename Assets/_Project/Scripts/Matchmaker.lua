@@ -221,7 +221,6 @@ function self:ClientAwake()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
     e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn,randomBoard)
-        local raceGame = raceGame:GetComponent("RaceGame")
         local instancePosition = GetGameInstancePosition(gameIndex) 
         p1.character:Teleport(instancePosition + gamesInfo.player1SpawnRelativePosition,function() end)
         p2.character:Teleport(instancePosition + gamesInfo.player2SpawnRelativePosition,function() end)
@@ -243,15 +242,19 @@ function self:ClientAwake()
         end
     end)
     e_sendMatchCancelledToClient:Connect(function()
-        playerHud.ShowOpponentLeft(function()
-            e_sendReadyForMatchmakingToServer:FireServer()
-        end)
+        -- Handle case where game has already finished
+        if(not playerHud.IsResultShowing()) then
+            -- Exit game
+            raceGame:GetComponent("RaceGame").EndMatch()
+            playerHud.ShowOpponentLeft(function()
+                e_sendReadyForMatchmakingToServer:FireServer()
+            end)
+        end
     end)
 end
 
 function GameFinished(_gameIndex,playerWhoWon)
     audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
-    local raceGame = raceGame:GetComponent("RaceGame")
     playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
