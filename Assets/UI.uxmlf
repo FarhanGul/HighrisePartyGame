@@ -3,3 +3,4 @@
 @import url("/Assets/_Project/UI/StandingPlatformUI.uxml");
 @import url("/Assets/_Project/UI/GenericText.uxml");
 @import url("/Assets/_Project/UI/ActionUI.uxml");
+@import guid("f179c331bd08c6b428f4ee67c508f3a2");

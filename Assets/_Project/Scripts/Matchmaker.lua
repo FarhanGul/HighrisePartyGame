@@ -67,6 +67,8 @@ local raceGame : GameObject = nil
 --!SerializeField
 local cameraRoot : GameObject = nil
 --!SerializeField
+local playGameHandlerGameObject : GameObject = nil
+--!SerializeField
 local playerHudGameObject : GameObject = nil
 --!SerializeField
 local cardManagerGameObject : GameObject = nil
@@ -88,6 +90,7 @@ local e_sendStartMatchToClient = Event.new("sendStartMatchToClient")
 local e_sendMatchCancelledToClient = Event.new("sendMatchCancelledToClient")
 local e_sendMoveToWaitingAreaToClient = Event.new("sendMoveToWaitingAreaToClient")
 local e_sendReadyForMatchmakingToServer= Event.new("sendReadyForMatchmakingToServer")
+local e_sendCancelMatchmakingToServer= Event.new("sendCancelMatchmakingToServer")
 local e_sendMatchFinishedToServer= Event.new("sendMatchFinishedToServer")
 --
 
@@ -177,7 +180,7 @@ function GameInstances()
             -- If no players are waiting then see if there is a free instance this player can be assigned to
             -- then send player to waiting area
             for k,v in pairs(self._table) do
-                if (v.p1 == nil and v.p2 == nil ) then 
+                if (v.p1 == nil and v.p2 == nil ) then
                     v.p1 = player
                     if(not IsPlayerInWaitingArea(v.p1)) then
                         v.p1.character.transform.position = gamesInfo.waitingAreaPosition
@@ -206,6 +209,9 @@ function self:ServerAwake()
     server.PlayerDisconnected:Connect(function(player)
         gameInstances:HandlePlayerLeft(player)
     end)
+    e_sendCancelMatchmakingToServer:Connect(function(player)
+        gameInstances:HandlePlayerLeft(player)
+    end)
     e_sendReadyForMatchmakingToServer:Connect(function(player)
         gameInstances:HandleNewPlayer(player)
     end)
@@ -217,14 +223,14 @@ end
 function self:ClientAwake()
     playerHud = playerHudGameObject:GetComponent("RacerUIView")
     cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
-    playerHud.ShowWelcomeScreen(function()
-        e_sendReadyForMatchmakingToServer:FireServer()
-    end)
+    -- playerHud.ShowWelcomeScreen(function()
+        -- e_sendReadyForMatchmakingToServer:FireServer()
+    -- end)
     e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn,randomBoard)
-        local instancePosition = GetGameInstancePosition(gameIndex) 
+        local instancePosition = GetGameInstancePosition(gameIndex)
         p1.character:Teleport(instancePosition + gamesInfo.player1SpawnRelativePosition,function() end)
         p2.character:Teleport(instancePosition + gamesInfo.player2SpawnRelativePosition,function() end)
-        if(p1 == client.localPlayer or p2 == client.localPlayer) then    
+        if(p1 == client.localPlayer or p2 == client.localPlayer) then
             raceGame.transform.position = instancePosition
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraGameRotation)
             cameraRoot:GetComponent("CustomRTSCamera").CenterOn(instancePosition)
@@ -238,11 +244,12 @@ function self:ClientAwake()
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
-            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition) 
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition)
         end
     end)
     e_sendMatchCancelledToClient:Connect(function()
         -- Handle case where game has already finished
+        playGameHandlerGameObject:GetComponent("PlayGameHandler").SetState("ModeSelection")
         if(not playerHud.IsResultShowing()) then
             -- Exit game
             raceGame:GetComponent("RaceGame").EndMatch()
@@ -253,12 +260,22 @@ function self:ClientAwake()
     end)
 end
 
+function EnterMatchmaking()
+    e_sendReadyForMatchmakingToServer:FireServer()
+end
+
+function ExitMatchmaking()
+    e_sendCancelMatchmakingToServer:FireServer()
+end
+
 function GameFinished(_gameIndex,playerWhoWon)
     audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
+    -- Notify Player Handler
+    playGameHandlerGameObject:GetComponent("PlayGameHandler").SetState("ModeSelection")
     playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
         e_sendReadyForMatchmakingToServer:FireServer()
     end)
-    if(client.localPlayer ~= playerWhoWon) then 
+    if(client.localPlayer ~= playerWhoWon) then
         e_sendMatchFinishedToServer:FireServer(_gameIndex)
     end
 end
@@ -276,7 +293,7 @@ function ServerVectorAdd(a,b)
 end
 
 function ValidateTileConfigurations()
-    for i =1 , #tileConfigurations do 
+    for i =1 , #tileConfigurations do
         local _count = 0
         for k , v in pairs(tileConfigurations[i]) do
             _count += v
@@ -309,7 +326,7 @@ function GenerateRandomBoard()
     if(randomConfig["Teleport"] ~= nil) then
         -- generate index in middle
         local middleIndex = GetRandomExcluding(8, 22,usedIndices)
-        -- Then generate teleport index 
+        -- Then generate teleport index
         teleportIndex1 = GetRandomExcluding(middleIndex - 6, middleIndex - 2,usedIndices)
         table.insert(usedIndices,teleportIndex1)
         teleportIndex2 = GetRandomExcluding(middleIndex + 2, middleIndex + 6,usedIndices)
@@ -317,7 +334,7 @@ function GenerateRandomBoard()
     end
     local remaingTiles = {}
     for k , v in pairs(randomConfig) do
-        for i = 1, v do 
+        for i = 1, v do
             if ( k ~= "Anomaly" and k ~= "Teleport") then
                 table.insert(remaingTiles,k)
             end

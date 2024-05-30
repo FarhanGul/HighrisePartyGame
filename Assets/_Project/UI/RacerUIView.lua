@@ -44,17 +44,17 @@ end
 
 function self:ClientAwake()
     Initialize()
-    playTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-        if(root:Q("welcome_group").visible) then
-            CloseWelcomeScreen()
-        elseif(root:Q("result_group").visible) then
-            CloseResult()
-        elseif(root:Q("opponent_left_group").visible) then
-            CloseOpponentLeft()
-        end
-        SetPlayMatchButton(false)
-        audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-    end)
+    -- playTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
+    --     if(root:Q("welcome_group").visible) then
+    --         CloseWelcomeScreen()
+    --     elseif(root:Q("result_group").visible) then
+    --         CloseResult()
+    --     elseif(root:Q("opponent_left_group").visible) then
+    --         CloseOpponentLeft()
+    --     end
+    --     SetPlayMatchButton(false)
+    --     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+    -- end)
 end
 
 function SetBoard(_board)
@@ -78,7 +78,7 @@ function UpdateGameView()
     if(racers.IsLocalRacerTurn()) then 
         root:Q("game_help"):SetPrelocalizedText("IT'S YOUR TURN", false)
     else 
-        root:Q("game_help"):SetPrelocalizedText("IT'S YOUR OPPONENET'S TURN", false)
+        root:Q("game_help"):SetPrelocalizedText("IT'S YOUR OPPONENT'S TURN", false)
     end
 
     for i=1,2 do
@@ -126,7 +126,6 @@ function Initialize()
     root:Q("waiting_title"):SetPrelocalizedText(strings.title, false)
     root:Q("waiting_help"):SetPrelocalizedText("PLEASE WAIT FOR MATCH", false)
     root:Q("game_title"):SetPrelocalizedText(strings.title, false)
-    
 
     -- Set Intial State
     root:Q("waiting_for_match_group").visible = false
@@ -136,8 +135,8 @@ function Initialize()
 end
 
 function SetPlayMatchButton(isActive)
-    playTapHandler.gameObject:SetActive(isActive)
-    playPressedGameObject:SetActive(not isActive)
+    -- playTapHandler.gameObject:SetActive(isActive)
+    -- playPressedGameObject:SetActive(not isActive)
 end
 
 function ShowWelcomeScreen(onClose)

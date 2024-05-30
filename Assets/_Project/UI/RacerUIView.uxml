@@ -73,6 +73,9 @@
     </VisualElement>
 
     <VisualElement name="welcome_group" class="popup" picking-mode="Ignore">
+      <hr:UIButton name="test_button">
+        <hr:UILabel name="test_button_text" class="title_text" picking-mode="Ignore"/>
+      </hr:UIButton>
       <hr:UILabel name="welcome_title" class="title_text" picking-mode="Ignore"/>
       <hr:UILabel name="welcome_subtitle" class="subtitle_text"  picking-mode="Ignore"/>
       <hr:UILabel name="welcome_description" class="normal_text"  picking-mode="Ignore"/>
