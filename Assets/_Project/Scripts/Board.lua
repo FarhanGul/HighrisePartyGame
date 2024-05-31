@@ -93,7 +93,7 @@ function SetHealth(_id,_health)
         audioManagerGameObject:GetComponent("AudioManager"):PlayDamage()
     end
     if(health[_id]  <= 0) then
-        matchmaker.GameFinished(gameIndex,racers:GetOtherPlayer())
+        matchmaker.GameFinished(gameIndex,racers:GetOtherPlayer(_id))
     end
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
 end
