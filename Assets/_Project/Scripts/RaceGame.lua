@@ -47,6 +47,14 @@ local function Racers()
             end
             return c
         end,
+        GetBotRacer = function(self)
+            for k,v in pairs(self.list) do
+                if(k.isBot ~= nil) then
+                    return v
+                end
+            end
+            return nil
+        end,
         GetOpponentRacer = function(self,player)
             return self:GetFromId(self.GetOtherId(self:GetFromPlayer(player).id))
         end,

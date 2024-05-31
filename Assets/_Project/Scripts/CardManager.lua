@@ -37,12 +37,11 @@ local isRollRequestInProgress
 local didRoll
 local debugRoll = nil
 local debugPlayedCard = nil
+local botRacer = nil
 
 -- Events
 local e_sendCardsToServer = Event.new("sendCardsToServer")
 local e_sendCardsToClient = Event.new("sendCardsToClient")
-local e_sendHandDiscardedToServer = Event.new("sendHandDiscardedToServer")
-local e_sendHandDiscardedToClient = Event.new("sendHandDiscardedToClient")
 local e_sendDrawCardToServer = Event.new("sendDrawCardToServer")
 local e_sendDrawCardToClient = Event.new("sendDrawCardToClient")
 local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
@@ -52,27 +51,33 @@ local e_sendRollToClients = Event.new("sendRollToClients")
 
 function self:ServerAwake()
     e_sendCardsToServer:Connect(function(player,opponentPlayer,_cards)
-        e_sendCardsToClient:FireClient(opponentPlayer,_cards)
-    end)
-    e_sendHandDiscardedToServer:Connect(function(player,opponentPlayer)
-        e_sendHandDiscardedToClient:FireClient(player,player)
-        e_sendHandDiscardedToClient:FireClient(opponentPlayer,player)
+        if(opponentPlayer.isBot == nil) then
+            e_sendCardsToClient:FireClient(opponentPlayer,_cards)
+        end
     end)
     e_sendDrawCardToServer:Connect(function(player,playerWhoDrew,opponentPlayer,cardsToDraw)
         local newCards = {}
         for i = 1, cardsToDraw do
             table.insert(newCards,GetRandomCard())
         end
-        e_sendDrawCardToClient:FireClient(playerWhoDrew,playerWhoDrew,newCards)
-        e_sendDrawCardToClient:FireClient(opponentPlayer,playerWhoDrew,newCards)
+        if(playerWhoDrew.isBot == nil) then
+            e_sendDrawCardToClient:FireClient(playerWhoDrew,playerWhoDrew,newCards)
+        end
+        if(opponentPlayer.isBot == nil) then
+            e_sendDrawCardToClient:FireClient(opponentPlayer,playerWhoDrew,newCards)
+        end
     end)
     e_sendPlayCardToServer:Connect(function(player,opponentPlayer,_playedCard)
         e_sendPlayCardToClient:FireClient(player,player,_playedCard)
-        e_sendPlayCardToClient:FireClient(opponentPlayer,player,_playedCard)
+        if(opponentPlayer.isBot == nil) then
+            e_sendPlayCardToClient:FireClient(opponentPlayer,player,_playedCard)
+        end
     end)
     e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
         e_sendRollToClients:FireClient(player,id,roll)
-        e_sendRollToClients:FireClient(opponentPlayer,id,roll)
+        if(opponentPlayer.isBot == nil) then
+            e_sendRollToClients:FireClient(opponentPlayer,id,roll)
+        end
     end)
 end
 
@@ -101,16 +106,7 @@ function self:ClientAwake()
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
 
     e_sendRollToClients:Connect(function(id, roll)
-        board.Move(id,roll,function() 
-            local skipOpponentTurn = false
-            if(GetPlayedCard() == "Zap") then skipOpponentTurn = true end
-            if(not skipOpponentTurn) then
-                racers:GetFromId(id).isTurn = false
-                racers:GetFromId(racers.GetOtherId(id)).isTurn = true
-            end
-            isRollRequestInProgress = false
-            TurnEnd()
-        end)
+        board.Move(id,roll,function() HandleMoveFinished(id) end)
     end)
 
     e_sendPlayCardToClient:Connect(function(_player,_playedCard)
@@ -147,11 +143,6 @@ function self:ClientAwake()
         OnCardCountUpdated()
     end)
 
-    e_sendHandDiscardedToClient:Connect(function(_playerWhoseHandIsDiscarded)
-        cards[_playerWhoseHandIsDiscarded] = {}
-        OnCardCountUpdated()
-    end)
-
     e_sendDrawCardToClient:Connect(function(playerWhoDrew,newCards)
         for i = 1 , #newCards do
             table.insert(cards[playerWhoDrew],newCards[i])
@@ -167,6 +158,17 @@ function self:ClientAwake()
             e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetRacerWhoseTurnItIs().id ,math.random(1,6)) 
         end
     end)
+end
+
+function HandleMoveFinished(id)
+    local skipOpponentTurn = false
+    if(GetPlayedCard() == "Zap") then skipOpponentTurn = true end
+    if(not skipOpponentTurn) then
+        racers:GetFromId(id).isTurn = false
+        racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+    end
+    isRollRequestInProgress = false
+    TurnEnd()
 end
 
 function HandleCardAudio(_card)
@@ -220,12 +222,6 @@ function OnCardCountUpdated()
     if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     UpdateView()
-end
-
-function SendHandDiscardedToServer(player)
-    if(#cards[player] > 0) then
-        e_sendHandDiscardedToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer))
-    end
 end
 
 function StealCards(thief,victim)
@@ -309,7 +305,17 @@ function Initialize(_racers, _board)
     isRollRequestInProgress = false
     debugRoll = nil
     debugPlayedCard = nil
+    botRacer = _racers:GetBotRacer()
     OnCardCountUpdated()
+    ExecuteBot()
+end
+
+function ExecuteBot()
+    if (botRacer ~= nil and botRacer.isTurn) then
+        Timer.new(1,function()
+            board.Move(botRacer.id,math.random(1,6),function() HandleMoveFinished(botRacer.id) end)  
+        end,false)
+    end
 end
 
 function TurnEnd()
@@ -318,6 +324,7 @@ function TurnEnd()
     debugPlayedCard = nil
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
     UpdateView()
+    ExecuteBot()
 end
 
 function PlaySelectedCard()

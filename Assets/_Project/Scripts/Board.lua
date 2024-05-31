@@ -35,15 +35,21 @@ local e_sendLandedOnSpecialTileToClient = Event.new("sendLandedOnSpecialTileToCl
 function self:ServerAwake()
     e_sendHealthToServer:Connect(function(player,opponentPlayer,id,_health)
         e_sendHealthToClient:FireClient(player,id,_health)
-        e_sendHealthToClient:FireClient(opponentPlayer,id,_health)
+        if(opponentPlayer.isBot == nil) then
+            e_sendHealthToClient:FireClient(opponentPlayer,id,_health)
+        end
     end)
     e_sendLocationToServer:Connect(function(player,opponentPlayer,id,_location)
         e_sendLocationToClient:FireClient(player,id,_location)
-        e_sendLocationToClient:FireClient(opponentPlayer,id,_location)
+        if(opponentPlayer.isBot == nil) then
+            e_sendLocationToClient:FireClient(opponentPlayer,id,_location)
+        end
     end)
     e_sendLandedOnSpecialTileToServer:Connect(function(player,opponentPlayer,landedPlayer,tileType)
         e_sendLandedOnSpecialTileToClient:FireClient(player,landedPlayer,tileType)
-        e_sendLandedOnSpecialTileToClient:FireClient(opponentPlayer,landedPlayer,tileType)
+        if(opponentPlayer.isBot == nil) then
+            e_sendLandedOnSpecialTileToClient:FireClient(opponentPlayer,landedPlayer,tileType)
+        end
     end)
 end
 
@@ -308,7 +314,7 @@ function _MovePiece(id, amount)
     SetPiecePosition(id)
     audioManagerGameObject:GetComponent("AudioManager"):PlayMove()
     amount -= 1
-    local newTimer = Timer.new(0.25,function() _MovePiece(id, amount) end,false)
+    Timer.new(0.25,function() _MovePiece(id, amount) end,false)
 end
 
 function GetHealth()

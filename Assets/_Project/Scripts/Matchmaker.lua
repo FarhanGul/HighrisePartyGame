@@ -1,64 +1,10 @@
+local boardGenerator = require("BoardGenerator")
+
 local gamesInfo = {
     totalGameInstances = 256,
     waitingAreaPosition = Vector3.new(0,0,0),
     player1SpawnRelativePosition = Vector3.new(5.3,0.96,0),
     player2SpawnRelativePosition = Vector3.new(-5.3,0.96,0)
-}
-
--- Total Tiles 31
-local tileConfigurations = {
-    {
-        -- 1 - A bit of everything
-        Default = 10,
-        Draw = 4,
-        Mine = 2,
-        Draw3 = 1,
-        Burn = 2,
-        Snare = 1,
-        Recharge = 2,
-        Draw2 = 2,
-        Dome = 4,
-        Teleport = 2,
-        Anomaly = 1
-    },
-    {
-        -- 2 - Lots of cards and lot of burns
-        Default = 8,
-        Draw = 8,
-        Mine = 2,
-        Draw3 = 1,
-        Burn = 4,
-        Snare = 1,
-        Recharge = 1,
-        Draw2 = 2,
-        Dome = 1,
-        Teleport = 2,
-        Anomaly = 1
-    },
-    {
-        -- 3 - Lots of mines and recharges
-        Default = 8,
-        Draw = 4,
-        Mine = 5,
-        Draw3 = 1,
-        Snare = 1,
-        Recharge = 5,
-        Draw2 = 2,
-        Dome = 2,
-        Teleport = 2,
-        Anomaly = 1
-    },
-    {
-        -- 4 - Safe
-        Default = 10,
-        Draw = 8,
-        Recharge = 2,
-        Mine = 2,
-        Draw2 = 2,
-        Dome = 4,
-        Teleport = 2,
-        Anomaly = 1
-    }
 }
 
 --Public Variables
@@ -89,9 +35,11 @@ local playerHud
 local e_sendStartMatchToClient = Event.new("sendStartMatchToClient")
 local e_sendMatchCancelledToClient = Event.new("sendMatchCancelledToClient")
 local e_sendMoveToWaitingAreaToClient = Event.new("sendMoveToWaitingAreaToClient")
-local e_sendReadyForMatchmakingToServer= Event.new("sendReadyForMatchmakingToServer")
-local e_sendCancelMatchmakingToServer= Event.new("sendCancelMatchmakingToServer")
-local e_sendMatchFinishedToServer= Event.new("sendMatchFinishedToServer")
+local e_sendReadyForMatchmakingToServer = Event.new("sendReadyForMatchmakingToServer")
+local e_sendCancelMatchmakingToServer = Event.new("sendCancelMatchmakingToServer")
+local e_sendMatchFinishedToServer = Event.new("sendMatchFinishedToServer")
+local e_sendMoveRequestToServer = Event.new("sendMoveRequestToServer")
+local e_sendMoveCommandToClient = Event.new("sendMoveCommandToClient")
 --
 
 --Classes
@@ -173,7 +121,7 @@ function GameInstances()
                     v.firstTurn = math.random(1,2)
                     v.p1.character.transform.position = ServerVectorAdd(GetGameInstancePosition(v.gameIndex) , gamesInfo.player1SpawnRelativePosition )
                     v.p2.character.transform.position = ServerVectorAdd(GetGameInstancePosition(v.gameIndex) , gamesInfo.player2SpawnRelativePosition )
-                    e_sendStartMatchToClient:FireAllClients(v.gameIndex,v.p1,v.p2,v.firstTurn,GenerateRandomBoard())
+                    e_sendStartMatchToClient:FireAllClients(v.gameIndex,v.p1,v.p2,v.firstTurn,boardGenerator.GenerateRandomBoard())
                     return
                 end
             end
@@ -201,7 +149,7 @@ function GameInstances()
 end
 
 function self:ServerAwake()
-    ValidateTileConfigurations()
+    boardGenerator.ValidateTileConfigurations()
     gameInstances = GameInstances()
     gameInstances:Initialize()
     server.PlayerConnected:Connect(function(player)
@@ -217,6 +165,10 @@ function self:ServerAwake()
     end)
     e_sendMatchFinishedToServer:Connect(function(player,_gameIndex)
         gameInstances:HandleGameFinished(_gameIndex)
+    end)
+    e_sendMoveRequestToServer:Connect(function(player,newPlayerPosition,newCameraRotation)
+        player.character.transform.position = newPlayerPosition
+        e_sendMoveCommandToClient:FireAllClients(player,newPlayerPosition,newCameraRotation)
     end)
 end
 
@@ -247,6 +199,13 @@ function self:ClientAwake()
             cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition)
         end
     end)
+    e_sendMoveCommandToClient:Connect(function(player,newPlayerPosition,newCameraRotation)
+        player.character:Teleport(newPlayerPosition,function() end)
+        if(player == client.localPlayer) then
+            cameraRoot:GetComponent("CustomRTSCamera").SetRotation(newCameraRotation)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(newPlayerPosition)
+        end
+    end)
     e_sendMatchCancelledToClient:Connect(function()
         -- Handle case where game has already finished
         playGameHandlerGameObject:GetComponent("PlayGameHandler").SetState("ModeSelection")
@@ -258,6 +217,19 @@ function self:ClientAwake()
             end)
         end
     end)
+end
+
+function StartBotMatch()
+    local bot = {
+        isBot = true,
+        name = "Glados"
+    }
+    raceGame:GetComponent("RaceGame").StartMatch(-1,client.localPlayer,bot,math.random(1,2),boardGenerator.GenerateRandomBoard())
+    local instancePosition = GetGameInstancePosition(-1)
+    e_sendMoveRequestToServer:FireServer(instancePosition + gamesInfo.player1SpawnRelativePosition,cameraGameRotation)
+    raceGame.transform.position = instancePosition
+    playerHud.SetLocation( playerHud.Location().Game )
+    playerHud.ShowGameView()
 end
 
 function EnterMatchmaking()
@@ -272,10 +244,10 @@ function GameFinished(_gameIndex,playerWhoWon)
     audioManagerGameObject:GetComponent("AudioManager"):PlayResultNotify()
     -- Notify Player Handler
     playGameHandlerGameObject:GetComponent("PlayGameHandler").SetState("ModeSelection")
-    playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
-        e_sendReadyForMatchmakingToServer:FireServer()
-    end)
-    if(client.localPlayer ~= playerWhoWon) then
+    -- playerHud.ShowResult(client.localPlayer == playerWhoWon,function()
+    --     e_sendReadyForMatchmakingToServer:FireServer()
+    -- end)
+    if( _gameIndex ~= -1 and client.localPlayer ~= playerWhoWon) then
         e_sendMatchFinishedToServer:FireServer(_gameIndex)
     end
 end
@@ -292,94 +264,6 @@ function ServerVectorAdd(a,b)
     return Vector3.new(a.x+b.x, a.y+b.y, a.z+b.z)
 end
 
-function ValidateTileConfigurations()
-    for i =1 , #tileConfigurations do
-        local _count = 0
-        for k , v in pairs(tileConfigurations[i]) do
-            _count += v
-        end
-        if(_count ~= 31) then
-            print("Tile Validation for "..i.." Failed with count ".._count)
-        end
-    end
-end
-
-function GenerateRandomBoard()
-    local printOutput = false
-    local randomConfigIndex = math.random(1,#tileConfigurations)
-    -- randomConfigIndex = 2
-    local randomConfig = tileConfigurations[randomConfigIndex]
-    if(printOutput) then
-        print("<Config Start>")
-        print("ConfigIndex : "..randomConfigIndex)
-        -- for k,v in pairs(randomConfig) do
-        --     print(k.." : "..v)
-        -- end
-        print("<Config End>")
-    end
-    local teleportIndex1,teleportIndex2,anomalyIndex
-    local usedIndices = {}
-    if(randomConfig["Anomaly"] ~= nil) then
-        anomalyIndex = GetRandomExcluding(16, 31, usedIndices)
-        table.insert(usedIndices,anomalyIndex)
-    end
-    if(randomConfig["Teleport"] ~= nil) then
-        -- generate index in middle
-        local middleIndex = GetRandomExcluding(8, 22,usedIndices)
-        -- Then generate teleport index
-        teleportIndex1 = GetRandomExcluding(middleIndex - 6, middleIndex - 2,usedIndices)
-        table.insert(usedIndices,teleportIndex1)
-        teleportIndex2 = GetRandomExcluding(middleIndex + 2, middleIndex + 6,usedIndices)
-        table.insert(usedIndices,teleportIndex2)
-    end
-    local remaingTiles = {}
-    for k , v in pairs(randomConfig) do
-        for i = 1, v do
-            if ( k ~= "Anomaly" and k ~= "Teleport") then
-                table.insert(remaingTiles,k)
-            end
-        end
-    end
-    for i = 1 , 5 do ShuffleArray(remaingTiles) end
-
-    local finalBoard = {}
-    for i = 1 , 31 do
-        if ( i == teleportIndex1 or i == teleportIndex2) then
-            finalBoard[i] = "Teleport"
-        elseif ( i == anomalyIndex) then
-            finalBoard[i] = "Anomaly"
-        else
-            finalBoard[i] = remaingTiles[1]
-            table.remove(remaingTiles,1)
-        end
-    end
-    if(printOutput) then
-        print("<Board Start>")
-        print("Is Valid : "..tostring(#finalBoard == 31))
-        -- for i = 1 , #finalBoard do
-        --     print(i..finalBoard[i])
-        -- end
-        print("<Board End>")
-    end
-    return finalBoard
-end
-
-function ShuffleArray(arr)
-    local n = #arr
-    for i = n, 2, -1 do
-        local j = math.random(i) -- Generate a random index
-        arr[i], arr[j] = arr[j], arr[i] -- Swap elements
-    end
-end
-
 function GetGameInstancePosition(_gameIndex)
     return Vector3.new(_gameIndex * 500, 0, 0)
-end
-
-function GetRandomExcluding(from, to, exclude)
-    local rand = math.random(from , to)
-    while( exclude[rand] ~= nil) do
-        rand = math.random(from , to)
-    end
-    return rand
 end
