@@ -42,42 +42,20 @@ local botRacer = nil
 -- Events
 local e_sendCardsToServer = Event.new("sendCardsToServer")
 local e_sendCardsToClient = Event.new("sendCardsToClient")
-local e_sendDrawCardToServer = Event.new("sendDrawCardToServer")
-local e_sendDrawCardToClient = Event.new("sendDrawCardToClient")
 local e_sendPlayCardToServer = Event.new("sendPlayCardToServer")
 local e_sendPlayCardToClient = Event.new("sendPlayCardToClient")
 local e_sendRollToServer = Event.new("sendRollToServer")
 local e_sendRollToClients = Event.new("sendRollToClients")
 
 function self:ServerAwake()
-    e_sendCardsToServer:Connect(function(player,opponentPlayer,_cards)
-        if(opponentPlayer.isBot == nil) then
-            e_sendCardsToClient:FireClient(opponentPlayer,_cards)
-        end
+    e_sendCardsToServer:Connect(function(player,targetPlayer,_cards)
+        e_sendCardsToClient:FireClient(targetPlayer,_cards)
     end)
-    e_sendDrawCardToServer:Connect(function(player,playerWhoDrew,opponentPlayer,cardsToDraw)
-        local newCards = {}
-        for i = 1, cardsToDraw do
-            table.insert(newCards,GetRandomCard())
-        end
-        if(playerWhoDrew.isBot == nil) then
-            e_sendDrawCardToClient:FireClient(playerWhoDrew,playerWhoDrew,newCards)
-        end
-        if(opponentPlayer.isBot == nil) then
-            e_sendDrawCardToClient:FireClient(opponentPlayer,playerWhoDrew,newCards)
-        end
+    e_sendPlayCardToServer:Connect(function(player,targetPlayer,playerWhoPlayed,_playedCard)
+        e_sendPlayCardToClient:FireClient(targetPlayer,playerWhoPlayed,_playedCard)
     end)
-    e_sendPlayCardToServer:Connect(function(player,opponentPlayer,_playedCard)
-        e_sendPlayCardToClient:FireClient(player,player,_playedCard)
-        if(opponentPlayer.isBot == nil) then
-            e_sendPlayCardToClient:FireClient(opponentPlayer,player,_playedCard)
-        end
-    end)
-    e_sendRollToServer:Connect(function(player,opponentPlayer,id, roll)
-        e_sendRollToClients:FireClient(player,id,roll)
-        if(opponentPlayer.isBot == nil) then
-            e_sendRollToClients:FireClient(opponentPlayer,id,roll)
-        end
+    e_sendRollToServer:Connect(function(player,targetPlayer,id, roll)
+        e_sendRollToClients:FireClient(targetPlayer,id,roll)
     end)
 end
 
@@ -106,47 +84,15 @@ function self:ClientAwake()
     cardSlot_03.gameObject:GetComponent(TapHandler).Tapped:Connect(function() CardSlotClick(3) end)
 
     e_sendRollToClients:Connect(function(id, roll)
-        board.Move(id,roll,function() HandleMoveFinished(id) end)
+        HandleRoll(id, roll)
     end)
 
     e_sendPlayCardToClient:Connect(function(_player,_playedCard)
-        audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-        table.remove(cards[_player],table.find(cards[_player], _playedCard))
-        HandleCardAudio(_playedCard)
-        local isOpponentOnSafeTile = board.IsOnSafeTile(racers:GetOpponentRacer(_player).id)
-        if ( not isOpponentOnSafeTile ) then
-            if(_playedCard == "WormHole") then
-                board.SwapPieces()
-            elseif(_playedCard == "ElectronBlaster") then
-                board.MovePieceToLocation(racers:GetOpponentRacer(_player).id,0)
-            elseif(_playedCard == "MeatHook") then
-                StealCards(_player, racers:GetOpponentPlayer(_player))
-            elseif(_playedCard == "AntimatterCannon") then
-                board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
-            end
-        end
-        if(_playedCard == "Regenerate") then
-            board.ChangeHealth(racers:GetFromPlayer(_player).id,1)
-        end
-        playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-            player = _player.name,
-            text  = "Played ".._playedCard..(isOpponentOnSafeTile and " but was blocked" or ""),
-            help = GetCardHelp(_playedCard)
-        })
-        playedCard = _playedCard
-        isPlayCardRequestInProgress = false
-        OnCardCountUpdated()
+        HandlePlayedCard(_player,_playedCard)
     end)
 
     e_sendCardsToClient:Connect(function(_cards)
         cards = _cards
-        OnCardCountUpdated()
-    end)
-
-    e_sendDrawCardToClient:Connect(function(playerWhoDrew,newCards)
-        for i = 1 , #newCards do
-            table.insert(cards[playerWhoDrew],newCards[i])
-        end
         OnCardCountUpdated()
     end)
 
@@ -155,20 +101,31 @@ function self:ClientAwake()
             isRollRequestInProgress = true
             didRoll = true
             SetInteractableState()
-            e_sendRollToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),racers:GetRacerWhoseTurnItIs().id ,math.random(1,6)) 
+            HandleSyncedRoll(racers:GetRacerWhoseTurnItIs().id)
         end
     end)
 end
 
-function HandleMoveFinished(id)
-    local skipOpponentTurn = false
-    if(GetPlayedCard() == "Zap") then skipOpponentTurn = true end
-    if(not skipOpponentTurn) then
-        racers:GetFromId(id).isTurn = false
-        racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+function HandleSyncedRoll(id)
+    local roll = math.random(1,6)
+    local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
+    if(remotePlayer.isBot == nil) then
+        e_sendRollToServer:FireServer(remotePlayer,id,roll)
     end
-    isRollRequestInProgress = false
-    TurnEnd()
+    HandleRoll(id, roll)
+end
+
+function HandleRoll(id,roll)
+    board.Move(id,roll,function() 
+        local skipOpponentTurn = false
+        if(GetPlayedCard() == "Zap") then skipOpponentTurn = true end
+        if(not skipOpponentTurn) then
+            racers:GetFromId(id).isTurn = false
+            racers:GetFromId(racers.GetOtherId(id)).isTurn = true
+        end
+        isRollRequestInProgress = false
+        TurnEnd()
+    end)
 end
 
 function HandleCardAudio(_card)
@@ -196,15 +153,22 @@ function HandleCardAudio(_card)
     end
 end
 
-function DiscardCards(_instigator,_victim,count)
+function DiscardCards(_victim,count)
     if(#cards[_victim] > 0) then
         local cardsToDiscard = math.min(count,#cards[_victim])
         for i = 1 , cardsToDiscard do
             local randIndex = math.random(1, #cards[_victim])
             table.remove(cards[_victim],randIndex)
         end
-        e_sendCardsToServer:FireServer(racers:GetOpponentPlayer(_instigator),cards)
+        SetSyncedCards()
         OnCardCountUpdated()
+    end
+end
+
+function SetSyncedCards()
+    local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
+    if(remotePlayer.isBot == nil) then
+        e_sendCardsToServer:FireServer(remotePlayer,cards)
     end
 end
 
@@ -229,7 +193,7 @@ function StealCards(thief,victim)
         local randomIndex = math.random(1,#cards[victim])
         table.insert(cards[thief],cards[victim][randomIndex])
         table.remove(cards[victim],randomIndex)
-        e_sendCardsToServer:FireServer(victim,cards)
+        SetSyncedCards()
         OnCardCountUpdated()
     end
 end
@@ -288,7 +252,11 @@ end
 function LandedOnDrawCardTile(count)
     local cardsToDraw = math.min(count,3 - #cards[racers:GetPlayerWhoseTurnItIs()])
     if(cardsToDraw > 0) then
-        e_sendDrawCardToServer:FireServer(racers:GetPlayerWhoseTurnItIs(),racers:GetOpponentPlayer(racers:GetPlayerWhoseTurnItIs()),cardsToDraw)
+        for i = 1, cardsToDraw do
+            table.insert(cards[racers:GetPlayerWhoseTurnItIs()],GetRandomCard())
+        end
+        OnCardCountUpdated()
+        SetSyncedCards()
     end
 end
 
@@ -313,7 +281,7 @@ end
 function ExecuteBot()
     if (botRacer ~= nil and botRacer.isTurn) then
         Timer.new(1,function()
-            board.Move(botRacer.id,math.random(1,6),function() HandleMoveFinished(botRacer.id) end)  
+            HandleSyncedRoll(botRacer.id)
         end,false)
     end
 end
@@ -332,9 +300,46 @@ function PlaySelectedCard()
     if(debugPlayedCard ~= nil ) then playedCard = debugPlayedCard end
     isPlayCardRequestInProgress = true
     if(playedCard == "FlameThrower") then
-        DiscardCards(client.localPlayer,racers:GetOpponentPlayer(client.localPlayer), 3)
+        DiscardCards(racers:GetOpponentPlayer(client.localPlayer), 3)
     end
-    e_sendPlayCardToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),playedCard)
+    SyncedHandlePlayedCard(playedCard)
+end
+
+function SyncedHandlePlayedCard(_playedCard)
+    local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
+    if(remotePlayer.isBot == nil) then
+        e_sendPlayCardToServer:FireServer(remotePlayer,client.localPlayer,_playedCard)
+    end
+    HandlePlayedCard(client.localPlayer,_playedCard)
+end
+
+function HandlePlayedCard(_player,_playedCard)
+    audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+    table.remove(cards[_player],table.find(cards[_player], _playedCard))
+    HandleCardAudio(_playedCard)
+    local isOpponentOnSafeTile = board.IsOnSafeTile(racers:GetOpponentRacer(_player).id)
+    if ( not isOpponentOnSafeTile ) then
+        if(_playedCard == "WormHole") then
+            board.SwapPieces()
+        elseif(_playedCard == "ElectronBlaster") then
+            board.MovePieceToLocation(racers:GetOpponentRacer(_player).id,0)
+        elseif(_playedCard == "MeatHook") then
+            StealCards(_player, racers:GetOpponentPlayer(_player))
+        elseif(_playedCard == "AntimatterCannon") then
+            board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
+        end
+    end
+    if(_playedCard == "Regenerate") then
+        board.ChangeHealth(racers:GetFromPlayer(_player).id,1)
+    end
+    playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+        player = _player.name,
+        text  = "Played ".._playedCard..(isOpponentOnSafeTile and " but was blocked" or ""),
+        help = GetCardHelp(_playedCard)
+    })
+    playedCard = _playedCard
+    isPlayCardRequestInProgress = false
+    OnCardCountUpdated()
 end
 
 function CardSlotClick(cardSlotIndex)

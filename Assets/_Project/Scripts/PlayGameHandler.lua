@@ -23,7 +23,6 @@ function self:ClientAwake()
     self.transform:Find("ModeSelectionGroup/PlayButton"):GetComponent(TapHandler).Tapped:Connect(function()
         audioManager.PlayClick()
         local isHuman = humanTapHandlerOutline.enabled
-        print("Start Match with : "..(isHuman and "Human" or "Bot"))
         if(isHuman) then
             SetState("WaitingForPlayers")
             matchmaker.EnterMatchmaking()

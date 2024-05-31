@@ -33,23 +33,14 @@ local e_sendLandedOnSpecialTileToServer = Event.new("sendLandedOnSpecialTileToSe
 local e_sendLandedOnSpecialTileToClient = Event.new("sendLandedOnSpecialTileToClient")
 
 function self:ServerAwake()
-    e_sendHealthToServer:Connect(function(player,opponentPlayer,id,_health)
-        e_sendHealthToClient:FireClient(player,id,_health)
-        if(opponentPlayer.isBot == nil) then
-            e_sendHealthToClient:FireClient(opponentPlayer,id,_health)
-        end
+    e_sendHealthToServer:Connect(function(player,targetPlayer,id,_health)
+        e_sendHealthToClient:FireClient(targetPlayer,id,_health)
     end)
-    e_sendLocationToServer:Connect(function(player,opponentPlayer,id,_location)
-        e_sendLocationToClient:FireClient(player,id,_location)
-        if(opponentPlayer.isBot == nil) then
-            e_sendLocationToClient:FireClient(opponentPlayer,id,_location)
-        end
+    e_sendLocationToServer:Connect(function(player,targetPlayer,id,_location)
+        e_sendLocationToClient:FireClient(targetPlayer,id,_location)
     end)
-    e_sendLandedOnSpecialTileToServer:Connect(function(player,opponentPlayer,landedPlayer,tileType)
-        e_sendLandedOnSpecialTileToClient:FireClient(player,landedPlayer,tileType)
-        if(opponentPlayer.isBot == nil) then
-            e_sendLandedOnSpecialTileToClient:FireClient(opponentPlayer,landedPlayer,tileType)
-        end
+    e_sendLandedOnSpecialTileToServer:Connect(function(player,targetPlayer,landedPlayer,tileType)
+        e_sendLandedOnSpecialTileToClient:FireClient(targetPlayer,landedPlayer,tileType)
     end)
 end
 
@@ -63,26 +54,49 @@ function self:ClientAwake()
     e_sendHealthToClient:Connect(function(_id,_health)
         SetHealth(_id,_health)
     end)
-    e_sendLocationToClient:Connect(function(id,_location)
-        location[id] = _location
-        SetPiecePosition(id)
+    e_sendLocationToClient:Connect(function(_id,_location)
+        SetLocation(_id, _location)
     end)
     e_sendLandedOnSpecialTileToClient:Connect(function(landedPlayer,tileType)
-        if(landedPlayer ~= nil) then
-            HandleTileAudio(landedPlayer,tileType)
-            if(tileType ~= "Default" and tileType ~= "Start")then
-                local label = tileType
-                if(label == "Draw3") then label = "Draw 3x" end
-                if(label == "Draw2") then label = "Draw 2x" end
-                playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
-                    player = landedPlayer.name,
-                    text  = "Landed on  "..label,
-                    help = GetTileHelp(tileType)
-                })
-            end
-        end
-
+        LandedOnSpecialTile(landedPlayer,tileType)
     end)
+end
+
+function SyncedLandedOnSpecialTile(landedPlayer, tileType)
+    LandedOnSpecialTile(landedPlayer, tileType)
+    local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
+    if(remotePlayer.isBot == nil) then
+        e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),landedPlayer,tileType)
+    end
+end
+
+function LandedOnSpecialTile(landedPlayer,tileType)
+    if(landedPlayer ~= nil) then
+        HandleTileAudio(tileType)
+        if(tileType ~= "Default" and tileType ~= "Start")then
+            local label = tileType
+            if(label == "Draw3") then label = "Draw 3x" end
+            if(label == "Draw2") then label = "Draw 2x" end
+            playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+                player = landedPlayer.name,
+                text  = "Landed on  "..label,
+                help = GetTileHelp(tileType)
+            })
+        end
+    end
+end
+
+function SetSyncedLocation(_id,_location)
+    SetLocation(_id,_location)
+    local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
+    if(remotePlayer.isBot == nil) then
+        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),_id,_location)
+    end
+end
+
+function SetLocation(_id,_location)
+    location[_id] = _location
+    SetPiecePosition(_id)
 end
 
 function IsOnSafeTile(_id)
@@ -91,6 +105,14 @@ end
 
 function ChangeHealth(_id,_change)
     SetHealth(_id, health[_id]+_change)
+end
+
+function SetSyncedHealth(_id,_health)
+    SetHealth(_id,_health)
+    local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
+    if(remotePlayer.isBot == nil) then
+        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),_id,health[_id])
+    end
 end
 
 function SetHealth(_id,_health)
@@ -104,7 +126,7 @@ function SetHealth(_id,_health)
     playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
 end
 
-function HandleTileAudio(landedPlayer, tileType)
+function HandleTileAudio(tileType)
     if(tileType == "Teleport") then
         audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
     end
@@ -261,7 +283,6 @@ end
 function LandedOnTile(id)
     if(not isInitialized)then return end
     local tileType = tiles[location[id]]:GetComponent("BoardTile").GetType()
-    local playerWhoseTurnItIs = client.localPlayer
     if(tileType == "Draw") then
         cardManager.LandedOnDrawCardTile(1)
     elseif(tileType == "Draw2") then
@@ -275,26 +296,26 @@ function LandedOnTile(id)
         else 
             destination = teleportTileLocations[1]
         end
-        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,destination)
+        SetSyncedLocation(id, destination)
     elseif(tileType == "Mine") then
-        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,health[id]-1)
+        SetSyncedHealth(id,health[id]-1)
     elseif(tileType == "Snare") then
-        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,health[id]-2)
+        SetSyncedHealth(id,health[id]-2)
     elseif(tileType == "Recharge") then
-        e_sendHealthToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,health[id]+1)
+        SetSyncedHealth(id,health[id]+1)
     elseif(tileType == "Anomaly") then
-        e_sendLocationToServer:FireServer(racers:GetOpponentPlayer(playerWhoseTurnItIs),id,0)
+        SetSyncedLocation(id, 0)
     elseif(tileType == "Burn") then
-        cardManager.DiscardCards(playerWhoseTurnItIs,playerWhoseTurnItIs,1)
+        cardManager.DiscardCards(racers:GetPlayerWhoseTurnItIs(),1)
     end
-    e_sendLandedOnSpecialTileToServer:FireServer(racers:GetOpponentPlayer(client.localPlayer),client.localPlayer,tileType)
+    SyncedLandedOnSpecialTile(racers:GetPlayerWhoseTurnItIs(),tileType)
 end
 
 function _MovePiece(id, amount)
     if(not isInitialized) then return end
     if( amount == 0 ) then
         -- This is the final tile
-        if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer) then
+        if(racers:GetPlayerWhoseTurnItIs() == client.localPlayer or racers:GetPlayerWhoseTurnItIs().isBot ~= nil) then
             LandedOnTile(id)
         end
         onMoveFinished()

@@ -1846,6 +1846,7 @@ MonoBehaviour:
   _upconverted: 0
   m_matchmakerGameObject: {fileID: 996734108}
   m_raceGameObject: {fileID: 826671485479143528}
+  m_audioManagerGameObject: {fileID: 121602343}
   references:
     version: 2
     RefIds:
