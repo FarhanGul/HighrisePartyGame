@@ -1,5 +1,7 @@
 --!Type(UI)
 
+local refs = require("References")
+
 --Constants
 local strings={
     title = "COSMIC RUSH",
@@ -22,6 +24,16 @@ local turnGenericTextGameObject : GameObject = nil
 local actionMessageGenericTextGameObject : GameObject = nil
 --!SerializeField
 local actionHelpGenericTextGameObject : GameObject = nil
+--!SerializeField
+local actionPanelGameObject : GameObject = nil
+--!SerializeField
+local resultPanelGameObject : GameObject = nil
+--!SerializeField
+local resultGenericTextGameObject : GameObject = nil
+--!SerializeField
+local resultContinueTapHandler : TapHandler = nil
+--!SerializeField
+local playGameHandlerGameObject : GameObject = nil
 
 --!Bind
 local root: VisualElement = nil
@@ -44,17 +56,6 @@ end
 
 function self:ClientAwake()
     Initialize()
-    -- playTapHandler.gameObject:GetComponent(TapHandler).Tapped:Connect(function()
-    --     if(root:Q("welcome_group").visible) then
-    --         CloseWelcomeScreen()
-    --     elseif(root:Q("result_group").visible) then
-    --         CloseResult()
-    --     elseif(root:Q("opponent_left_group").visible) then
-    --         CloseOpponentLeft()
-    --     end
-    --     SetPlayMatchButton(false)
-    --     audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
-    -- end)
 end
 
 function SetBoard(_board)
@@ -127,6 +128,12 @@ function Initialize()
     root:Q("waiting_help"):SetPrelocalizedText("PLEASE WAIT FOR MATCH", false)
     root:Q("game_title"):SetPrelocalizedText(strings.title, false)
 
+    -- Button Handler
+    resultContinueTapHandler.Tapped:Connect(function()
+        refs.Matchmaker().EndMatch()
+        refs.AudioManager().PlayClick()
+    end)
+
     -- Set Intial State
     root:Q("waiting_for_match_group").visible = false
     root:Q("game_view_group").visible = false
@@ -163,6 +170,9 @@ function ShowGameView()
     UpdateAction(nil)
     CloseWaitingForMatch()
     root:Q("game_view_group").visible = true
+
+    actionPanelGameObject:SetActive(true)
+    resultPanelGameObject:SetActive(false)
 end
 
 function CloseGameView()
@@ -177,6 +187,11 @@ function ShowResult(didWin,onClose)
     root:Q("result_win_image"):EnableInClassList("hide", not didWin)
     root:Q("result_lose_image"):EnableInClassList("hide",didWin)
 
+    --New UI
+    actionPanelGameObject:SetActive(false)
+    resultPanelGameObject:SetActive(true)
+    resultGenericTextGameObject:GetComponent("GenericText").SetText(didWin and "You win" or "You Lose")
+    refs.CardManager().SetInteractableState()
 end
 
 function CloseResult()
@@ -197,6 +212,12 @@ function ShowOpponentLeft(onClose)
     SetPlayMatchButton(true)
     OnOpponentLeftScreenClosed = onClose
     root:Q("opponent_left_group").visible = true
+
+    --New UI
+    actionPanelGameObject:SetActive(false)
+    resultPanelGameObject:SetActive(true)
+    resultGenericTextGameObject:GetComponent("GenericText").SetText("Opponent left the match")
+    refs.CardManager().SetInteractableState()
 end
 
 function CloseOpponentLeft()
@@ -241,6 +262,6 @@ function SetActionAndTurn(action,isTurn)
     if(isTurn) then 
         turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR TURN")
     else 
-        turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR OPPONENET'S TURN")
+        turnGenericTextGameObject:GetComponent("GenericText").SetText("IT'S YOUR OPPONENT'S TURN")
     end
 end

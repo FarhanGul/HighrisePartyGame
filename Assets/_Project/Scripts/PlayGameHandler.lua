@@ -25,7 +25,6 @@ function self:ClientAwake()
         local isHuman = humanTapHandlerOutline.enabled
         if(isHuman) then
             SetState("WaitingForPlayers")
-            matchmaker.EnterMatchmaking()
         else
             matchmaker.StartBotMatch()
         end

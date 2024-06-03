@@ -1,3 +1,5 @@
+local refs = require("References")
+
 -- Public
 --!SerializeField
 local debug : boolean = false
@@ -173,12 +175,20 @@ function SetSyncedCards()
 end
 
 function SetInteractableState()
+    emptyHandGenericTextGameObject:GetComponent(MeshRenderer).enabled = #cards[client.localPlayer] == 0
+    local status = refs.Matchmaker().GetMatchStatus() 
+    if(status == "OpponentLeft" or status == "Finished")then
+        rollPressed:SetActive(true)
+        playCardPressed:SetActive(true)
+        rollTapHandler.gameObject:SetActive(false)
+        playCardTapHandler.gameObject:SetActive(false)
+        return
+    end
     local isLocalTurn = racers.IsLocalRacerTurn()
     rollPressed:SetActive(not isLocalTurn or (isLocalTurn and isRollRequestInProgress))
     playCardPressed:SetActive(not isLocalTurn or not CanPlaycard() or didRoll)
     rollTapHandler.gameObject:SetActive(isLocalTurn and not isRollRequestInProgress)
     playCardTapHandler.gameObject:SetActive(isLocalTurn and CanPlaycard() and not didRoll)
-    emptyHandGenericTextGameObject:GetComponent(MeshRenderer).enabled = #cards[client.localPlayer] == 0
 end
 
 

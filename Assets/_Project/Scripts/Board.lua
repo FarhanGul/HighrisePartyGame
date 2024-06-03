@@ -324,6 +324,8 @@ function _MovePiece(id, amount)
     location[id] += 1
     if( location[id] == #tiles + 1) then
         if(laps[id] == TotalLaps ) then
+            location[id] = 0
+            SetPiecePosition(id)
             matchmaker.GameFinished(gameIndex,racers:GetPlayerWhoseTurnItIs())
             return
         end
