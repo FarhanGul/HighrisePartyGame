@@ -7,6 +7,8 @@ local playerHudGameObject : GameObject = nil
 local cardManagerGameObject : GameObject = nil
 --!SerializeField
 local audioManagerGameObject : GameObject = nil
+--!SerializeField
+local botGameObject : GameObject = nil
 
 --Private Variables
 local racers
@@ -109,6 +111,7 @@ function StartMatch(gameIndex, p1,p2,firstTurn,randomBoard)
     playerHud.SetBoard( boardGameObject:GetComponent("Board") )
     localRacer = racers:GetFromPlayer(client.localPlayer)
     boardGameObject:GetComponent("Board").Initialize(gameIndex,racers,p1,p2,randomBoard)
+    botGameObject:SetActive(gameIndex == -1)
 end
 
 function EndMatch()

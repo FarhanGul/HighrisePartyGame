@@ -169,6 +169,8 @@ function self:ServerAwake()
         gameInstances:HandleGameFinished(_gameIndex)
     end)
     e_sendMoveRequestToServer:Connect(function(player,newPlayerPosition,newCameraRotation)
+        print("Move request recieved : "..tostring(newPlayerPosition))
+
         player.character.transform.position = newPlayerPosition
         e_sendMoveCommandToClient:FireAllClients(player,newPlayerPosition,newCameraRotation)
     end)
@@ -223,7 +225,7 @@ end
 function StartBotMatch()
     local bot = {
         isBot = true,
-        name = "Glados"
+        name = "Bot"
     }
     matchStatus = "InProgress"
     raceGame:GetComponent("RaceGame").StartMatch(-1,client.localPlayer,bot,math.random(1,2),boardGenerator.GenerateRandomBoard())
