@@ -1,6 +1,7 @@
 --!Type(Client)
 
 local refs = require("References")
+local common = require("Common")
 
 -- Possible Values : Player1 , Player2 , Bot
 --!SerializeField

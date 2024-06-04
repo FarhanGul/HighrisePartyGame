@@ -344,6 +344,10 @@ function GetHealth()
     return health
 end
 
+function GetLocation()
+    return location
+end
+
 function GetCardManager()
     return cardManager
 end

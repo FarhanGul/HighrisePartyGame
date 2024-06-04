@@ -1,31 +1,18 @@
 local refs = require("References")
+local common = require("Common")
 
 -- Public
 --!SerializeField
 local debug : boolean = false
---!SerializeField
 local diceAnimator : Animator = nil
---!SerializeField
 local diceMesh : Transform = nil
---!SerializeField
 local playCardTapHandler : TapHandler = nil
---!SerializeField
 local rollTapHandler : TapHandler = nil
---!SerializeField
 local rollPressed : GameObject = nil
---!SerializeField
 local playCardPressed : GameObject = nil
---!SerializeField
 local cardSlot_01 : TapHandler = nil
---!SerializeField
 local cardSlot_02 : TapHandler = nil
---!SerializeField
 local cardSlot_03 : TapHandler = nil
---!SerializeField
-local audioManagerGameObject : GameObject = nil
---!SerializeField
-local playerHudGameObject : GameObject = nil
---!SerializeField
 local emptyHandGenericTextGameObject : GameObject = nil
 
 -- Private
@@ -62,6 +49,7 @@ function self:ServerAwake()
 end
 
 function self:ClientAwake()
+    SetReferences()
     if(debug) then
         print("Debug mode activated")
         Chat.TextMessageReceivedHandler:Connect(function(channel,from,message)
@@ -75,7 +63,7 @@ function self:ClientAwake()
                 board.SetLaps({3,3})
                 racers:GetFromId(1).lap = 3
                 racers:GetFromId(2).lap = 3
-                playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
+                refs.RacerUIView().UpdateGameView()
             end
             Chat:DisplayTextMessage(channel, from, message)
         end)
@@ -108,6 +96,19 @@ function self:ClientAwake()
     end)
 end
 
+function SetReferences()
+    diceAnimator = self.transform:Find("Dice/Animator"):GetComponent(Animator)
+    diceMesh = self.transform:Find("Dice/Animator/Mesh")
+    playCardTapHandler = self.transform:Find("BoardCenter/PlayCardButton"):GetComponent(TapHandler)
+    rollTapHandler = self.transform:Find("BoardCenter/RollButton"):GetComponent(TapHandler)
+    rollPressed = self.transform:Find("BoardCenter/RollButtonPressed").gameObject
+    playCardPressed = self.transform:Find("BoardCenter/PlayCardButtonPressed").gameObject
+    cardSlot_01 = self.transform:Find("Cards/CardSlot_01"):GetComponent(TapHandler)
+    cardSlot_02 = self.transform:Find("Cards/CardSlot_02"):GetComponent(TapHandler)
+    cardSlot_03 = self.transform:Find("Cards/CardSlot_03"):GetComponent(TapHandler)
+    emptyHandGenericTextGameObject = self.transform:Find("LabelEmptyHandGenericText").gameObject
+end
+
 function HandleSyncedRoll(id)
     local roll = math.random(1,6)
     local remotePlayer = racers:GetOpponentPlayer(client.localPlayer)
@@ -132,26 +133,26 @@ end
 
 function HandleCardAudio(_card)
     if(_card == "Zap") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
+        refs.AudioManager().PlayZap()
     elseif(_card == "Nos") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
+        refs.AudioManager().PlayNos()
     elseif(_card == "Honk") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayHonk()
+        refs.AudioManager().PlayHonk()
     elseif(_card == "WarpDrive") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayNos()
+        refs.AudioManager().PlayNos()
     elseif(_card == "WormHole") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayTeleport()
+        refs.AudioManager().PlayTeleport()
     elseif(_card == "ElectronBlaster") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayZap()
-        audioManagerGameObject:GetComponent("AudioManager"):PlayLaser()
+        refs.AudioManager().PlayZap()
+        refs.AudioManager().PlayLaser()
     elseif(_card == "MeatHook") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayHook()
+        refs.AudioManager().PlayHook()
     elseif(_card == "AntimatterCannon") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayLaser()
+        refs.AudioManager().PlayLaser()
     elseif(_card == "FlameThrower") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayFlame()
+        refs.AudioManager().PlayFlame()
     elseif(_card == "Regenerate") then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayUpgrade()
+        refs.AudioManager().PlayUpgrade()
     end
 end
 
@@ -194,7 +195,7 @@ end
 
 function OnCardCountUpdated()
     if(#cards[client.localPlayer] > 0) then selectedCard = #cards[client.localPlayer] else selectedCard = -1 end
-    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
+    refs.RacerUIView().UpdateGameView()
     UpdateView()
 end
 
@@ -289,10 +290,59 @@ function Initialize(_racers, _board)
 end
 
 function ExecuteBot()
-    if (botRacer ~= nil and botRacer.isTurn) then
-        Timer.new(1,function()
-            HandleSyncedRoll(botRacer.id)
-        end,false)
+    if (botRacer ~= nil and botRacer.isTurn and refs.Matchmaker().GetMatchStatus() == "InProgress") then
+        -- Fetch Context
+        local c = {
+            botHealth = board.GetHealth()[botRacer.id],
+            enemyHealth = board.GetHealth()[racers:GetOtherId(botRacer.id)],
+            enemyCardCount = #cards[client.localPlayer],
+            botLoc = board.GetLocation()[botRacer.id],
+            enemyLoc = board.GetLocation()[racers:GetOtherId(botRacer.id)],
+            cardsInHand = cards[botRacer.player],
+            isEnemyOnSafeTile = board.IsOnSafeTile(racers:GetOtherId(botRacer.id))
+        }
+
+        -- Order cards by priority
+        local priorityList = {"WormHole","ElectronBlaster","Regenerate","AntimatterCannon","WarpDrive","MeatHook","FlameThrower","Zap","Nos","Honk"}
+        -- Adjust Damage and regeneration based on health
+        -- Adjust Flamethrower based on opponent card count
+        
+        local _chosenCard = nil
+        for i = 1, #priorityList do
+            if(table.find(c.cardsInHand, priorityList[i])) then
+                local _card = priorityList[i]
+                if(_card == "WormHole") then
+                    -- Only play if opponent is signifcantly ahead
+                    local shouldPlay = c.enemyLoc > c.botLoc and math.abs(c.enemyLoc - c.botLoc) > math.random(14,20) and not c.isEnemyOnSafeTile
+                    if(not shouldPlay) then continue end
+                elseif(_card == "MeatHook") then
+                    -- Only play if opponent has a card
+                    local shouldPlay = c.enemyCardCount > 0 and not c.isEnemyOnSafeTile
+                    if(not shouldPlay) then continue end
+                elseif(_card == "ElectronBlaster") then
+                    -- Only play if opponent is almost at end
+                    local shouldPlay = c.enemyLoc > math.random(20,24) and not c.isEnemyOnSafeTile
+                    if(not shouldPlay) then continue end
+                elseif(_card == "Regenerate") then
+                    -- Only play if damaged
+                    local shouldPlay = c.botHealth < 4
+                    if(not shouldPlay) then continue end
+                elseif(_card == "FlameThrower") then
+                    -- Only play if opponent has random 1-2 cards
+                    local shouldPlay = c.enemyCardCount > math.random(1,2) and not c.isEnemyOnSafeTile
+                    if(not shouldPlay) then continue end
+                end
+                _chosenCard = _card
+            end
+        end
+
+        -- Do the executation with waits
+        common.Coroutine(
+            2,
+            function() if(_chosenCard ~= nil) then HandlePlayedCard(botRacer.player,_chosenCard) end  end,
+            _chosenCard == nil and 0 or 4,
+            function() if( refs.Matchmaker().GetMatchStatus() == "InProgress" ) then HandleSyncedRoll(botRacer.id) end end
+        )
     end
 end
 
@@ -300,7 +350,7 @@ function TurnEnd()
     didRoll = false
     playedCard = nil
     debugPlayedCard = nil
-    playerHudGameObject:GetComponent("RacerUIView").UpdateGameView()
+    refs.RacerUIView().UpdateGameView()
     UpdateView()
     ExecuteBot()
 end
@@ -309,9 +359,6 @@ function PlaySelectedCard()
     playedCard = cards[client.localPlayer][selectedCard]
     if(debugPlayedCard ~= nil ) then playedCard = debugPlayedCard end
     isPlayCardRequestInProgress = true
-    if(playedCard == "FlameThrower") then
-        DiscardCards(racers:GetOpponentPlayer(client.localPlayer), 3)
-    end
     SyncedHandlePlayedCard(playedCard)
 end
 
@@ -324,7 +371,7 @@ function SyncedHandlePlayedCard(_playedCard)
 end
 
 function HandlePlayedCard(_player,_playedCard)
-    audioManagerGameObject:GetComponent("AudioManager"):PlayClick()
+    refs.AudioManager().PlayClick()
     table.remove(cards[_player],table.find(cards[_player], _playedCard))
     HandleCardAudio(_playedCard)
     local isOpponentOnSafeTile = board.IsOnSafeTile(racers:GetOpponentRacer(_player).id)
@@ -337,12 +384,14 @@ function HandlePlayedCard(_player,_playedCard)
             StealCards(_player, racers:GetOpponentPlayer(_player))
         elseif(_playedCard == "AntimatterCannon") then
             board.ChangeHealth(racers:GetOpponentRacer(_player).id,-1)
+        elseif(_playedCard == "FlameThrower") then
+            DiscardCards(racers:GetOpponentPlayer(_player), 3)
         end
     end
     if(_playedCard == "Regenerate") then
         board.ChangeHealth(racers:GetFromPlayer(_player).id,1)
     end
-    playerHudGameObject:GetComponent("RacerUIView").UpdateAction({
+    refs.RacerUIView().UpdateAction({
         player = _player.name,
         text  = "Played ".._playedCard..(isOpponentOnSafeTile and " but was blocked" or ""),
         help = GetCardHelp(_playedCard)
@@ -354,7 +403,7 @@ end
 
 function CardSlotClick(cardSlotIndex)
     if(CanPlaycard() and selectedCard ~= cardSlotIndex) then
-        audioManagerGameObject:GetComponent("AudioManager"):PlayHit()
+        refs.AudioManager().PlayHit()
     end
     selectedCard = cardSlotIndex
     UpdateView()
@@ -448,5 +497,5 @@ function _DiceAnimation(id, roll)
     rotation = Vector3.new(x,y,z)
     diceMesh.localEulerAngles = rotation
     diceAnimator:SetTrigger("Flip")
-    audioManagerGameObject:GetComponent("AudioManager"):PlayDiceRoll()
+    refs.AudioManager().PlayDiceRoll()
 end

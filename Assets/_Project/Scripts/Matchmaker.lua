@@ -126,8 +126,6 @@ function GameInstances()
                     if (v.p1 == nil and v.p2 == nil ) then
                         v.p1 = self._slots[1]
                         v.p2 = self._slots[2]
-                        print("p1 : "..tostring(v.p1 == nil))
-                        print("p2 : "..tostring(v.p2 == nil))
                         v.firstTurn = math.random(1,2)
                         v.p1.character.transform.position = ServerVectorAdd(GetGameInstancePosition(v.gameIndex) , gamesInfo.player1SpawnRelativePosition )
                         v.p2.character.transform.position = ServerVectorAdd(GetGameInstancePosition(v.gameIndex) , gamesInfo.player2SpawnRelativePosition )
@@ -137,7 +135,6 @@ function GameInstances()
                         self._slots[2] = nil
                         e_sendSlotStatusToClient:FireAllClients(1,nil)
                         e_sendSlotStatusToClient:FireAllClients(2,nil)
-                        print("Server Created Match with index : "..v.gameIndex)
                         return
                     end
                 end
@@ -169,8 +166,6 @@ function self:ServerAwake()
         gameInstances:HandleGameFinished(_gameIndex)
     end)
     e_sendMoveRequestToServer:Connect(function(player,newPlayerPosition,newCameraRotation)
-        print("Move request recieved : "..tostring(newPlayerPosition))
-
         player.character.transform.position = newPlayerPosition
         e_sendMoveCommandToClient:FireAllClients(player,newPlayerPosition,newCameraRotation)
     end)
@@ -184,8 +179,8 @@ function self:ClientAwake()
     cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
     e_sendStartMatchToClient:Connect(function(gameIndex,p1,p2,firstTurn,randomBoard)
         local instancePosition = GetGameInstancePosition(gameIndex)
-        p1.character:Teleport(instancePosition + gamesInfo.player1SpawnRelativePosition,function() end)
-        p2.character:Teleport(instancePosition + gamesInfo.player2SpawnRelativePosition,function() end)
+        SetPlayerPositionOnClient(p1,instancePosition + gamesInfo.player1SpawnRelativePosition)
+        SetPlayerPositionOnClient(p2,instancePosition + gamesInfo.player2SpawnRelativePosition)
         if(p1 == client.localPlayer or p2 == client.localPlayer) then
             matchStatus = "InProgress"
             raceGame.transform.position = instancePosition
@@ -197,7 +192,7 @@ function self:ClientAwake()
         end
     end)
     e_sendMoveToWaitingAreaToClient:Connect(function(player)
-        player.character:Teleport(gamesInfo.waitingAreaPosition,function() end)
+        SetPlayerPositionOnClient(player,gamesInfo.waitingAreaPosition)
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
@@ -205,7 +200,7 @@ function self:ClientAwake()
         end
     end)
     e_sendMoveCommandToClient:Connect(function(player,newPlayerPosition,newCameraRotation)
-        player.character:Teleport(newPlayerPosition,function() end)
+        SetPlayerPositionOnClient(player,newPlayerPosition)
         if(player == client.localPlayer) then
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(newCameraRotation)
             cameraRoot:GetComponent("CustomRTSCamera").CenterOn(newPlayerPosition)
@@ -220,6 +215,12 @@ function self:ClientAwake()
             onSlotStatusUpdatedEvent[i](slot,player)
         end
     end)
+end
+
+function SetPlayerPositionOnClient(player,newPosition)
+    player.character.usePathfinding = false
+    player.character:Teleport(newPosition,function() end)
+    player.character.usePathfinding = true
 end
 
 function StartBotMatch()
@@ -245,7 +246,6 @@ function SubscribeOnSlotStatusUpdated(event)
 end
 
 function EnterMatchmaking(slot)
-    print("Enter Matchmaking : "..slot)
     e_sendReadyForMatchmakingToServer:FireServer(slot)
 end
 
