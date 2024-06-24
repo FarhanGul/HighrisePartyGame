@@ -2,8 +2,6 @@ local refs = require("References")
 local common = require("Common")
 
 -- Public
---!SerializeField
-local debug : boolean = false
 local diceAnimator : Animator = nil
 local diceMesh : Transform = nil
 local playCardTapHandler : TapHandler = nil
@@ -25,6 +23,8 @@ local isPlayCardRequestInProgress
 local isRollRequestInProgress
 local didRoll
 local debugRoll = nil
+local botDebugRoll = nil
+local botDebugPlayedCard = nil
 local debugPlayedCard = nil
 local botRacer = nil
 
@@ -50,8 +50,8 @@ end
 
 function self:ClientAwake()
     SetReferences()
-    if(debug) then
-        print("Debug mode activated")
+    if(common.CEnableDevCommands()) then
+        print("Development Commands Enabled")
         Chat.TextMessageReceivedHandler:Connect(function(channel,from,message)
             local command = string.sub(message,1,1)
             local param = string.sub(message,3,-1)
@@ -64,6 +64,10 @@ function self:ClientAwake()
                 racers:GetFromId(1).lap = 3
                 racers:GetFromId(2).lap = 3
                 refs.RacerUIView().UpdateGameView()
+            elseif(command == "x") then
+                botDebugRoll = tonumber(param)
+            elseif(command == "y") then
+                botDebugPlayedCard = param
             end
             Chat:DisplayTextMessage(channel, from, message)
         end)
@@ -200,7 +204,7 @@ function OnCardCountUpdated()
 end
 
 function StealCards(thief,victim)
-    if(client.localPlayer == thief and #cards[victim] > 0) then
+    if( ( thief == client.localPlayer or botRacer ~= nil) and #cards[victim] > 0) then
         local randomIndex = math.random(1,#cards[victim])
         table.insert(cards[thief],cards[victim][randomIndex])
         table.remove(cards[victim],randomIndex)
@@ -336,12 +340,24 @@ function ExecuteBot()
             end
         end
 
+        if(botDebugRoll ~= nil) then
+            debugRoll = botDebugRoll
+            botDebugRoll = nil
+        end
+
+        if(botDebugPlayedCard ~= nil) then
+            _chosenCard = botDebugPlayedCard
+            botDebugPlayedCard = nil
+        end
+
         -- Do the executation with waits
         common.Coroutine(
             2,
             function() if(_chosenCard ~= nil) then HandlePlayedCard(botRacer.player,_chosenCard) end  end,
             _chosenCard == nil and 0 or 4,
-            function() if( refs.Matchmaker().GetMatchStatus() == "InProgress" ) then HandleSyncedRoll(botRacer.id) end end
+            function() if( refs.Matchmaker().GetMatchStatus() == "InProgress" ) then
+                HandleSyncedRoll(botRacer.id)
+            end end
         )
     end
 end
