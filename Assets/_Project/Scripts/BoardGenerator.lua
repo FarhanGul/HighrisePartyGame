@@ -32,9 +32,9 @@ local tileConfigurations = {
     },
     {
         -- 3 - Lots of mines and recharges
-        Default = 8,
+        Default = 9,
         Draw = 4,
-        Mine = 5,
+        Mine = 4,
         Draw3 = 1,
         Snare = 1,
         Recharge = 5,
