@@ -16,10 +16,9 @@ function _ExecuteCoroutineStep(args,i)
     end
 end
 
-
     -- Development Constants
 function CUseProductionStorage() return false end
-function CEnableDevCommands() return true end
+function CEnableDevCommands() return false end
 
 -- Storage Keys
 function KTotalWinsLeaderboard() return CUseProductionStorage() and "TotalWinsLeaderboard" or "_TotalWinsLeaderboard" end

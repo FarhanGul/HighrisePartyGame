@@ -165,9 +165,9 @@ function self:ServerAwake()
     e_sendMatchFinishedToServer:Connect(function(player,_gameIndex)
         gameInstances:HandleGameFinished(_gameIndex)
     end)
-    e_sendMoveRequestToServer:Connect(function(player,newPlayerPosition,newCameraRotation)
+    e_sendMoveRequestToServer:Connect(function(player,newPlayerPosition,newCameraPosition,newCameraRotation)
         player.character.transform.position = newPlayerPosition
-        e_sendMoveCommandToClient:FireAllClients(player,newPlayerPosition,newCameraRotation)
+        e_sendMoveCommandToClient:FireAllClients(player,newPlayerPosition,newCameraPosition,newCameraRotation)
     end)
     e_requestSlotStatusFromServer:Connect(function(player)
         gameInstances:SendSlotStatusToClient(player)
@@ -185,7 +185,7 @@ function self:ClientAwake()
             matchStatus = "InProgress"
             raceGame.transform.position = instancePosition
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraGameRotation)
-            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(instancePosition)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(instancePosition,60)
             raceGame:GetComponent("RaceGame").StartMatch(gameIndex,p1,p2,firstTurn,randomBoard)
             playerHud.SetLocation( playerHud.Location().Game )
             playerHud.ShowGameView()
@@ -196,14 +196,14 @@ function self:ClientAwake()
         if(player == client.localPlayer) then
             playerHud.SetLocation( playerHud.Location().Lobby )
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(cameraWaitingAreaRotation)
-            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(gamesInfo.waitingAreaPosition,60)
         end
     end)
-    e_sendMoveCommandToClient:Connect(function(player,newPlayerPosition,newCameraRotation)
+    e_sendMoveCommandToClient:Connect(function(player,newPlayerPosition,newCameraPosition,newCameraRotation)
         SetPlayerPositionOnClient(player,newPlayerPosition)
         if(player == client.localPlayer) then
             cameraRoot:GetComponent("CustomRTSCamera").SetRotation(newCameraRotation)
-            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(newPlayerPosition)
+            cameraRoot:GetComponent("CustomRTSCamera").CenterOn(newCameraPosition,60)
         end
     end)
     e_sendMatchCancelledToClient:Connect(function()
@@ -231,7 +231,7 @@ function StartBotMatch()
     matchStatus = "InProgress"
     raceGame:GetComponent("RaceGame").StartMatch(-1,client.localPlayer,bot,math.random(1,2),boardGenerator.GenerateRandomBoard())
     local instancePosition = GetGameInstancePosition(-1)
-    e_sendMoveRequestToServer:FireServer(instancePosition + gamesInfo.player1SpawnRelativePosition,cameraGameRotation)
+    e_sendMoveRequestToServer:FireServer(instancePosition + gamesInfo.player1SpawnRelativePosition,instancePosition,cameraGameRotation)
     raceGame.transform.position = instancePosition
     playerHud.SetLocation( playerHud.Location().Game )
     playerHud.ShowGameView()
@@ -255,7 +255,7 @@ end
 
 function EndMatch()
     e_sendLeaveMatchToServer:FireServer()
-    e_sendMoveRequestToServer:FireServer(gamesInfo.waitingAreaPosition,cameraWaitingAreaRotation)
+    e_sendMoveRequestToServer:FireServer(gamesInfo.waitingAreaPosition,gamesInfo.waitingAreaPosition,cameraWaitingAreaRotation)
     raceGame:GetComponent("RaceGame").EndMatch()
 end
 
